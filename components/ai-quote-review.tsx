@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { createClient } from "@/lib/supabase/client"
 import { ChevronDown, Loader2, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 type QuoteReviewInput = { squareFootage: number; bedrooms: number; bathrooms: number; serviceType: string; cleaningLevel: string; recurringFrequency: string; pets: number; addOns: string[]; estimatedHours: number; notes: string; checklist: unknown; totalPrice: number }
@@ -11,17 +13,27 @@ export function AIQuoteReview({ quote }: { quote: QuoteReviewInput }) {
   const [review, setReview] = useState<QuoteReview | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [authenticated, setAuthenticated] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setAuthenticated(Boolean(data.user)))
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setAuthenticated(Boolean(session?.user)))
+    return () => listener.subscription.unsubscribe()
+  }, [])
 
   async function handleOpen() {
     const nextOpen = !open
     setOpen(nextOpen)
-    if (!nextOpen || review || loading) return
+    if (!nextOpen || review || loading || !authenticated) return
     setLoading(true)
     setError(null)
     try {
       const response = await fetch("/api/quote-review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(quote) })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || "Unable to review quote")
+      const contentType = response.headers.get("content-type") ?? ""
+      const data = contentType.includes("application/json") ? await response.json() : null
+      if (!response.ok) throw new Error(data?.error || "The AI review service is temporarily unavailable")
+      if (!data) throw new Error("The AI review returned an invalid response")
       setReview(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to review quote")
@@ -34,8 +46,9 @@ export function AIQuoteReview({ quote }: { quote: QuoteReviewInput }) {
       <ChevronDown className={cn("h-4 w-4 text-primary transition-transform", open && "rotate-180")} />
     </button>
     {open && <div className="border-t border-primary/15 px-4 py-4">
-      {loading && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Reviewing your quote...</div>}
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {!authenticated && <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold text-foreground">Sign in to unlock your AI quote review</p><p className="mt-1 text-sm text-muted-foreground">Get pricing feedback, market context, and upsell suggestions for this quote.</p></div><Link href="/login" className="inline-flex shrink-0 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Log in to continue</Link></div>}
+      {authenticated && loading && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Reviewing your quote...</div>}
+      {error && <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive"><p className="font-medium">AI review unavailable</p><p className="mt-1">{error}</p></div>}
       {review && <div className="space-y-4 text-sm"><div className="flex flex-wrap items-center justify-between gap-3"><p className="font-semibold text-foreground">{review.summary}</p><span className="rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground">Confidence {review.confidenceScore}/5</span></div><div className="grid gap-3 sm:grid-cols-3"><div><p className="text-xs text-muted-foreground">Market range</p><p className="font-semibold text-foreground">${review.estimatedMarketPriceRange.min}–${review.estimatedMarketPriceRange.max}</p></div><div><p className="text-xs text-muted-foreground">Labor estimate</p><p className="font-semibold text-foreground">{review.estimatedLaborHours.toFixed(1)} hrs</p></div><div><p className="text-xs text-muted-foreground">Estimated profit</p><p className="font-semibold text-primary">${review.estimatedProfit.toFixed(0)}</p></div></div><p className="leading-relaxed text-muted-foreground">{review.pricingFeedback}</p><div className="grid gap-4 sm:grid-cols-2"><div><p className="font-semibold text-foreground">Suggested upsells</p><ul className="mt-1 list-disc pl-4 text-muted-foreground">{review.suggestedUpsells.map((item) => <li key={item}>{item}</li>)}</ul></div><div><p className="font-semibold text-foreground">Missing services</p><ul className="mt-1 list-disc pl-4 text-muted-foreground">{review.missingServices.map((item) => <li key={item}>{item}</li>)}</ul></div></div></div>}
     </div>}
   </div>

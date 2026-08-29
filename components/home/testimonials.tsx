@@ -23,8 +23,9 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="relative overflow-hidden bg-accent/35 py-20">
-      <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-chart-4/15 blur-3xl" />
+    <section className="relative z-10 -mt-16 overflow-hidden bg-gradient-to-b from-background/0 via-background/90 to-background py-10 sm:-mt-20 sm:py-14">
+      <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-brand-pink/15 blur-3xl" />
+      <div className="pointer-events-none absolute right-10 top-8 h-40 w-40 rounded-full bg-brand-pink/10 blur-3xl" />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -37,11 +38,11 @@ export function Testimonials() {
           {testimonials.map((t) => (
             <figure
               key={t.name}
-              className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+              className="rounded-2xl border border-brand-pink/20 bg-card p-6 shadow-sm"
             >
               <div className="mb-3 flex gap-0.5">
                 {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <Star key={i} className="h-4 w-4 fill-brand-pink text-brand-pink" />
                 ))}
               </div>
               <blockquote className="mb-4 text-sm leading-relaxed text-card-foreground">

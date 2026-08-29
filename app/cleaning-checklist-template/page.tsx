@@ -143,17 +143,17 @@ const checklistPreviews = [
   {
     title: "Residential Cleaning Checklist",
     desc: "Perfect for standard weekly, bi-weekly, or monthly recurring clients.",
-    sections: ["Living Areas (10 items)", "Kitchen (10 items)", "Bathrooms (10 items)", "Bedrooms (10 items)", "Final Checks (10 items)"],
+    sections: ["Living Areas", "Kitchen", "Bathrooms", "Bedrooms", "Final Checks"],
   },
   {
     title: "Deep Cleaning Checklist",
     desc: "For clients who need a thorough clean — inside cabinets, appliances, grout lines, and more.",
-    sections: ["Kitchen Deep Clean (10 items)", "Bathrooms Deep Clean (10 items)", "Bedroom & Living Areas (10 items)", "Windows & Surfaces (10 items)", "Final Checks (10 items)"],
+    sections: ["Kitchen Deep Clean", "Bathrooms Deep Clean", "Bedroom & Living Areas", "Windows & Surfaces", "Final Checks"],
   },
   {
     title: "Move-In / Move-Out Checklist",
     desc: "Built for vacant properties — covers every area a landlord or property manager will inspect.",
-    sections: ["Kitchen (10 items)", "Bathrooms (10 items)", "Bedrooms & Living Areas (10 items)", "Windows & Doors (10 items)", "Final Checks (10 items)"],
+    sections: ["Kitchen", "Bathrooms", "Bedrooms & Living Areas", "Windows & Doors", "Final Checks"],
   },
 ]
 
@@ -248,19 +248,13 @@ export default function CleaningChecklistTemplatePage() {
           ))}
         </div>
 
-        {/* Mid CTA */}
-        <div className="mb-10 rounded-2xl border border-primary/20 bg-primary/5 p-6 text-center">
-          <p className="mb-1 font-semibold text-foreground">Ready to raise the quality of every clean?</p>
-          <p className="mb-4 text-sm text-muted-foreground">Download all 3 checklists free — no login, no credit card.</p>
-          <Button className="gap-2" onClick={() => setModalOpen(true)}>
-            <Download className="h-4 w-4" />
-            Download Free Checklists
-          </Button>
-        </div>
-
         {/* How to use */}
-        <h2 className="mb-3 text-2xl font-bold text-foreground">How to Use These Checklists</h2>
-        <ul className="mb-8 space-y-2 text-muted-foreground">
+        <div className="mb-10 rounded-2xl border border-primary/20 bg-primary/5 px-6 py-7 sm:px-8">
+          <div className="mb-5 flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">✓</span>
+            <h2 className="text-2xl font-bold text-foreground">How to Use These Checklists</h2>
+          </div>
+          <ul className="space-y-3 text-muted-foreground">
           {[
             "Print one checklist per job and hand it to your cleaner",
             "Have the cleaner initial or check off each item as completed",
@@ -273,7 +267,8 @@ export default function CleaningChecklistTemplatePage() {
               {item}
             </li>
           ))}
-        </ul>
+          </ul>
+        </div>
 
         {/* Calculator link */}
         <div className="mb-10 rounded-2xl border border-border bg-card p-6">

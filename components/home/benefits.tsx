@@ -11,9 +11,11 @@ const benefits = [
 
 export function Benefits() {
   return (
-    <section className="relative overflow-hidden bg-background py-20">
+    <section className="relative isolate overflow-hidden border-y border-border bg-gradient-to-br from-secondary via-background to-accent/45 py-20">
+      <div className="pointer-events-none absolute inset-0 bg-[url('/images/cleaning-brand-pattern.png')] bg-cover bg-center opacity-24" />
+      <div className="pointer-events-none absolute inset-0 bg-background/45" />
       <div className="pointer-events-none absolute right-0 top-10 h-56 w-56 rounded-full bg-chart-2/10 blur-3xl" />
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+      <div className="relative mx-auto max-w-3xl px-4 sm:px-6">
         <div className="mb-10 text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Built for cleaners who want to grow
@@ -38,7 +40,7 @@ export function Benefits() {
           </h3>
           <div className="mt-7 flex justify-center">
             <Button size="lg" className="min-w-44 shadow-sm" asChild>
-              <Link href="/dashboard">Get Started Free</Link>
+              <Link href="/login">Login or Create an Account</Link>
             </Button>
           </div>
           <p className="mt-4 text-xs text-primary-foreground/75">

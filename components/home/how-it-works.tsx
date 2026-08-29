@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowRight, Home, Zap, Send } from "lucide-react"
+import Image from "next/image"
+import { Home, Zap, Send } from "lucide-react"
 
 const steps = [
   {
@@ -25,12 +25,12 @@ const steps = [
 ]
 
 export function HowItWorks() {
-  const [showSummary, setShowSummary] = useState(false)
-
   return (
-    <section className="relative overflow-hidden border-y border-border bg-card py-20">
-      <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-chart-3/10 blur-3xl" />
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section className="relative isolate overflow-hidden bg-secondary/20 py-12 sm:py-16">
+      <Image src="/images/cleaning-tools-banner-v2.png" alt="" fill sizes="100vw" className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover object-center opacity-55" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/95 via-background/65 to-secondary/20" />
+      <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-brand-blue/10 blur-3xl" />
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             How It Works
@@ -38,41 +38,18 @@ export function HowItWorks() {
           <p className="mt-3 text-base text-muted-foreground">
             Three simple steps to professional pricing
           </p>
-          <button
-            type="button"
-            onClick={() => setShowSummary((current) => !current)}
-            aria-expanded={showSummary}
-            className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
-          >
-            {showSummary ? "Hide workflow summary" : "Explore the workflow"}
-            <ArrowRight className={`h-4 w-4 transition-transform ${showSummary ? "rotate-90" : ""}`} aria-hidden="true" />
-          </button>
         </div>
 
-        {showSummary && (
-          <div className="mb-8 grid gap-x-8 gap-y-5 border-y border-primary/20 py-5 text-left sm:grid-cols-3">
-            <div><p className="font-semibold text-foreground">Quote faster</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Use your pricing rules to create a polished estimate in seconds.</p></div>
-            <div><p className="font-semibold text-foreground">Stay organized</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Keep client details, quotes, and follow-ups together in one place.</p></div>
-            <div><p className="font-semibold text-foreground">Book confidently</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Turn accepted quotes into scheduled cleaning jobs without retyping.</p></div>
-          </div>
-        )}
-
-        <div className="relative divide-y divide-border sm:flex sm:divide-x sm:divide-y-0">
-          {steps.map((s) => (
-            <div
-              key={s.number}
-              className="flex flex-1 gap-4 py-6 first:pt-0 last:pb-0 sm:block sm:px-7 sm:py-2 sm:first:pl-0 sm:last:pr-0"
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-                  <s.icon className="h-5 w-5" />
-                </div>
-                <span className="text-3xl font-black text-muted-foreground/30 select-none leading-none">
-                  {s.number}
-                </span>
+        <div className="relative grid gap-8 border-l border-primary/25 pl-7 sm:grid-cols-3 sm:gap-0 sm:border-l-0 sm:border-t sm:pl-0">
+          {steps.map((s, index) => (
+            <div key={s.number} className="relative sm:px-7 sm:pt-8 sm:first:pl-0 sm:last:pr-0">
+              <div className="absolute -left-[2.15rem] top-0 flex h-9 w-9 items-center justify-center rounded-full border-4 border-secondary bg-primary text-primary-foreground sm:left-0 sm:top-[-1.15rem]">
+                <s.icon className="h-4 w-4" />
               </div>
-              <h3 className="mb-1.5 text-base font-semibold text-card-foreground">{s.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{s.description}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Step {s.number}</p>
+              <h3 className="mt-2 text-lg font-semibold text-foreground">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
+              {index < steps.length - 1 && <span className="absolute right-0 top-[-0.2rem] hidden h-px w-8 bg-primary/25 sm:block" aria-hidden="true" />}
             </div>
           ))}
         </div>

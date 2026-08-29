@@ -1,34 +1,35 @@
-import { Calculator, CalendarDays, Receipt, Users } from "lucide-react"
+"use client"
+
+import { useState } from "react"
 
 const features = [
-  [Calculator, "Smart Quote Calculator", "Create accurate, professional quotes in minutes with pricing that fits the way you work.", "bg-chart-3/15 text-chart-3"],
-  [CalendarDays, "Scheduling & Calendar", "Book jobs, manage your schedule, and keep every appointment in one clear view.", "bg-chart-2/15 text-chart-2"],
-  [Receipt, "Invoices & Payments", "Turn accepted quotes into polished invoices and get paid faster with Stripe.", "bg-chart-4/20 text-chart-4"],
-  [Users, "Client Management", "Keep client notes, history, and communication organized in one welcoming workspace.", "bg-primary/15 text-primary"],
+  ["Smart Quote Calculator", "Create accurate, professional quotes in minutes with pricing that fits the way you work."],
+  ["Scheduling & Calendar", "Book jobs, manage your schedule, and keep every appointment in one clear view."],
+  ["Invoices & Payments", "Turn accepted quotes into polished invoices and get paid faster with Stripe."],
+  ["Client Management", "Keep client notes, history, and communication organized in one welcoming workspace."],
 ] as const
 
 export function FeaturesPreview() {
+  const [openFeature, setOpenFeature] = useState(0)
+
   return (
-    <section className="relative overflow-hidden bg-background py-24 sm:py-32">
+    <section className="relative overflow-visible bg-background py-12 sm:py-16">
       <div className="pointer-events-none absolute left-0 top-20 h-72 w-72 rounded-full bg-chart-4/10 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">One simple workspace</p><h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Everything you need to run your business beautifully.</h2><p className="mt-5 text-lg leading-relaxed text-muted-foreground">From the first estimate to the final payment, every tool works together.</p></div>
-        <div className="mt-16 space-y-8 sm:space-y-12">
-          {features.map(([Icon, title, description, color], index) => (
-            <details key={title} className="group overflow-hidden border-b border-border/70 first:border-t">
-              <summary className="grid cursor-pointer list-none items-center gap-8 px-2 py-8 outline-none transition-colors hover:bg-secondary/35 focus-visible:ring-2 focus-visible:ring-primary sm:grid-cols-2 sm:px-6 sm:py-10">
-                <div className={`${index % 2 ? "sm:order-2" : ""} flex min-h-48 items-center justify-center rounded-2xl bg-background/75`}>
-                  <div className={`rounded-3xl p-8 ${color}`}><Icon className="h-20 w-20" strokeWidth={1.5} /></div>
-                </div>
-                <div className={index % 2 ? "sm:order-1" : ""}>
-                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</p>
-                  <h3 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{title}</h3>
-                  <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">{description}</p>
-                  <p className="mt-6 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></p>
-                </div>
+        <div className="relative mt-8 grid min-w-0 gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-max">
+          <div className="pointer-events-none absolute left-[12%] right-[12%] top-12 hidden border-t border-dashed border-primary/30 lg:block" />
+          {features.map(([title, description], index) => (
+            <details key={title} open={openFeature === index} className="contents group">
+              <summary onClick={(event) => { event.preventDefault(); setOpenFeature(openFeature === index ? -1 : index) }} className={`flex min-h-52 min-w-0 cursor-pointer list-none flex-col items-center justify-center gap-3 rounded-3xl border border-border bg-card px-5 py-6 text-center shadow-sm outline-none transition-all hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-primary group-open:border-primary/40 group-open:shadow-lg group-open:shadow-primary/10 sm:row-start-1 sm:col-span-1 ${index === 0 ? "sm:col-start-1" : index === 1 ? "sm:col-start-2" : index === 2 ? "sm:col-start-3" : "sm:col-start-4"} lg:col-span-1 lg:row-start-1` }>
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground shadow-md shadow-primary/20">{index + 1}</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</span>
+                <span className="text-xl font-bold tracking-tight text-foreground">{title}</span>
+                <span className="text-sm leading-relaxed text-muted-foreground">{description}</span>
+                <span className="inline-flex items-center gap-2 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
               </summary>
-              <div className="border-t border-border/50 bg-secondary/20 px-2 py-6 sm:px-6 sm:py-8">
-                <div className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm">
+              <div style={{ gridColumn: "auto", gridRow: "2", width: "calc(400% + 48px)", marginLeft: `calc(${index} * -100% - ${index} * 16px)` }} className="w-full min-w-0 max-w-none overflow-hidden rounded-3xl border border-primary/20 bg-secondary/95 px-4 py-4 shadow-xl shadow-primary/10 backdrop-blur-sm">
+                <div className="w-full min-w-0 overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm">
                   <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
                     <div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-chart-3" /><span className="text-xs font-semibold text-muted-foreground">CleanQuote Pro</span></div>
                     <span className="text-xs text-muted-foreground">{title}</span>

@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Star, RotateCcw, Info } from "lucide-react"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -78,10 +77,10 @@ function calculateQuote(form: FormState): QuoteResult {
 
 const RESULT_LABELS: { key: keyof Omit<QuoteResult, "totalHours">; label: string; subtitle: string; recommended?: boolean; hoursMultiplier: number }[] = [
   { key: "deepClean", label: "Deep Clean", subtitle: "One-time thorough cleaning", hoursMultiplier: 1 },
-  { key: "moveInMoveOut", label: "Move In / Move Out", subtitle: "Extra time for vacant properties", hoursMultiplier: 1 },
-  { key: "standardSingle", label: "Standard Single", subtitle: "One-time regular cleaning", hoursMultiplier: 0.85 },
   { key: "monthly", label: "Monthly Recurring", subtitle: "Once a month service", hoursMultiplier: 0.85 },
+  { key: "standardSingle", label: "Standard Single", subtitle: "One-time regular cleaning", hoursMultiplier: 0.85 },
   { key: "biweekly", label: "Biweekly Recurring", subtitle: "Every two weeks service", recommended: true, hoursMultiplier: 0.80 },
+  { key: "moveInMoveOut", label: "Move In / Move Out", subtitle: "Extra time for vacant properties", hoursMultiplier: 1 },
   { key: "weekly", label: "Weekly Recurring", subtitle: "Weekly recurring service", hoursMultiplier: 0.75 },
 ]
 
@@ -119,6 +118,7 @@ export function QuoteCalculator() {
   const [result, setResult] = useState<QuoteResult | null>(null)
   const [showPaywall, setShowPaywall] = useState(false)
   const [sqftUnit, setSqftUnit] = useState<"sqft" | "sqm">("sqft")
+  const [selectedTier, setSelectedTier] = useState<keyof Omit<QuoteResult, "totalHours">>("biweekly")
   const { toast } = useToast()
 
   const setField = (field: keyof FormState, value: string) =>
@@ -140,6 +140,7 @@ export function QuoteCalculator() {
   const handleReset = () => {
     setForm(DEFAULT_FORM)
     setResult(null)
+    setSelectedTier("biweekly")
   }
 
 
@@ -308,32 +309,35 @@ export function QuoteCalculator() {
                   ? result.totalHours + 2
                   : result.totalHours * hoursMultiplier
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={key}
+                    onClick={() => setSelectedTier(key)}
+                    aria-pressed={selectedTier === key}
                     className={cn(
-                      "relative flex items-center justify-between rounded-xl border p-4 transition-shadow hover:shadow-sm",
-                      recommended
+                      "relative flex w-full items-center justify-between rounded-xl border p-4 text-left transition-shadow hover:shadow-sm",
+                      selectedTier === key
                         ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20"
                         : "border-border bg-card text-card-foreground",
                     )}
                   >
-                    {recommended && (
+                    {(recommended || selectedTier === key) && (
                       <div className="absolute -top-2.5 left-3">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-yellow-400 px-2 py-0.5 text-[10px] font-semibold text-yellow-900">
-                          <Star className="h-2.5 w-2.5 fill-yellow-900" />
-                          Recommended
+                        <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", recommended && selectedTier !== key ? "bg-yellow-400 text-yellow-900" : "bg-primary text-primary-foreground")}>
+                          {recommended && selectedTier !== key && <Star className="h-2.5 w-2.5 fill-yellow-900" />}
+                          {recommended && selectedTier !== key ? "Recommended" : "Selected"}
                         </span>
                       </div>
                     )}
                     <div>
-                      <p className={cn("text-sm font-medium", recommended ? "text-primary-foreground" : "text-foreground")}>
+                      <p className={cn("text-sm font-medium", selectedTier === key ? "text-primary-foreground" : "text-foreground")}>
                         {label}
                       </p>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button type="button" className={cn("flex items-center gap-1 text-xs mt-0.5", recommended ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                          <button type="button" className={cn("flex items-center gap-1 text-xs mt-0.5", selectedTier === key ? "text-primary-foreground/70" : "text-muted-foreground")}>
                             <span>{subtitle}</span>
-                            <Info className={cn("h-3 w-3 shrink-0", recommended ? "text-primary-foreground" : "text-primary")} />
+                            <Info className={cn("h-3 w-3 shrink-0", selectedTier === key ? "text-primary-foreground" : "text-primary")} />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" showArrow={false} className="bg-white text-foreground border border-border shadow-md rounded-lg px-2.5 py-1.5 space-y-0.5 text-[11px]">
@@ -346,35 +350,24 @@ export function QuoteCalculator() {
                     <span
                       className={cn(
                         "text-xl font-black",
-                        recommended ? "text-primary-foreground" : "text-foreground",
+                        selectedTier === key ? "text-primary-foreground" : "text-foreground",
                       )}
                     >
                       ${result[key].toLocaleString()}
                     </span>
-                  </div>
+                  </button>
                 )
               })}
             </div>
             </TooltipProvider>
 
-            <AIQuoteReview quote={{ squareFootage: parseFloat(form.squareFootage) || 0, bedrooms: parseFloat(form.bedrooms) || 0, bathrooms: parseFloat(form.bathrooms) || 0, serviceType: "Residential cleaning", cleaningLevel: ["Light", "Medium", "Heavy"][parseInt(form.cleanLevel) - 1], recurringFrequency: "Flexible", pets: parseFloat(form.pets) || 0, addOns: [], estimatedHours: result.totalHours, notes: "", checklist: null, totalPrice: result.biweekly }} />
+            <AIQuoteReview quote={{ squareFootage: parseFloat(form.squareFootage) || 0, bedrooms: parseFloat(form.bedrooms) || 0, bathrooms: parseFloat(form.bathrooms) || 0, serviceType: "Residential cleaning", cleaningLevel: ["Light", "Medium", "Heavy"][parseInt(form.cleanLevel) - 1], recurringFrequency: RESULT_LABELS.find(({ key }) => key === selectedTier)?.label ?? "Flexible", pets: parseFloat(form.pets) || 0, addOns: [], estimatedHours: result.totalHours * (RESULT_LABELS.find(({ key }) => key === selectedTier)?.hoursMultiplier ?? 1), notes: "", checklist: null, totalPrice: result[selectedTier] }} />
 
             <p className="mt-4 text-center text-xs text-muted-foreground">
                 Based on ${form.hourlyRate}/hr &middot; {form.squareFootage} {sqftUnit === "sqft" ? "sq ft" : "m²"} &middot;{" "}
               {["Light", "Medium", "Heavy"][parseInt(form.cleanLevel) - 1]} clean
             </p>
 
-            <div className="mt-5 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-center">
-              <p className="text-sm text-muted-foreground">
-                Want to personalize, save, and share this quote?
-              </p>
-              <Link
-                href="/login"
-                className="mt-2 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Log in to continue
-              </Link>
-            </div>
           </div>
         )}
       </div>

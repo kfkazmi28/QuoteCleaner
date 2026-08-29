@@ -16,8 +16,8 @@ export default function HomePage() {
         <FeaturesPreview />
         <HowItWorks />
         <CalculatorCrmInfo />
-        <Benefits />
         <Testimonials />
+        <Benefits />
       </main>
       <Footer />
     </div>

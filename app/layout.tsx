@@ -1,7 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Caveat, Geist, Geist_Mono } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "sonner"
 import { PricingSettingsProvider } from "@/contexts/pricing-settings-context"
@@ -9,6 +9,7 @@ import "./globals.css"
 
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-sans" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
+const caveat = Caveat({ subsets: ["latin"], variable: "--font-hand" })
 
 export const metadata: Metadata = {
   title: "Cleaning Estimate Calculator | CleanQuote Pro",
@@ -38,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} bg-background`} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} bg-background`} suppressHydrationWarning>
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <PricingSettingsProvider>
