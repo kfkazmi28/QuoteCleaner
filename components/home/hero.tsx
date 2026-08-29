@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden bg-secondary py-16 sm:py-24" style={{ backgroundImage: "url('/images/cleaning-brand-pattern.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
+    <section className="relative isolate min-h-[calc(100vh-4rem)] overflow-hidden bg-secondary py-16 sm:py-24" style={{ backgroundImage: "url('/images/cleaning-brand-pattern.png')", backgroundSize: "100% 100%", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-secondary/85 via-background/70 to-accent/65" />
       <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-brand-blue/20 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-chart-2/15 blur-3xl" />
