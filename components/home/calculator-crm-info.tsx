@@ -71,7 +71,6 @@ export function CalculatorCrmInfo() {
         />
         <div className="absolute inset-0 bg-primary/5 mix-blend-multiply" />
       </div>
-      <p className="mt-5 text-center text-xs font-bold uppercase tracking-[0.24em] text-primary">Loved by cleaning pros</p>
     </section>
   )
 }
