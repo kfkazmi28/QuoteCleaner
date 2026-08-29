@@ -249,8 +249,12 @@ export default function CleaningChecklistTemplatePage() {
         </div>
 
         {/* How to use */}
-        <h2 className="mb-3 text-2xl font-bold text-foreground">How to Use These Checklists</h2>
-        <ul className="mb-8 space-y-2 text-muted-foreground">
+        <div className="mb-10 rounded-2xl border border-primary/20 bg-primary/5 px-6 py-7 sm:px-8">
+          <div className="mb-5 flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">✓</span>
+            <h2 className="text-2xl font-bold text-foreground">How to Use These Checklists</h2>
+          </div>
+          <ul className="space-y-3 text-muted-foreground">
           {[
             "Print one checklist per job and hand it to your cleaner",
             "Have the cleaner initial or check off each item as completed",
@@ -263,7 +267,8 @@ export default function CleaningChecklistTemplatePage() {
               {item}
             </li>
           ))}
-        </ul>
+          </ul>
+        </div>
 
         {/* Calculator link */}
         <div className="mb-10 rounded-2xl border border-border bg-card p-6">
