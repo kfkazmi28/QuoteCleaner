@@ -37,7 +37,7 @@ export function CalculatorCrmInfo() {
             </Link>
           </div>
 
-          <div className="divide-y divide-border border-b border-border">
+          <div className="divide-y divide-border">
             {highlights.map(({ icon: Icon, title, description }) => (
               <article key={title} className="flex gap-4 py-6 first:pt-0 last:pb-0">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
