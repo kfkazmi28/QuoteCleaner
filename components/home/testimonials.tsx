@@ -28,6 +28,7 @@ export function Testimonials() {
       <div className="pointer-events-none absolute right-10 top-8 h-40 w-40 rounded-full bg-brand-pink/10 blur-3xl" />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-brand-pink">Loved by cleaning pros</p>
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             What Cleaners Are Saying
           </h2>
@@ -42,7 +43,7 @@ export function Testimonials() {
             >
               <div className="mb-3 flex gap-0.5">
                 {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <Star key={i} className="h-4 w-4 fill-brand-pink text-brand-pink" />
                 ))}
               </div>
               <blockquote className="mb-4 text-sm leading-relaxed text-card-foreground">

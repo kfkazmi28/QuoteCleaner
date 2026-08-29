@@ -28,7 +28,7 @@ export function Benefits() {
               key={b.text}
               className="flex items-center gap-3 py-5 first:pt-5 sm:border-b sm:border-border sm:py-5 sm:[&:nth-child(3)]:border-b-0 sm:[&:nth-child(4)]:border-b-0"
             >
-              <b.icon className="h-4 w-4 shrink-0 text-primary" />
+              <b.icon className={`h-4 w-4 shrink-0 ${b.text === "Look more professional" || b.text === "Works on mobile" ? "text-brand-pink" : "text-primary"}`} />
               <span className="text-sm font-medium text-foreground">{b.text}</span>
             </li>
           ))}
