@@ -24,7 +24,8 @@ const testimonials = [
 export function Testimonials() {
   return (
     <section className="relative overflow-hidden border-t border-brand-blue/20 bg-background/90 py-16 sm:py-20">
-      <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-chart-4/15 blur-3xl" />
+      <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-brand-pink/15 blur-3xl" />
+      <div className="pointer-events-none absolute right-10 top-8 h-40 w-40 rounded-full bg-brand-pink/10 blur-3xl" />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -37,7 +38,7 @@ export function Testimonials() {
           {testimonials.map((t) => (
             <figure
               key={t.name}
-              className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+              className="rounded-2xl border border-brand-pink/20 bg-card p-6 shadow-sm"
             >
               <div className="mb-3 flex gap-0.5">
                 {Array.from({ length: t.rating }).map((_, i) => (
