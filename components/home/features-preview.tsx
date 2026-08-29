@@ -28,7 +28,7 @@ export function FeaturesPreview() {
                 <span className="text-sm leading-relaxed text-muted-foreground">{description}</span>
                 <span className="inline-flex items-center gap-2 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
               </summary>
-              <div className="col-start-1 col-end-[-1] row-start-2 w-full min-w-0 max-w-none overflow-hidden rounded-3xl border border-primary/20 bg-secondary/95 px-4 py-4 shadow-xl shadow-primary/10 backdrop-blur-sm">
+              <div style={{ gridColumn: "1 / -1", gridRow: "2" }} className="w-full min-w-0 max-w-none overflow-hidden rounded-3xl border border-primary/20 bg-secondary/95 px-4 py-4 shadow-xl shadow-primary/10 backdrop-blur-sm">
                 <div className="w-full min-w-0 overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm">
                   <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
                     <div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-chart-3" /><span className="text-xs font-semibold text-muted-foreground">CleanQuote Pro</span></div>
