@@ -10,14 +10,14 @@ function getOpenAI() {
 }
 
 export const quoteReviewSchema = z.object({
-  confidenceScore: z.number().int().min(1).max(5),
-  estimatedMarketPriceRange: z.object({ min: z.number(), max: z.number() }),
-  pricingFeedback: z.string(),
-  suggestedUpsells: z.array(z.string()),
-  missingServices: z.array(z.string()),
-  estimatedLaborHours: z.number().min(0),
-  estimatedProfit: z.number(),
-  summary: z.string(),
+  confidenceScore: z.coerce.number().transform((value) => Math.max(1, Math.min(5, Math.round(value)))),
+  estimatedMarketPriceRange: z.object({ min: z.coerce.number(), max: z.coerce.number() }),
+  pricingFeedback: z.string().default("Pricing looks reasonable for the provided quote details."),
+  suggestedUpsells: z.array(z.string()).default([]),
+  missingServices: z.array(z.string()).default([]),
+  estimatedLaborHours: z.coerce.number().min(0),
+  estimatedProfit: z.coerce.number(),
+  summary: z.string().default("Your quote has been reviewed."),
 })
 
 export type QuoteReview = z.infer<typeof quoteReviewSchema>
@@ -47,7 +47,7 @@ export async function reviewQuote(input: QuoteReviewInput): Promise<QuoteReview>
     messages: [
       {
         role: "system",
-        content: "You are a pricing advisor for professional cleaning businesses. Analyze quotes without changing the provided pricing algorithm. Return only valid JSON matching the requested fields. Use USD, estimate a realistic local-market range conservatively, calculate estimated profit as revenue minus estimated labor at 55% of revenue, and never invent certainty. Keep the summary and feedback concise.",
+        content: "You are a pricing advisor for professional cleaning businesses. Analyze quotes without changing the provided pricing algorithm. Return ONLY one valid JSON object with EVERY field listed below, including estimatedMarketPriceRange as an object with numeric min and max. confidenceScore must be a whole number from 1 to 5. suggestedUpsells and missingServices must always be arrays, even when empty. estimatedLaborHours and estimatedProfit must be numbers. Use USD, estimate a realistic local-market range conservatively, calculate estimated profit as revenue minus estimated labor at 55% of revenue, and keep the summary and feedback concise. Required shape: {confidenceScore: 4, estimatedMarketPriceRange: {min: 250, max: 350}, pricingFeedback: \"...\", suggestedUpsells: [], missingServices: [], estimatedLaborHours: 3.5, estimatedProfit: 90, summary: \"...\"}.",
       },
       {
         role: "user",
@@ -58,5 +58,15 @@ export async function reviewQuote(input: QuoteReviewInput): Promise<QuoteReview>
 
   const raw = completion.choices[0]?.message.content
   if (!raw) throw new Error("The AI returned an empty quote review")
-  return quoteReviewSchema.parse(JSON.parse(raw))
+  const parsed = JSON.parse(raw) as Record<string, unknown>
+  const range = (parsed.estimatedMarketPriceRange ?? {}) as Record<string, unknown>
+  const marketMin = Number(range.min ?? input.totalPrice * 0.9)
+  const marketMax = Number(range.max ?? input.totalPrice * 1.15)
+  return quoteReviewSchema.parse({
+    ...parsed,
+    confidenceScore: parsed.confidenceScore ?? 3,
+    estimatedMarketPriceRange: { min: marketMin, max: marketMax },
+    estimatedLaborHours: parsed.estimatedLaborHours ?? input.estimatedHours,
+    estimatedProfit: parsed.estimatedProfit ?? input.totalPrice * 0.45,
+  })
 }
