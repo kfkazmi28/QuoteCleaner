@@ -17,18 +17,18 @@ export function FeaturesPreview() {
       <div className="pointer-events-none absolute left-0 top-20 h-72 w-72 rounded-full bg-chart-4/10 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">One simple workspace</p><h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Everything you need to run your business beautifully.</h2><p className="mt-5 text-lg leading-relaxed text-muted-foreground">From the first estimate to the final payment, every tool works together.</p></div>
-        <div className="relative mt-10 grid min-w-0 gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="relative mt-10 grid min-w-0 gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-max">
           <div className="pointer-events-none absolute left-[12%] right-[12%] top-12 hidden border-t border-dashed border-primary/30 lg:block" />
           {features.map(([title, description], index) => (
             <details key={title} open={openFeature === index} className="contents group">
-              <summary onClick={(event) => { event.preventDefault(); setOpenFeature(openFeature === index ? -1 : index) }} className="order-1 flex min-h-52 min-w-0 cursor-pointer list-none flex-col items-center justify-center gap-3 rounded-3xl border border-border bg-card px-5 py-6 text-center shadow-sm outline-none transition-all hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-primary group-open:border-primary/40 group-open:shadow-lg group-open:shadow-primary/10 lg:row-start-1">
+              <summary onClick={(event) => { event.preventDefault(); setOpenFeature(openFeature === index ? -1 : index) }} className={`flex min-h-52 min-w-0 cursor-pointer list-none flex-col items-center justify-center gap-3 rounded-3xl border border-border bg-card px-5 py-6 text-center shadow-sm outline-none transition-all hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-primary group-open:border-primary/40 group-open:shadow-lg group-open:shadow-primary/10 sm:row-start-1 ${index === 0 ? "sm:col-start-1" : index === 1 ? "sm:col-start-2" : index === 2 ? "sm:col-start-3" : "sm:col-start-4"}`}>
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground shadow-md shadow-primary/20">{index + 1}</span>
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</span>
                 <span className="text-xl font-bold tracking-tight text-foreground">{title}</span>
                 <span className="text-sm leading-relaxed text-muted-foreground">{description}</span>
                 <span className="inline-flex items-center gap-2 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
               </summary>
-              <div className="order-2 col-span-full row-start-2 max-w-full overflow-hidden rounded-3xl border border-primary/20 bg-secondary/95 px-4 py-4 shadow-xl shadow-primary/10 backdrop-blur-sm lg:row-start-2">
+              <div className="col-span-full row-start-2 max-w-full overflow-hidden rounded-3xl border border-primary/20 bg-secondary/95 px-4 py-4 shadow-xl shadow-primary/10 backdrop-blur-sm">
                 <div className="w-full min-w-0 overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm">
                   <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
                     <div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-chart-3" /><span className="text-xs font-semibold text-muted-foreground">CleanQuote Pro</span></div>
