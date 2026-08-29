@@ -1111,7 +1111,7 @@ export default function DashboardPage() {
                 {/* One-Time Clean */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "oklch(0.72 0.15 80)" }}>One-Time Clean</p>
-                  <div className="grid gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     {oneTimeCleans.map((card) => {
                       const cardKey = card.key
                       const isPreferred = preferredPackage === cardKey
@@ -1171,7 +1171,7 @@ export default function DashboardPage() {
                 {/* Recurring Clean */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "oklch(0.72 0.15 80)" }}>Recurring Clean</p>
-                  <div className="grid gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     {recurringCleans.map((card) => {
                       const cardKey = card.key
                       const isPreferred = preferredPackage === cardKey
