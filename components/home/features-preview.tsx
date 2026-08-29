@@ -9,16 +9,16 @@ const features = [
 
 export function FeaturesPreview() {
   return (
-    <section className="relative overflow-hidden bg-background py-24 sm:py-32">
+    <section className="relative overflow-hidden bg-background py-16 sm:py-20">
       <div className="pointer-events-none absolute left-0 top-20 h-72 w-72 rounded-full bg-chart-4/10 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">One simple workspace</p><h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Everything you need to run your business beautifully.</h2><p className="mt-5 text-lg leading-relaxed text-muted-foreground">From the first estimate to the final payment, every tool works together.</p></div>
-        <div className="mt-16 space-y-8 sm:space-y-12">
+        <div className="mt-10 space-y-2 sm:mt-12">
           {features.map(([Icon, title, description, color], index) => (
             <details key={title} className="group overflow-hidden border-b border-border/70 first:border-t">
-              <summary className="grid cursor-pointer list-none items-center gap-8 px-2 py-8 outline-none transition-colors hover:bg-secondary/35 focus-visible:ring-2 focus-visible:ring-primary sm:grid-cols-2 sm:px-6 sm:py-10">
-                <div className={`${index % 2 ? "sm:order-2" : ""} flex min-h-48 items-center justify-center rounded-2xl bg-background/75`}>
-                  <div className={`rounded-3xl p-8 ${color}`}><Icon className="h-20 w-20" strokeWidth={1.5} /></div>
+              <summary className="grid cursor-pointer list-none items-center gap-8 px-2 py-5 outline-none transition-colors hover:bg-secondary/35 focus-visible:ring-2 focus-visible:ring-primary sm:grid-cols-2 sm:px-6 sm:py-6">
+                <div className={`${index % 2 ? "sm:order-2" : ""} flex min-h-28 items-center justify-center rounded-2xl bg-background/75`}>
+                  <div className={`rounded-2xl p-5 ${color}`}><Icon className="h-14 w-14" strokeWidth={1.5} /></div>
                 </div>
                 <div className={index % 2 ? "sm:order-1" : ""}>
                   <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</p>
@@ -27,7 +27,7 @@ export function FeaturesPreview() {
                   <p className="mt-6 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></p>
                 </div>
               </summary>
-              <div className="border-t border-border/50 bg-secondary/20 px-2 py-6 sm:px-6 sm:py-8">
+              <div className="border-t border-border/50 bg-secondary/20 px-2 py-4 sm:px-6 sm:py-5">
                 <div className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm">
                   <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
                     <div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-chart-3" /><span className="text-xs font-semibold text-muted-foreground">CleanQuote Pro</span></div>
