@@ -10,14 +10,14 @@ export function FinalCTA() {
           <div className="relative">
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-brand-pink">Fresh start, brighter business</p>
             <h2 className="text-balance text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-            Start quoting like a pro today
+            Start quoting like a <span className="text-brand-pink">pro</span> today
           </h2>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button size="lg" className="min-w-44 shadow-sm" asChild>
               <Link href="/dashboard">Get Started Free</Link>
             </Button>
           </div>
-          <p className="mt-4 text-xs text-primary-foreground/75">
+          <p className="mt-4 text-xs text-brand-pink/90">
             No credit card required &middot; Free plan available
           </p>
           </div>
