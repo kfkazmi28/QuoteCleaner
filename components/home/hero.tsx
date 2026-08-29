@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 export function Hero() {
   return (
     <section className="relative isolate overflow-hidden border-b border-border bg-gradient-to-br from-secondary via-background to-accent/60 py-16 sm:py-24">
-      <div className="pointer-events-none absolute inset-0 bg-[url('/images/cleaning-brand-pattern.png')] bg-cover bg-center opacity-30" />
+      <div className="pointer-events-none absolute -inset-6 bg-[url('/images/cleaning-brand-pattern.png')] bg-cover bg-center opacity-30" />
       <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-brand-blue/20 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-chart-2/15 blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr]">
