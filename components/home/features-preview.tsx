@@ -1,10 +1,8 @@
-import { Calculator, CalendarDays, Receipt, Users } from "lucide-react"
-
 const features = [
-  [Calculator, "Smart Quote Calculator", "Create accurate, professional quotes in minutes with pricing that fits the way you work.", "bg-chart-3/15 text-chart-3"],
-  [CalendarDays, "Scheduling & Calendar", "Book jobs, manage your schedule, and keep every appointment in one clear view.", "bg-chart-2/15 text-chart-2"],
-  [Receipt, "Invoices & Payments", "Turn accepted quotes into polished invoices and get paid faster with Stripe.", "bg-chart-4/20 text-chart-4"],
-  [Users, "Client Management", "Keep client notes, history, and communication organized in one welcoming workspace.", "bg-primary/15 text-primary"],
+  ["Smart Quote Calculator", "Create accurate, professional quotes in minutes with pricing that fits the way you work."],
+  ["Scheduling & Calendar", "Book jobs, manage your schedule, and keep every appointment in one clear view."],
+  ["Invoices & Payments", "Turn accepted quotes into polished invoices and get paid faster with Stripe."],
+  ["Client Management", "Keep client notes, history, and communication organized in one welcoming workspace."],
 ] as const
 
 export function FeaturesPreview() {
@@ -14,18 +12,15 @@ export function FeaturesPreview() {
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">One simple workspace</p><h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Everything you need to run your business beautifully.</h2><p className="mt-5 text-lg leading-relaxed text-muted-foreground">From the first estimate to the final payment, every tool works together.</p></div>
         <div className="mt-10 space-y-2 sm:mt-12">
-          {features.map(([Icon, title, description, color], index) => (
+          {features.map(([title, description], index) => (
             <details key={title} className="group overflow-hidden border-b border-border/70 first:border-t">
-              <summary className="grid cursor-pointer list-none items-center gap-8 px-2 py-5 outline-none transition-colors hover:bg-secondary/35 focus-visible:ring-2 focus-visible:ring-primary sm:grid-cols-2 sm:px-6 sm:py-6">
-                <div className={`${index % 2 ? "sm:order-2" : ""} flex min-h-28 items-center justify-center rounded-2xl bg-background/75`}>
-                  <div className={`rounded-2xl p-5 ${color}`}><Icon className="h-14 w-14" strokeWidth={1.5} /></div>
-                </div>
-                <div className={index % 2 ? "sm:order-1" : ""}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-8 px-2 py-5 outline-none transition-colors hover:bg-secondary/35 focus-visible:ring-2 focus-visible:ring-primary sm:px-6 sm:py-6">
+                <div className="min-w-0">
                   <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</p>
-                  <h3 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{title}</h3>
-                  <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">{description}</p>
-                  <p className="mt-6 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></p>
+                  <h3 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{title}</h3>
+                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">{description}</p>
                 </div>
+                <span className="hidden shrink-0 items-center gap-2 font-semibold text-primary sm:inline-flex">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
               </summary>
               <div className="border-t border-border/50 bg-secondary/20 px-2 py-4 sm:px-6 sm:py-5">
                 <div className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm">
