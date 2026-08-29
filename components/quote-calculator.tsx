@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Star, RotateCcw, Info } from "lucide-react"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -369,17 +368,6 @@ export function QuoteCalculator() {
               {["Light", "Medium", "Heavy"][parseInt(form.cleanLevel) - 1]} clean
             </p>
 
-            <div className="mt-5 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-center">
-              <p className="text-sm text-muted-foreground">
-                Want to personalize, save, and share this quote?
-              </p>
-              <Link
-                href="/login"
-                className="mt-2 inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Log in to continue
-              </Link>
-            </div>
           </div>
         )}
       </div>
