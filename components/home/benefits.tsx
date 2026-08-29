@@ -12,7 +12,7 @@ const benefits = [
 export function Benefits() {
   return (
     <section className="relative isolate overflow-hidden border-y border-border bg-gradient-to-br from-secondary via-background to-accent/45 py-20">
-      <div className="pointer-events-none absolute inset-0 bg-[url('/images/cleaning-hero-accent.png')] bg-cover bg-center opacity-20" />
+      <div className="pointer-events-none absolute inset-0 bg-[url('/images/cleaning-brand-pattern.png')] bg-cover bg-center opacity-24" />
       <div className="pointer-events-none absolute inset-0 bg-background/45" />
       <div className="pointer-events-none absolute right-0 top-10 h-56 w-56 rounded-full bg-chart-2/10 blur-3xl" />
       <div className="relative mx-auto max-w-3xl px-4 sm:px-6">
