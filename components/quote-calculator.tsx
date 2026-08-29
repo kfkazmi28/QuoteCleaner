@@ -322,23 +322,23 @@ export function QuoteCalculator() {
                         : "border-border bg-card text-card-foreground",
                     )}
                   >
-                    {selectedTier === key && (
+                    {(recommended || selectedTier === key) && (
                       <div className="absolute -top-2.5 left-3">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-yellow-400 px-2 py-0.5 text-[10px] font-semibold text-yellow-900">
-                          <Star className="h-2.5 w-2.5 fill-yellow-900" />
-                          {key === "biweekly" ? "Recommended" : "Selected"}
+                        <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", recommended && selectedTier !== key ? "bg-yellow-400 text-yellow-900" : "bg-primary text-primary-foreground")}>
+                          {recommended && selectedTier !== key && <Star className="h-2.5 w-2.5 fill-yellow-900" />}
+                          {recommended && selectedTier !== key ? "Recommended" : "Selected"}
                         </span>
                       </div>
                     )}
                     <div>
-                      <p className={cn("text-sm font-medium", recommended ? "text-primary-foreground" : "text-foreground")}>
+                      <p className={cn("text-sm font-medium", selectedTier === key ? "text-primary-foreground" : "text-foreground")}>
                         {label}
                       </p>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button type="button" className={cn("flex items-center gap-1 text-xs mt-0.5", recommended ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                          <button type="button" className={cn("flex items-center gap-1 text-xs mt-0.5", selectedTier === key ? "text-primary-foreground/70" : "text-muted-foreground")}>
                             <span>{subtitle}</span>
-                            <Info className={cn("h-3 w-3 shrink-0", recommended ? "text-primary-foreground" : "text-primary")} />
+                            <Info className={cn("h-3 w-3 shrink-0", selectedTier === key ? "text-primary-foreground" : "text-primary")} />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" showArrow={false} className="bg-white text-foreground border border-border shadow-md rounded-lg px-2.5 py-1.5 space-y-0.5 text-[11px]">
@@ -351,7 +351,7 @@ export function QuoteCalculator() {
                     <span
                       className={cn(
                         "text-xl font-black",
-                        recommended ? "text-primary-foreground" : "text-foreground",
+                        selectedTier === key ? "text-primary-foreground" : "text-foreground",
                       )}
                     >
                       ${result[key].toLocaleString()}
