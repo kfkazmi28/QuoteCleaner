@@ -739,7 +739,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="flex flex-col gap-10">
           {/* Calculator Form */}
           <Card className="h-fit">
             <CardHeader>
@@ -1106,7 +1106,7 @@ export default function DashboardPage() {
           <div className="space-y-4">
             {results ? (
               <>
-                <h2 className="text-lg font-semibold text-foreground">Your Quote</h2>
+                <h2 className="text-2xl font-bold tracking-tight text-foreground">Your Quote</h2>
                 
                 {/* One-Time Clean */}
                 <div className="space-y-2">
