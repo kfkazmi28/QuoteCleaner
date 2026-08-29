@@ -14,13 +14,13 @@ export function FeaturesPreview() {
         <div className="mt-10 space-y-2 sm:mt-12">
           {features.map(([title, description], index) => (
             <details key={title} className="group overflow-hidden border-b border-border/70 first:border-t">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-8 px-2 py-5 outline-none transition-colors hover:bg-secondary/35 focus-visible:ring-2 focus-visible:ring-primary sm:px-6 sm:py-6">
+              <summary className="flex cursor-pointer list-none flex-col items-start gap-4 px-2 py-5 text-left sm:flex-row sm:items-center outline-none transition-colors hover:bg-secondary/35 focus-visible:ring-2 focus-visible:ring-primary sm:px-6 sm:py-6">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</p>
                   <h3 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{title}</h3>
                   <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">{description}</p>
                 </div>
-                <span className="hidden shrink-0 items-center gap-2 font-semibold text-primary sm:inline-flex">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
+                <span className="mt-4 inline-flex shrink-0 items-center gap-2 self-start font-semibold text-primary sm:mt-0">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
               </summary>
               <div className="border-t border-border/50 bg-secondary/20 px-2 py-4 sm:px-6 sm:py-5">
                 <div className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm">
