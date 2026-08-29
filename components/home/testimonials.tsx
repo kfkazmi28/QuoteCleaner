@@ -28,7 +28,7 @@ export function Testimonials() {
       <div className="pointer-events-none absolute right-10 top-8 h-40 w-40 rounded-full bg-brand-pink/10 blur-3xl" />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-brand-pink">Loved by cleaning pros</p>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary">Loved by cleaning pros</p>
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             What Cleaners Are Saying
           </h2>
