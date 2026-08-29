@@ -23,7 +23,7 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="relative overflow-hidden bg-accent/35 py-20">
+    <section className="relative overflow-hidden border-t border-brand-blue/20 bg-background/90 py-16 sm:py-20">
       <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-chart-4/15 blur-3xl" />
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
