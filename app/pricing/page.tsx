@@ -2,8 +2,9 @@
 
 import { useTransition } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Check, Zap } from "lucide-react"
+import { Check, Zap, Sparkles } from "lucide-react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -285,6 +286,25 @@ export default function PricingPage() {
                 Start free &rarr;
               </Link>
             </p>
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden border-y border-border bg-secondary/35 py-16 sm:py-24">
+          <div className="pointer-events-none absolute inset-0 bg-[url('/images/cleaning-hero-accent.png')] bg-cover bg-center opacity-15" />
+          <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-xl shadow-primary/10">
+              <Image src="/images/feature-saved-quotes.jpg" alt="QuoteCleaner Pro workspace showing saved quotes" width={900} height={650} className="h-full min-h-64 w-full object-cover" />
+              <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full border border-border bg-card/95 px-3 py-2 text-sm font-semibold shadow-lg"><Sparkles className="h-4 w-4 text-primary" /> More control, less busywork</div>
+            </div>
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Everything in Pro</p>
+              <h2 className="mt-3 max-w-xl text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Run the business behind every clean.</h2>
+              <p className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground">Pro turns QuoteCleaner into your everyday command center, so you can spend less time piecing tools together and more time growing a business you&apos;re proud of.</p>
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                {["Unlimited quotes & saves", "Full pricing customization", "Save and manage all quotes", "Built-in client & job tracking", "2 included team members", "Mobile access and core calculator"].map((feature) => <div key={feature} className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-card/75 p-3 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span className="text-foreground">{feature}</span></div>)}
+              </div>
+              <Button asChild size="lg" className="mt-8 shadow-lg shadow-primary/20"><Link href="/login">Unlock Pro</Link></Button>
+            </div>
           </div>
         </section>
       </main>
