@@ -129,4 +129,10 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  @media (min-width: 768px) {
+    body:has(.dashboard-sidebar) main {
+      margin-left: 16rem;
+    }
+  }
 }

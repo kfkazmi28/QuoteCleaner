@@ -731,7 +731,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-muted/30">
       <DashboardNav />
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Cleaning Quote Calculator</h1>
           <p className="mt-1 text-muted-foreground">

@@ -112,7 +112,7 @@ export function Header() {
           {user ? (
             <>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/account">Account</Link>
+                <Link href="/dashboard" className="font-bold">Go to Dashboard</Link>
               </Button>
               <Button size="sm" variant="outline" onClick={handleSignOut}>
                 Logout
