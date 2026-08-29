@@ -22,6 +22,7 @@ export function FeaturesPreview() {
                   <h3 className="text-xl font-bold tracking-tight text-foreground">{title}</h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
                   <span className="inline-flex items-center gap-2 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
+                </div>
               </summary>
               <div className="border-t border-primary/15 bg-secondary/20 px-4 py-4">
                 <div className="overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm">
