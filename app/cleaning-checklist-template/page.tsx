@@ -248,16 +248,6 @@ export default function CleaningChecklistTemplatePage() {
           ))}
         </div>
 
-        {/* Mid CTA */}
-        <div className="mb-10 rounded-2xl border border-primary/20 bg-primary/5 p-6 text-center">
-          <p className="mb-1 font-semibold text-foreground">Ready to raise the quality of every clean?</p>
-          <p className="mb-4 text-sm text-muted-foreground">Download all 3 checklists free — no login, no credit card.</p>
-          <Button className="gap-2" onClick={() => setModalOpen(true)}>
-            <Download className="h-4 w-4" />
-            Download Free Checklists
-          </Button>
-        </div>
-
         {/* How to use */}
         <h2 className="mb-3 text-2xl font-bold text-foreground">How to Use These Checklists</h2>
         <ul className="mb-8 space-y-2 text-muted-foreground">
