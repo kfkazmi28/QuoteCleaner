@@ -70,6 +70,11 @@ export function CalculatorCrmInfo() {
           className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-primary/5 mix-blend-multiply" />
+        <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
+          <p className="text-balance text-4xl font-black uppercase tracking-tight text-primary-foreground drop-shadow-md sm:text-6xl lg:text-7xl">
+            Loved by cleaning pros
+          </p>
+        </div>
       </div>
     </section>
   )
