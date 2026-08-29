@@ -28,7 +28,7 @@ export function HowItWorks() {
   const [showSummary, setShowSummary] = useState(false)
 
   return (
-    <section className="relative overflow-hidden border-y border-border bg-secondary/20 py-20">
+    <section className="relative overflow-hidden border-y border-border bg-secondary/20 py-12 sm:py-16">
       <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-chart-3/10 blur-3xl" />
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="mb-12 text-center">

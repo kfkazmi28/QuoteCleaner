@@ -13,11 +13,11 @@ export function FeaturesPreview() {
   const [openFeature, setOpenFeature] = useState(0)
 
   return (
-    <section className="relative overflow-visible bg-background py-16 sm:py-20">
+    <section className="relative overflow-visible bg-background py-12 sm:py-16">
       <div className="pointer-events-none absolute left-0 top-20 h-72 w-72 rounded-full bg-chart-4/10 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">One simple workspace</p><h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Everything you need to run your business beautifully.</h2><p className="mt-5 text-lg leading-relaxed text-muted-foreground">From the first estimate to the final payment, every tool works together.</p></div>
-        <div className="relative mt-10 grid min-w-0 gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-max">
+        <div className="relative mt-8 grid min-w-0 gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-max">
           <div className="pointer-events-none absolute left-[12%] right-[12%] top-12 hidden border-t border-dashed border-primary/30 lg:block" />
           {features.map(([title, description], index) => (
             <details key={title} open={openFeature === index} className="contents group">
