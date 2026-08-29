@@ -25,7 +25,7 @@ export function Hero() {
               <Link href="/quote">Try the Calculator</Link>
             </Button>
           </div>
-          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+          <div className="mt-6 flex flex-col gap-2 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> No credit card required</span>
             <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Setup in under 60 seconds</span>
           </div>
