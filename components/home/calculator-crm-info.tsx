@@ -61,6 +61,16 @@ export function CalculatorCrmInfo() {
           </div>
         </div>
       </div>
+      <div className="relative mt-12 h-36 overflow-hidden sm:mt-16 sm:h-44">
+        <Image
+          src="/images/cleaning-tools-banner-v2.png"
+          alt="Colorful cleaning bubbles and tools"
+          fill
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-primary/5 mix-blend-multiply" />
+      </div>
     </section>
   )
 }
