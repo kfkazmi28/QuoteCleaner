@@ -1,11 +1,13 @@
+import Image from "next/image"
 import Link from "next/link"
 import { CalendarDays, Check, CircleDollarSign, FileText, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden bg-secondary py-12 sm:py-16" style={{ backgroundImage: "url('/images/cleaning-brand-pattern.png')", backgroundSize: "100% 100%", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-secondary/85 via-background/70 to-accent/65" />
+    <section className="relative isolate overflow-hidden bg-secondary py-12 sm:py-16">
+      <Image src="/images/cleaning-brand-pattern.png" alt="" fill priority sizes="100vw" className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover object-center" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-secondary/85 via-background/70 to-accent/65" />
       <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-brand-blue/20 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-chart-2/15 blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr]">
