@@ -26,9 +26,11 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="relative overflow-hidden bg-secondary/20 py-12 sm:py-16">
-      <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-chart-3/10 blur-3xl" />
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section className="relative isolate overflow-hidden bg-secondary/20 py-12 sm:py-16">
+      <Image src="/images/cleaning-tools-banner-v2.png" alt="" fill sizes="100vw" className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover object-center opacity-55" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/95 via-background/65 to-secondary/20" />
+      <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-brand-blue/10 blur-3xl" />
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             How It Works
@@ -51,10 +53,6 @@ export function HowItWorks() {
             </div>
           ))}
         </div>
-      </div>
-      <div className="relative mt-10 h-28 overflow-hidden sm:mt-12 sm:h-36">
-        <Image src="/images/cleaning-tools-banner-v2.png" alt="Colorful cleaning tools, lemons, bubbles, and water splashes" fill sizes="100vw" className="object-cover object-center" />
-        <div className="absolute inset-0 bg-primary/5 mix-blend-multiply" />
       </div>
     </section>
   )
