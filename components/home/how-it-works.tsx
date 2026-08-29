@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 import { ArrowRight, Home, Zap, Send } from "lucide-react"
 
@@ -71,6 +72,10 @@ export function HowItWorks() {
             </div>
           ))}
         </div>
+      </div>
+      <div className="relative mt-10 h-24 overflow-hidden border-y-2 border-brand-blue/60 sm:mt-12 sm:h-32">
+        <Image src="/images/cleaning-tools-banner.png" alt="Colorful cleaning tools, lemons, bubbles, and water splashes" fill sizes="100vw" className="object-cover" />
+        <div className="absolute inset-0 bg-primary/10 mix-blend-multiply" />
       </div>
     </section>
   )
