@@ -18,7 +18,8 @@ const highlights = [
 
 export function CalculatorCrmInfo() {
   return (
-    <section id="workflow-summary" className="scroll-mt-24 border-t border-border bg-muted/30 py-12 sm:py-16">
+    <section id="workflow-summary" className="relative scroll-mt-24 overflow-hidden border-y-4 border-brand-blue/70 bg-muted/30 py-12 sm:py-16">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-brand-yellow/80" />
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr] lg:items-center lg:gap-16">
           <div>

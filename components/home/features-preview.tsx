@@ -13,7 +13,8 @@ export function FeaturesPreview() {
   const [openFeature, setOpenFeature] = useState(0)
 
   return (
-    <section className="relative overflow-visible bg-background py-12 sm:py-16">
+    <section className="relative overflow-visible border-b-4 border-brand-blue/60 bg-background py-12 sm:py-16">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-brand-yellow/70" />
       <div className="pointer-events-none absolute left-0 top-20 h-72 w-72 rounded-full bg-chart-4/10 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">One simple workspace</p><h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Everything you need to run your business beautifully.</h2><p className="mt-5 text-lg leading-relaxed text-muted-foreground">From the first estimate to the final payment, every tool works together.</p></div>
