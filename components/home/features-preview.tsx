@@ -26,7 +26,7 @@ export function FeaturesPreview() {
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</span>
                 <span className="text-xl font-bold tracking-tight text-foreground">{title}</span>
                 <span className="text-sm leading-relaxed text-muted-foreground">{description}</span>
-                <span className="inline-flex items-center gap-2 font-semibold text-brand-pink">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
+                <span className="inline-flex items-center gap-2 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
               </summary>
               <div style={{ gridColumn: "auto", gridRow: "2", width: "calc(400% + 48px)", marginLeft: `calc(${index} * -100% - ${index} * 16px)` }} className="w-full min-w-0 max-w-none overflow-hidden rounded-3xl border border-primary/20 bg-secondary/95 px-4 py-4 shadow-xl shadow-primary/10 backdrop-blur-sm">
                 <div className="w-full min-w-0 overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm">
