@@ -14,7 +14,7 @@ export function FinalCTA() {
           </h2>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button size="lg" className="min-w-44 shadow-sm" asChild>
-              <Link href="/dashboard">Get Started Free</Link>
+              <Link href="/login">Login/Create Account</Link>
             </Button>
           </div>
           <p className="mt-4 text-xs text-brand-pink/90">
