@@ -40,7 +40,7 @@ export function Benefits() {
           </h3>
           <div className="mt-7 flex justify-center">
             <Button size="lg" className="min-w-44 shadow-sm" asChild>
-              <Link href="/dashboard">Get Started Free</Link>
+              <Link href="/login">Login or Create an Account</Link>
             </Button>
           </div>
           <p className="mt-4 text-xs text-primary-foreground/75">
