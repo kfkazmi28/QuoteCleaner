@@ -143,17 +143,17 @@ const checklistPreviews = [
   {
     title: "Residential Cleaning Checklist",
     desc: "Perfect for standard weekly, bi-weekly, or monthly recurring clients.",
-    sections: ["Living Areas (10 items)", "Kitchen (10 items)", "Bathrooms (10 items)", "Bedrooms (10 items)", "Final Checks (10 items)"],
+    sections: ["Living Areas", "Kitchen", "Bathrooms", "Bedrooms", "Final Checks"],
   },
   {
     title: "Deep Cleaning Checklist",
     desc: "For clients who need a thorough clean — inside cabinets, appliances, grout lines, and more.",
-    sections: ["Kitchen Deep Clean (10 items)", "Bathrooms Deep Clean (10 items)", "Bedroom & Living Areas (10 items)", "Windows & Surfaces (10 items)", "Final Checks (10 items)"],
+    sections: ["Kitchen Deep Clean", "Bathrooms Deep Clean", "Bedroom & Living Areas", "Windows & Surfaces", "Final Checks"],
   },
   {
     title: "Move-In / Move-Out Checklist",
     desc: "Built for vacant properties — covers every area a landlord or property manager will inspect.",
-    sections: ["Kitchen (10 items)", "Bathrooms (10 items)", "Bedrooms & Living Areas (10 items)", "Windows & Doors (10 items)", "Final Checks (10 items)"],
+    sections: ["Kitchen", "Bathrooms", "Bedrooms & Living Areas", "Windows & Doors", "Final Checks"],
   },
 ]
 
