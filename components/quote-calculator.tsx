@@ -78,10 +78,10 @@ function calculateQuote(form: FormState): QuoteResult {
 
 const RESULT_LABELS: { key: keyof Omit<QuoteResult, "totalHours">; label: string; subtitle: string; recommended?: boolean; hoursMultiplier: number }[] = [
   { key: "deepClean", label: "Deep Clean", subtitle: "One-time thorough cleaning", hoursMultiplier: 1 },
-  { key: "moveInMoveOut", label: "Move In / Move Out", subtitle: "Extra time for vacant properties", hoursMultiplier: 1 },
-  { key: "standardSingle", label: "Standard Single", subtitle: "One-time regular cleaning", hoursMultiplier: 0.85 },
   { key: "monthly", label: "Monthly Recurring", subtitle: "Once a month service", hoursMultiplier: 0.85 },
+  { key: "standardSingle", label: "Standard Single", subtitle: "One-time regular cleaning", hoursMultiplier: 0.85 },
   { key: "biweekly", label: "Biweekly Recurring", subtitle: "Every two weeks service", recommended: true, hoursMultiplier: 0.80 },
+  { key: "moveInMoveOut", label: "Move In / Move Out", subtitle: "Extra time for vacant properties", hoursMultiplier: 1 },
   { key: "weekly", label: "Weekly Recurring", subtitle: "Weekly recurring service", hoursMultiplier: 0.75 },
 ]
 
