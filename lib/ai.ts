@@ -3,7 +3,11 @@ import "server-only"
 import OpenAI from "openai"
 import { z } from "zod"
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+function getOpenAI() {
+  const apiKey = process.env.QuoteCleaner_OpenAI ?? process.env.OPENAI_API_KEY
+  if (!apiKey) throw new Error("QuoteCleaner_OpenAI is not configured")
+  return new OpenAI({ apiKey })
+}
 
 export const quoteReviewSchema = z.object({
   confidenceScore: z.number().int().min(1).max(5),
@@ -34,7 +38,7 @@ export interface QuoteReviewInput {
 }
 
 export async function reviewQuote(input: QuoteReviewInput): Promise<QuoteReview> {
-  if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured")
+  const openai = getOpenAI()
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",

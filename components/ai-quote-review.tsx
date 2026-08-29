@@ -20,8 +20,10 @@ export function AIQuoteReview({ quote }: { quote: QuoteReviewInput }) {
     setError(null)
     try {
       const response = await fetch("/api/quote-review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(quote) })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || "Unable to review quote")
+      const contentType = response.headers.get("content-type") ?? ""
+      const data = contentType.includes("application/json") ? await response.json() : null
+      if (!response.ok) throw new Error(data?.error || "The AI review service is temporarily unavailable")
+      if (!data) throw new Error("The AI review returned an invalid response")
       setReview(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to review quote")
