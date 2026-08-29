@@ -17,10 +17,10 @@ export function FeaturesPreview() {
       <div className="pointer-events-none absolute left-0 top-20 h-72 w-72 rounded-full bg-chart-4/10 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">One simple workspace</p><h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Everything you need to run your business beautifully.</h2><p className="mt-5 text-lg leading-relaxed text-muted-foreground">From the first estimate to the final payment, every tool works together.</p></div>
-        <div className={`relative mt-10 grid min-w-0 gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4 ${openFeature >= 0 ? "pb-[34rem] sm:pb-[27rem]" : ""}`}>
+        <div className="relative mt-10 grid min-w-0 gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="pointer-events-none absolute left-[12%] right-[12%] top-12 hidden border-t border-dashed border-primary/30 lg:block" />
           {features.map(([title, description], index) => (
-            <details key={title} open={openFeature === index} className="group relative z-10 overflow-visible rounded-3xl border border-border bg-card shadow-sm transition-all open:border-primary/40 open:shadow-lg open:shadow-primary/10">
+            <details key={title} open={openFeature === index} className={`group relative z-10 min-w-0 overflow-visible rounded-3xl border border-border bg-card shadow-sm transition-all open:border-primary/40 open:shadow-lg open:shadow-primary/10 ${openFeature === index ? "sm:col-span-2 lg:col-span-4" : ""}`}>
               <summary onClick={(event) => { event.preventDefault(); setOpenFeature(openFeature === index ? -1 : index) }} className="flex min-h-52 cursor-pointer list-none flex-col items-center justify-center gap-3 px-5 py-6 text-center outline-none transition-colors hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-primary">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground shadow-md shadow-primary/20">{index + 1}</span>
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</span>
@@ -28,7 +28,7 @@ export function FeaturesPreview() {
                 <span className="text-sm leading-relaxed text-muted-foreground">{description}</span>
                 <span className="inline-flex items-center gap-2 font-semibold text-primary">Explore the workflow <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">→</span></span>
               </summary>
-              <div className="absolute left-0 right-0 top-full z-30 mt-3 max-w-full overflow-hidden border border-primary/20 bg-secondary/95 px-4 py-4 shadow-2xl shadow-primary/15 backdrop-blur-sm">
+              <div className="max-w-full overflow-hidden border-t border-primary/20 bg-secondary/95 px-4 py-4 shadow-inner shadow-primary/10 backdrop-blur-sm">
                 <div className="w-full min-w-0 overflow-hidden rounded-xl border border-border/70 bg-background shadow-sm">
                   <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
                     <div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-chart-3" /><span className="text-xs font-semibold text-muted-foreground">CleanQuote Pro</span></div>
