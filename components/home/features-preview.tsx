@@ -1,3 +1,7 @@
+"use client"
+
+import { useState } from "react"
+
 const features = [
   ["Smart Quote Calculator", "Create accurate, professional quotes in minutes with pricing that fits the way you work."],
   ["Scheduling & Calendar", "Book jobs, manage your schedule, and keep every appointment in one clear view."],
@@ -6,6 +10,8 @@ const features = [
 ] as const
 
 export function FeaturesPreview() {
+  const [openFeature, setOpenFeature] = useState(0)
+
   return (
     <section className="relative overflow-hidden bg-background py-16 sm:py-20">
       <div className="pointer-events-none absolute left-0 top-20 h-72 w-72 rounded-full bg-chart-4/10 blur-3xl" />
@@ -14,8 +20,8 @@ export function FeaturesPreview() {
         <div className="relative mt-10 grid gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="pointer-events-none absolute left-[12%] right-[12%] top-12 hidden border-t border-dashed border-primary/30 lg:block" />
           {features.map(([title, description], index) => (
-            <details key={title} className="group relative z-10 overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all open:border-primary/40 open:shadow-lg open:shadow-primary/10">
-              <summary className="flex min-h-52 cursor-pointer list-none flex-col items-center justify-center gap-3 px-5 py-6 text-center outline-none transition-colors hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-primary">
+            <details key={title} open={openFeature === index} className="group relative z-10 overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all open:border-primary/40 open:shadow-lg open:shadow-primary/10">
+              <summary onClick={(event) => { event.preventDefault(); setOpenFeature(openFeature === index ? -1 : index) }} className="flex min-h-52 cursor-pointer list-none flex-col items-center justify-center gap-3 px-5 py-6 text-center outline-none transition-colors hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-primary">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground shadow-md shadow-primary/20">{index + 1}</span>
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Feature {index + 1}</span>
                 <span className="text-xl font-bold tracking-tight text-foreground">{title}</span>
