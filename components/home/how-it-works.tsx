@@ -28,7 +28,7 @@ export function HowItWorks() {
   const [showSummary, setShowSummary] = useState(false)
 
   return (
-    <section className="relative overflow-hidden border-y border-border bg-card py-20">
+    <section className="relative overflow-hidden border-y border-border bg-secondary/20 py-20">
       <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-chart-3/10 blur-3xl" />
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="mb-12 text-center">
@@ -57,22 +57,16 @@ export function HowItWorks() {
           </div>
         )}
 
-        <div className="relative divide-y divide-border sm:flex sm:divide-x sm:divide-y-0">
-          {steps.map((s) => (
-            <div
-              key={s.number}
-              className="flex flex-1 gap-4 py-6 first:pt-0 last:pb-0 sm:block sm:px-7 sm:py-2 sm:first:pl-0 sm:last:pr-0"
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-                  <s.icon className="h-5 w-5" />
-                </div>
-                <span className="text-3xl font-black text-muted-foreground/30 select-none leading-none">
-                  {s.number}
-                </span>
+        <div className="relative grid gap-8 border-l border-primary/25 pl-7 sm:grid-cols-3 sm:gap-0 sm:border-l-0 sm:border-t sm:pl-0">
+          {steps.map((s, index) => (
+            <div key={s.number} className="relative sm:px-7 sm:pt-8 sm:first:pl-0 sm:last:pr-0">
+              <div className="absolute -left-[2.15rem] top-0 flex h-9 w-9 items-center justify-center rounded-full border-4 border-secondary bg-primary text-primary-foreground sm:left-0 sm:top-[-1.15rem]">
+                <s.icon className="h-4 w-4" />
               </div>
-              <h3 className="mb-1.5 text-base font-semibold text-card-foreground">{s.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{s.description}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Step {s.number}</p>
+              <h3 className="mt-2 text-lg font-semibold text-foreground">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
+              {index < steps.length - 1 && <span className="absolute right-0 top-[-0.2rem] hidden h-px w-8 bg-primary/25 sm:block" aria-hidden="true" />}
             </div>
           ))}
         </div>
