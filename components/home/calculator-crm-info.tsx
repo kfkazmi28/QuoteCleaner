@@ -19,8 +19,16 @@ const highlights = [
 
 export function CalculatorCrmInfo() {
   return (
-    <section id="workflow-summary" className="relative scroll-mt-24 overflow-hidden bg-muted/30 pt-12 pb-0 sm:pt-16">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+    <section id="workflow-summary" className="relative scroll-mt-24 overflow-hidden bg-muted/30 py-12 sm:py-16">
+      <Image
+        src="/images/cleaning-tools-banner-v2.png"
+        alt=""
+        fill
+        sizes="100vw"
+        className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover object-center"
+      />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/95 via-background/75 to-secondary/25" />
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr] lg:items-center lg:gap-16">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wider text-primary">One connected workflow</p>
@@ -52,17 +60,6 @@ export function CalculatorCrmInfo() {
             ))}
           </div>
         </div>
-      </div>
-      <div className="relative mt-12 h-36 overflow-hidden sm:mt-16 sm:h-44">
-        <Image
-          src="/images/cleaning-tools-banner-v2.png"
-          alt="Colorful cleaning bubbles and tools"
-          fill
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-primary/5 mix-blend-multiply" />
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-muted/30 via-muted/10 to-transparent" />
       </div>
     </section>
   )
