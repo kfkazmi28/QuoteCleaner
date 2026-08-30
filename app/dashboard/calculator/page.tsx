@@ -1126,14 +1126,14 @@ export default function DashboardPage() {
                           }
                           className={`relative transition-all hover:shadow-md ${
                             card.clickable ? "cursor-pointer hover:border-primary/50 hover:bg-accent/30" : ""
-                          } ${isPreferred ? "border-primary bg-primary/5" : ""}`}
+                          } ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
                         >
                           {isPreferred && (
-                            <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary text-primary bg-background">
-                              Client Preferred
+                            <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
+                              Selected
                             </Badge>
                           )}
-                          <CardContent className="flex items-center justify-between p-4">
+                          <CardContent className="flex min-h-28 items-center justify-between gap-4 p-5">
                             <div className="flex items-center gap-3">
                               <Checkbox
                                 checked={isPreferred}
@@ -1142,11 +1142,11 @@ export default function DashboardPage() {
                                 className="h-5 w-5"
                               />
                               <div>
-                                <p className="font-medium text-foreground">{card.label}</p>
+                                <p className={`text-base font-semibold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <TooltipProvider delayDuration={100}>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <button type="button" className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                                      <button type="button" className={`flex items-center gap-1 text-sm mt-0.5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                         <span>{card.subtitle}</span>
                                         <Info className="h-3 w-3 shrink-0 text-primary" />
                                       </button>
@@ -1160,7 +1160,7 @@ export default function DashboardPage() {
                                 </TooltipProvider>
                               </div>
                             </div>
-                            <p className="text-2xl font-bold text-primary">${card.price}</p>
+                            <p className={`shrink-0 text-3xl font-bold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
                           </CardContent>
                         </Card>
                       )
@@ -1178,14 +1178,14 @@ export default function DashboardPage() {
                       return (
                         <Card
                           key={cardKey}
-                          className={`relative transition-all hover:shadow-md ${isPreferred ? "border-primary bg-primary/5" : ""}`}
+                          className={`relative transition-all hover:shadow-md ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
                         >
                           {isPreferred && (
-                            <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary text-primary bg-background">
-                              Client Preferred
+                            <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
+                              Selected
                             </Badge>
                           )}
-                          <CardContent className="flex items-center justify-between p-4">
+                          <CardContent className="flex min-h-28 items-center justify-between gap-4 p-5">
                             <div className="flex items-center gap-3">
                               <Checkbox
                                 checked={isPreferred}
@@ -1193,11 +1193,11 @@ export default function DashboardPage() {
                                 className="h-5 w-5"
                               />
                               <div>
-                                <p className="font-medium text-foreground">{card.label}</p>
+                                <p className={`text-base font-semibold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <TooltipProvider delayDuration={100}>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <button type="button" className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                                      <button type="button" className={`flex items-center gap-1 text-sm mt-0.5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                         <span>{card.subtitle}</span>
                                         <Info className="h-3 w-3 shrink-0 text-primary" />
                                       </button>
@@ -1211,7 +1211,7 @@ export default function DashboardPage() {
                                 </TooltipProvider>
                               </div>
                             </div>
-                            <p className="text-2xl font-bold text-primary">${card.price}</p>
+                            <p className={`shrink-0 text-3xl font-bold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
                           </CardContent>
                         </Card>
                       )
