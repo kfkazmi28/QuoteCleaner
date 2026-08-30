@@ -1057,11 +1057,11 @@ export default function DashboardPage() {
                   <span className="hidden text-sm text-muted-foreground sm:block">Select any option to use it</span>
                 </div>
                 {(() => {
-                  const recommended = oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
+                  const recommended = oneTimeCleans.find(card => card.key === preferredPackage) ?? oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
                   if (!recommended) return null
                   return <section className="border-b border-border pb-9 pt-3">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                      <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span><span className="text-sm text-muted-foreground">One-time clean</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><p className="mt-4 text-sm font-medium text-muted-foreground">1 cleaner · {formatHours(recommended.hours)}</p></div>
+                      <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span><span className="text-sm text-muted-foreground">{recommended.key === "deep" ? "Deep clean" : recommended.key === "move" ? "Move in / move out" : recommended.key === "standard" ? "Standard clean" : "One-time clean"}</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><p className="mt-4 text-sm font-medium text-muted-foreground">1 cleaner · {formatHours(recommended.hours)}</p></div>
                       <div className="sm:text-right"><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => setPreferredPackage(recommended.key)} className="mt-5 w-full bg-primary sm:w-auto">Use this quote →</Button></div>
                     </div>
                   </section>
