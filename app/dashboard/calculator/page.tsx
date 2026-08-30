@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { usePricingSettings, defaultSettings } from "@/contexts/pricing-settings-context"
@@ -1135,12 +1134,6 @@ export default function DashboardPage() {
                           )}
                           <CardContent className="flex min-h-28 items-center justify-between gap-4 p-5">
                             <div className="flex items-center gap-3">
-                              <Checkbox
-                                checked={isPreferred}
-                                onCheckedChange={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                                onClick={(e) => e.stopPropagation()}
-                                className="h-5 w-5"
-                              />
                               <div>
                                 <p className={`text-base font-semibold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <TooltipProvider delayDuration={100}>
@@ -1178,7 +1171,8 @@ export default function DashboardPage() {
                       return (
                         <Card
                           key={cardKey}
-                          className={`relative transition-all hover:shadow-md ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
+                          onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
+                          className={`relative cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
                         >
                           {isPreferred && (
                             <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
@@ -1187,11 +1181,6 @@ export default function DashboardPage() {
                           )}
                           <CardContent className="flex min-h-28 items-center justify-between gap-4 p-5">
                             <div className="flex items-center gap-3">
-                              <Checkbox
-                                checked={isPreferred}
-                                onCheckedChange={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                                className="h-5 w-5"
-                              />
                               <div>
                                 <p className={`text-base font-semibold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <TooltipProvider delayDuration={100}>
