@@ -360,12 +360,37 @@ export default function DashboardPage() {
   const [sqftUnit, setSqftUnit] = useState<"sqft" | "sqm">("sqft")
   const [quoteCity, setQuoteCity] = useState("")
   const [quoteZip, setQuoteZip] = useState("")
+  const [locationQuery, setLocationQuery] = useState("")
+  const [locationSuggestions, setLocationSuggestions] = useState<{ city: string; state: string; zip: string }[]>([])
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false)
+  const [isLookingUpZip, setIsLookingUpZip] = useState(false)
+  const lookupCityFromZip = async (zip: string) => {
+    const normalizedZip = zip.replace(/\D/g, "").slice(0, 5)
+    setQuoteZip(normalizedZip)
+    if (normalizedZip.length !== 5) return
+    setIsLookingUpZip(true)
+    try {
+      const response = await fetch(`https://api.zippopotam.us/us/${normalizedZip}`)
+      if (!response.ok) return
+      const data = await response.json() as { places?: { [key: string]: string }[] }
+      const place = data.places?.[0]
+      const city = place?.["place name"]
+      const state = place?.["state abbreviation"] || place?.state || ""
+      if (city) {
+        setQuoteCity(city)
+        setLocationSuggestions([{ city, state, zip: normalizedZip }])
+        setShowLocationSuggestions(true)
+      }
+    } catch {
+      // Keep manual city entry available if lookup is unavailable.
+    } finally {
+      setIsLookingUpZip(false)
+    }
+  }
   const [showPaywall, setShowPaywall] = useState(false)
   const [showCreditConfirm, setShowCreditConfirm] = useState(false)
   const [isCalculating, setIsCalculating] = useState(false)
-  const [showDeepClean, setShowDeepClean] = useState(false)
-  const [showMoveIn, setShowMoveIn] = useState(false)
-  const [showStandardClean, setShowStandardClean] = useState(false)
+  const [showChecklist, setShowChecklist] = useState(false)
   const [customDeepClean, setCustomDeepClean] = useState(DEEP_CLEAN_CHECKLIST)
   const [customMoveIn, setCustomMoveIn] = useState(MOVE_IN_CHECKLIST)
   const [customStandardClean, setCustomStandardClean] = useState(STANDARD_CLEAN_CHECKLIST)
@@ -377,6 +402,7 @@ export default function DashboardPage() {
   const [isDayPassLoading, setIsDayPassLoading] = useState(false)
   const [defaultSenderName, setDefaultSenderName] = useState<string | null>(null)
   const [preferredPackage, setPreferredPackage] = useState<string | null>(null)
+  const [showCompare, setShowCompare] = useState(false)
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
@@ -761,36 +787,24 @@ export default function DashboardPage() {
       <DashboardNav />
 
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Cleaning Quote Calculator</h1>
-          <p className="mt-1 text-muted-foreground">
-            Enter the home details to generate accurate pricing
-          </p>
+        <div className="mb-12 max-w-2xl">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
+          <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">Build a professional quote in seconds. Enter a few details and we&apos;ll recommend a price.</p>
         </div>
 
-        <div className="flex flex-col gap-10">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(24rem,0.78fr)_minmax(0,1.22fr)]">
           {/* Calculator Form */}
-          <Card className="h-fit overflow-hidden border-brand-blue/30 bg-card shadow-sm">
-            <CardHeader className="border-b border-brand-blue/20 bg-brand-blue/10">
-              <CardTitle className="flex items-center gap-2">
-                <span className="flex size-9 items-center justify-center rounded-lg bg-brand-blue text-primary-foreground">
-                  <Calculator className="size-5" />
-                </span>
-                Home Details
-              </CardTitle>
-              <CardDescription>
-                Fill in the details below to calculate your quote
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 bg-background/60">
-              <div className="grid gap-4 rounded-xl border border-brand-blue/20 bg-brand-blue/5 p-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="quote-city">City</Label>
-                  <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="quote-zip">ZIP Code</Label>
-                  <Input id="quote-zip" inputMode="numeric" placeholder="e.g., 78701" value={quoteZip} onChange={e => setQuoteZip(e.target.value)} />
+          <section className="h-fit">
+            <div className="mb-10">
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s price this clean</h2>
+            </div>
+            <div className="space-y-9">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2"><Label htmlFor="quote-location">Location</Label><span className="text-[11px] text-muted-foreground">City or ZIP code</span></div>
+                <div className="relative">
+                  <Input id="quote-location" placeholder="Enter a city or ZIP code" value={locationQuery} onFocus={() => setShowLocationSuggestions(locationSuggestions.length > 0)} onChange={e => { const value = e.target.value; setLocationQuery(value); setQuoteCity(/\d/.test(value) ? quoteCity : value); setQuoteZip(/^[0-9]{5}$/.test(value) ? value : ""); if (/^[0-9]{5}$/.test(value)) void lookupCityFromZip(value); else setShowLocationSuggestions(false) }} className="h-12 bg-transparent text-base shadow-none focus-visible:ring-primary" autoComplete="off" />
+                  {isLookingUpZip && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" aria-live="polite">Looking up…</span>}
+                  {showLocationSuggestions && locationSuggestions.length > 0 && <div className="absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md" role="listbox" aria-label="Location suggestions">{locationSuggestions.map(suggestion => <button key={suggestion.zip} type="button" className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent" onMouseDown={event => event.preventDefault()} onClick={() => { setLocationQuery(`${suggestion.city}, ${suggestion.state} ${suggestion.zip}`); setQuoteCity(suggestion.city); setQuoteZip(suggestion.zip); setShowLocationSuggestions(false) }}><span className="font-medium text-foreground">{suggestion.city}{suggestion.state ? `, ${suggestion.state}` : ""}</span><span className="text-xs text-muted-foreground">{suggestion.zip}</span></button>)}</div>}
                 </div>
               </div>
               <div className="space-y-2">
@@ -857,7 +871,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <Label htmlFor="bedrooms">Bedrooms *</Label>
                   <Input
@@ -903,7 +917,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-muted/50 p-3">
+              <div className="border-t border-border pt-5">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Hourly Rate</span>
                   <span className="font-medium">${settings.hourlyRate}/hr</span>
@@ -1007,17 +1021,6 @@ export default function DashboardPage() {
               </div>
 
               <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowSaveCalculatorModal(true)}
-                className="w-full gap-2"
-                size="lg"
-              >
-                <BookmarkPlus className="h-4 w-4" />
-                Save Calculator
-              </Button>
-
-              <Button
                 onClick={calculateQuote}
                 className="w-full"
                 size="lg"
@@ -1028,7 +1031,7 @@ export default function DashboardPage() {
                 ) : (
                   <>
                     <Calculator className="mr-2 h-4 w-4" />
-                    Generate Quote
+                    Generate my quote →
                   </>
                 )}
               </Button>
@@ -1042,123 +1045,28 @@ export default function DashboardPage() {
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
           {/* Results */}
-          <div className="space-y-4">
-            <div className="relative overflow-visible rounded-2xl border-2 border-brand-pink/40 bg-brand-pink/15 px-5 py-4 shadow-sm">
-              <div className="absolute -bottom-2 left-8 size-4 rotate-45 border-b-2 border-r-2 border-brand-pink/40 bg-brand-pink/15" aria-hidden="true" />
-              <div className="relative flex items-start gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-yellow text-foreground shadow-sm"><Sparkles className="size-5" aria-hidden="true" /></div>
-                <div><p className="font-bold text-foreground">Your clean, your numbers, your next move.</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Pick a quote card to see the pricing details and Profit Planner insights that matter most.</p></div>
-              </div>
-            </div>
+          <div className="space-y-10">
             {results ? (
               <>
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">Your Quote</h2>
-                
-                {/* One-Time Clean */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-brand-yellow" />
-                    <p className="text-xs font-bold uppercase tracking-wide text-foreground">One-Time Clean</p>
-                  </div>
-                  <div className="grid gap-3 md:grid-cols-3">
-                    {oneTimeCleans.map((card) => {
-                      const cardKey = card.key
-                      const isPreferred = preferredPackage === cardKey
-                      return (
-                        <Card
-                          key={cardKey}
-                          onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                          className={`relative cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${
-                            isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"
-                          }`}
-                        >
-                          {isPreferred && (
-                            <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
-                              Selected
-                            </Badge>
-                          )}
-                          <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
-                            <div className="flex min-w-0 h-full flex-col">
-                              <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
-                                <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                  <span>{card.subtitle}</span>
-                                </p>
-                                <div className={`mt-auto pt-5 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                  <span>1 cleaner: {formatHours(card.hours)}</span>
-                                  <span>2 cleaners: {formatHours(card.hours / 2)}</span>
-                                </div>
-                              </div>
-                            <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
-                          </CardContent>
-                        </Card>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Recurring Clean */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-brand-pink" />
-                    <p className="text-xs font-bold uppercase tracking-wide text-foreground">Recurring Clean</p>
-                  </div>
-                  <div className="grid gap-3 md:grid-cols-3">
-                    {recurringCleans.map((card) => {
-                      const cardKey = card.key
-                      const isPreferred = preferredPackage === cardKey
-                      return (
-                        <Card
-                          key={cardKey}
-                          onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                          className={`relative cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
-                        >
-                          {isPreferred && (
-                            <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
-                              Selected
-                            </Badge>
-                          )}
-                          <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
-                            <div className="flex min-w-0 h-full flex-col">
-                              <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
-                                <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                  <span>{card.subtitle}</span>
-                                </p>
-                                <div className={`mt-auto pt-5 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                  <span>1 cleaner: {formatHours(card.hours)}</span>
-                                  <span>2 cleaners: {formatHours(card.hours / 2)}</span>
-                                </div>
-                              </div>
-                            <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
-                          </CardContent>
-                        </Card>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
-                  <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <h3 className="font-semibold text-foreground">Cleaning Checklist</h3>
-                      <p className="text-sm text-muted-foreground">Review and customize what&apos;s included in your cleaning service.</p>
+  <div>
+    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Quote summary</p>
+    <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your quote</h2>
+    <p className="mt-2 text-base text-muted-foreground">Choose the cleaning service that best fits this home.</p>
+  </div>
+                {(() => {
+                  const recommended = oneTimeCleans.find(card => card.key === preferredPackage) ?? oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
+                  if (!recommended) return null
+                  return <section className="border-b border-border pb-9 pt-3">
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                      <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span><span className="text-sm text-muted-foreground">{recommended.key === "deep" ? "Deep clean" : recommended.key === "move" ? "Move in / move out" : recommended.key === "standard" ? "Standard clean" : "One-time clean"}</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium text-muted-foreground"><span>1 cleaner · {formatHours(recommended.hours)}</span><span>2 cleaners · {formatHours(recommended.hours / 2)}</span></div></div>
+                      <div className="sm:text-right"><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => setPreferredPackage(recommended.key)} className="mt-5 w-full bg-primary sm:w-auto">Use this quote →</Button></div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        if (preferredPackage === "deep") setShowDeepClean(true)
-                        else if (preferredPackage === "move") setShowMoveIn(true)
-                        else setShowStandardClean(true)
-                      }}
-                    >
-                      Open Checklist
-                    </Button>
-                  </CardContent>
-                </Card>
+                  </section>
+                })()}
 
                 {preferredPackage && results && (
                   <AIQuoteReview
@@ -1179,8 +1087,28 @@ export default function DashboardPage() {
                     }}
                   />
                 )}
+                <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
+                {showCompare && <div className="space-y-8">
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section></div>}
 
-                <div className="flex flex-col gap-2">
+                {preferredPackage && <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
+                  <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="font-semibold text-foreground">Cleaning Checklist</h3>
+                      <p className="text-sm text-muted-foreground">Review and customize what&apos;s included in your cleaning service.</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+  onClick={() => setShowChecklist(true)}
+                    >
+                      Open Checklist
+                    </Button>
+                  </CardContent>
+                </Card>}
+
+                {preferredPackage && <div className="flex flex-col gap-2">
                   <Button onClick={handleSaveQuote} variant="outline" className="w-full">
                     <Bookmark className="mr-2 h-4 w-4" />Save Quote
                   </Button>
@@ -1200,7 +1128,7 @@ export default function DashboardPage() {
                       )}
                     </Button>
                   </div>
-                </div>
+                </div>}
               </>
             ) : (
               <Card className="flex h-full min-h-[300px] items-center justify-center border-dashed">
@@ -1219,39 +1147,18 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      <ChecklistModal
-        open={showDeepClean}
-        onClose={() => setShowDeepClean(false)}
-        title="Deep Clean Checklist"
-        description="Everything included in a deep clean service"
-        checklist={customDeepClean}
-        onSave={(updated) => {
-          setCustomDeepClean(updated)
-          toast.success("Deep clean checklist updated")
-        }}
-      />
-      <ChecklistModal
-        open={showMoveIn}
-        onClose={() => setShowMoveIn(false)}
-        title="Move In / Move Out Checklist"
-        description="Everything included in a move in or move out clean"
-        checklist={customMoveIn}
-        onSave={(updated) => {
-          setCustomMoveIn(updated)
-          toast.success("Move in/out checklist updated")
-        }}
-      />
-      <ChecklistModal
-        open={showStandardClean}
-        onClose={() => setShowStandardClean(false)}
-        title="Standard Cleaning Checklist"
-        description="Everything included in a standard cleaning"
-        checklist={customStandardClean}
-        onSave={(updated) => {
-          setCustomStandardClean(updated)
-          toast.success("Standard clean checklist updated")
-        }}
-      />
+  <ChecklistModal
+  open={showChecklist}
+  onClose={() => setShowChecklist(false)}
+  title="Cleaning Checklists"
+  description="Choose a service checklist to review or customize"
+  checklist={customStandardClean}
+  checklistOptions={[
+  { key: "move", label: "Move In / Out", title: "Move In / Move Out Checklist", description: "Everything included in a move in or move out clean", checklist: customMoveIn, onSave: (updated) => { setCustomMoveIn(updated); toast.success("Move in/out checklist updated") } },
+  { key: "deep", label: "Deep Clean", title: "Deep Clean Checklist", description: "Everything included in a deep clean service", checklist: customDeepClean, onSave: (updated) => { setCustomDeepClean(updated); toast.success("Deep clean checklist updated") } },
+  { key: "standard", label: "Standard", title: "Standard Cleaning Checklist", description: "Everything included in a standard cleaning", checklist: customStandardClean, onSave: (updated) => { setCustomStandardClean(updated); toast.success("Standard clean checklist updated") } },
+  ]}
+  />
 
       <SaveQuoteModal
         open={showSaveModal}

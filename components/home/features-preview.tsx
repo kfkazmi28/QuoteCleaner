@@ -10,7 +10,7 @@ const features = [
 ] as const
 
 export function FeaturesPreview() {
-  const [openFeature, setOpenFeature] = useState(0)
+  const [openFeature, setOpenFeature] = useState(-1)
 
   return (
     <section className="relative overflow-visible bg-background py-12 sm:py-16">
