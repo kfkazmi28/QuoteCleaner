@@ -775,6 +775,17 @@ export default function DashboardPage() {
               <CardDescription>
                 Fill in the details below to calculate your quote
               </CardDescription>
+              {/* Saved calculator controls */}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Button type="button" size="sm" className="gap-2" onClick={() => setShowSaveCalculatorModal(true)}>
+                  <BookmarkPlus className="h-4 w-4" />
+                  Save Calculator
+                </Button>
+                <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => setBookmarksOpen(true)}>
+                  <FolderOpen className="h-4 w-4" />
+                  Browse Saved
+                </Button>
+              </div>
               {/* Saved Calculators Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1459,6 +1470,11 @@ export default function DashboardPage() {
                   <option value="">Unfiled</option>
                   {calculatorFolders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
                 </select>
+                <div className="flex gap-2">
+                  <Input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} placeholder="Create new folder" className="h-9" />
+                  <input type="color" value={newFolderColor} onChange={e => setNewFolderColor(e.target.value)} className="h-9 w-10 rounded border border-input bg-background p-1" aria-label="New folder color" />
+                  <Button type="button" variant="outline" size="sm" onClick={async () => { await handleCreateFolder(); }} disabled={!newFolderName.trim()}>Create</Button>
+                </div>
               </div>
               <div className="rounded-lg bg-muted/50 p-3 text-sm">
               <p className="font-medium text-foreground">Current Settings Preview</p>
