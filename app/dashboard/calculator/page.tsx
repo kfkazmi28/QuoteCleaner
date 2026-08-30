@@ -725,6 +725,7 @@ export default function DashboardPage() {
   ] : []
 
   const priceCards = [...oneTimeCleans, ...recurringCleans]
+  const cleanLevelLabel = ({ "1": "Light Clean", "2": "Medium Clean", "3": "Heavy Clean" } as Record<string, string>)[cleanLevel] ?? cleanLevel
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -1205,13 +1206,14 @@ export default function DashboardPage() {
 
                 {preferredPackage && results && (
                   <AIQuoteReview
+                    key={`${preferredPackage}-${toSqFt(squareFootage)}-${bedrooms}-${bathrooms}-${cleanLevel}-${pets}-${children}-${priceCards.find((card) => card.key === preferredPackage)?.price ?? 0}`}
                     quote={{
                       squareFootage: toSqFt(squareFootage),
                       bedrooms: Number(bedrooms) || 0,
                       bathrooms: Number(bathrooms) || 0,
                       serviceType: preferredPackage,
-                      cleaningLevel: cleanLevel,
-                      recurringFrequency: preferredPackage,
+                      cleaningLevel: cleanLevelLabel,
+                      recurringFrequency: preferredPackage.startsWith("monthly") ? "Monthly" : preferredPackage.startsWith("biweekly") ? "Bi-weekly" : preferredPackage.startsWith("weekly") ? "Weekly" : "One-time",
                       pets: Number(pets) || 0,
                       addOns: [],
                       estimatedHours: priceCards.find((card) => card.key === preferredPackage)?.hours ?? results.totalHours,
