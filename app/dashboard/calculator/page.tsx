@@ -1117,12 +1117,6 @@ export default function DashboardPage() {
                       return (
                         <Card
                           key={cardKey}
-                          onClick={
-                            card.label === "Deep Clean" ? () => setShowDeepClean(true)
-                            : card.label === "Move In / Move Out" ? () => setShowMoveIn(true)
-                            : card.label === "Single" ? () => setShowStandardClean(true)
-                            : undefined
-                          }
                           className={`relative transition-all hover:shadow-md ${
                             card.clickable ? "cursor-pointer hover:border-primary/50 hover:bg-accent/30" : ""
                           } ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
@@ -1207,6 +1201,26 @@ export default function DashboardPage() {
                     })}
                   </div>
                 </div>
+
+                <Card className="border-primary/20 bg-primary/5">
+                  <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="font-semibold text-foreground">Cleaning Checklist</h3>
+                      <p className="text-sm text-muted-foreground">Review and customize what&apos;s included in your cleaning service.</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        if (preferredPackage === "deep") setShowDeepClean(true)
+                        else if (preferredPackage === "move") setShowMoveIn(true)
+                        else setShowStandardClean(true)
+                      }}
+                    >
+                      Open Checklist
+                    </Button>
+                  </CardContent>
+                </Card>
 
                 <div className="flex flex-col gap-2">
                   <Button onClick={handleSaveQuote} variant="outline" className="w-full">
