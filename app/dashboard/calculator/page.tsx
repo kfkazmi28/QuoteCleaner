@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { usePricingSettings, defaultSettings } from "@/contexts/pricing-settings-context"
 import { Calculator, Sparkles, Lock, Info, Check, Bookmark, Send, FileDown, Pencil, Trash2, Plus, FolderOpen, ChevronDown, BookmarkPlus, MoreHorizontal } from "lucide-react"
@@ -1130,21 +1129,13 @@ export default function DashboardPage() {
                           <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
                             <div className="min-w-0">
                               <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
-                                <TooltipProvider delayDuration={100}>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <button type="button" className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                        <span>{card.subtitle}</span>
-                                        <Info className={`mt-0.5 h-3 w-3 shrink-0 ${isPreferred ? "text-primary-foreground" : "text-primary"}`} />
-                                      </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" showArrow={false} className="bg-white text-foreground border border-border shadow-md rounded-lg px-2.5 py-1.5 space-y-0.5 text-[11px]">
-                                      <p className="font-bold text-foreground">Estimated Labor Time</p>
-                                      <p className="text-foreground"><span className="font-bold">1 Cleaner:</span> {formatHours(card.hours)}</p>
-                                      <p className="text-foreground"><span className="font-bold">2 Cleaners:</span> {formatHours(card.hours / 2)}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                  <span>{card.subtitle}</span>
+                                </p>
+                                <div className={`mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                  <span>1 cleaner: {formatHours(card.hours)}</span>
+                                  <span>2 cleaners: {formatHours(card.hours / 2)}</span>
+                                </div>
                               </div>
                             <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
                           </CardContent>
@@ -1175,21 +1166,13 @@ export default function DashboardPage() {
                           <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
                             <div className="min-w-0">
                               <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
-                                <TooltipProvider delayDuration={100}>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <button type="button" className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                        <span>{card.subtitle}</span>
-                                        <Info className={`mt-0.5 h-3 w-3 shrink-0 ${isPreferred ? "text-primary-foreground" : "text-primary"}`} />
-                                      </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" showArrow={false} className="bg-white text-foreground border border-border shadow-md rounded-lg px-2.5 py-1.5 space-y-0.5 text-[11px]">
-                                      <p className="font-bold text-foreground">Estimated Labor Time</p>
-                                      <p className="text-foreground"><span className="font-bold">1 Cleaner:</span> {formatHours(card.hours)}</p>
-                                      <p className="text-foreground"><span className="font-bold">2 Cleaners:</span> {formatHours(card.hours / 2)}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                  <span>{card.subtitle}</span>
+                                </p>
+                                <div className={`mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                  <span>1 cleaner: {formatHours(card.hours)}</span>
+                                  <span>2 cleaners: {formatHours(card.hours / 2)}</span>
+                                </div>
                               </div>
                             <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
                           </CardContent>
