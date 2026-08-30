@@ -1117,9 +1117,10 @@ export default function DashboardPage() {
                       return (
                         <Card
                           key={cardKey}
-                          className={`relative transition-all hover:shadow-md ${
-                            card.clickable ? "cursor-pointer hover:border-primary/50 hover:bg-accent/30" : ""
-                          } ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
+                          onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
+                          className={`relative cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${
+                            isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"
+                          }`}
                         >
                           {isPreferred && (
                             <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
