@@ -403,6 +403,7 @@ export default function DashboardPage() {
   const [defaultSenderName, setDefaultSenderName] = useState<string | null>(null)
   const [preferredPackage, setPreferredPackage] = useState<string | null>(null)
   const [showCompare, setShowCompare] = useState(false)
+  const [showQuoteActions, setShowQuoteActions] = useState(false)
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
@@ -1060,16 +1061,15 @@ export default function DashboardPage() {
               <>
   <div>
     <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Quote summary</p>
-    <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your quote</h2>
     <p className="mt-2 text-base text-muted-foreground">Choose the cleaning service that best fits this home.</p>
   </div>
                 {(() => {
-                  const recommended = oneTimeCleans.find(card => card.key === preferredPackage) ?? oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
+                  const recommended = priceCards.find(card => card.key === preferredPackage) ?? oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
                   if (!recommended) return null
                   return <section className="border-b border-border pb-9 pt-3">
-                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                      <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span><span className="text-sm text-muted-foreground">{recommended.key === "deep" ? "Deep clean" : recommended.key === "move" ? "Move in / move out" : recommended.key === "standard" ? "Standard clean" : "One-time clean"}</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium text-muted-foreground"><span>1 cleaner · {formatHours(recommended.hours)}</span><span>2 cleaners · {formatHours(recommended.hours / 2)}</span></div></div>
-                      <div className="sm:text-right"><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => setPreferredPackage(recommended.key)} className="mt-5 w-full bg-primary sm:w-auto">Use this quote →</Button></div>
+                    <div className="flex flex-col gap-6">
+                      <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><div className="mt-4 flex flex-col gap-1 text-sm font-medium text-muted-foreground"><span>1 cleaner · {formatHours(recommended.hours)}</span><span>2 cleaners · {formatHours(recommended.hours / 2)}</span></div></div>
+                      <div><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p></div>
                     </div>
                   </section>
                 })()}
@@ -1093,48 +1093,16 @@ export default function DashboardPage() {
                     }}
                   />
                 )}
-                <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
-                {showCompare && <div className="space-y-8">
-                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
-                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section></div>}
+                {showCompare && <div className="mb-6 space-y-8">
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.map(card => <button key={card.key} type="button" onClick={() => { setPreferredPackage(card.key); setShowQuoteActions(false) }} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => { setPreferredPackage(card.key); setShowQuoteActions(false) }} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section></div>}
+                <div className="flex flex-col items-start gap-4">
+                  <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide options ↑" : "Compare Options →"}</button>
+                  {preferredPackage && <button type="button" onClick={() => setShowChecklist(true)} className="text-left text-sm font-semibold text-primary hover:underline">Open Checklist →</button>}
+                  <Button type="button" onClick={() => { setPreferredPackage(preferredPackage ?? "deep"); setShowQuoteActions(true) }} className="w-full bg-primary sm:w-auto">Use this quote →</Button>
+                </div>
 
-                {preferredPackage && <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
-                  <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <h3 className="font-semibold text-foreground">Cleaning Checklist</h3>
-                      <p className="text-sm text-muted-foreground">Review and customize what&apos;s included in your cleaning service.</p>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-  onClick={() => setShowChecklist(true)}
-                    >
-                      Open Checklist
-                    </Button>
-                  </CardContent>
-                </Card>}
 
-                {preferredPackage && <div className="flex flex-col gap-2">
-                  <Button onClick={handleSaveQuote} variant="outline" className="w-full">
-                    <Bookmark className="mr-2 h-4 w-4" />Save Quote
-                  </Button>
-                  <div className="flex gap-2">
-                    <Button onClick={handleSendQuote} variant="outline" className="flex-1">
-                      {hasUnlimitedAccess ? (
-                        <><Send className="mr-2 h-4 w-4" />Send Quote</>
-                      ) : (
-                        <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>
-                      )}
-                    </Button>
-                    <Button onClick={handleExportPdf} variant="outline" className="flex-1">
-                      {hasUnlimitedAccess ? (
-                        <><FileDown className="mr-2 h-4 w-4" />Export PDF</>
-                      ) : (
-                        <><Lock className="mr-2 h-4 w-4" />Export PDF (Pro)</>
-                      )}
-                    </Button>
-                  </div>
-                </div>}
               </>
             ) : (
               <Card className="flex h-full min-h-[300px] items-center justify-center border-dashed">
@@ -1152,6 +1120,23 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+  <Dialog open={showQuoteActions} onOpenChange={setShowQuoteActions}>
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle>What would you like to do?</DialogTitle>
+        <DialogDescription>Choose an option for this quote, or close this window to keep reviewing it.</DialogDescription>
+      </DialogHeader>
+      <div className="flex flex-col gap-3 pt-2">
+        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleSaveQuote}><Bookmark className="mr-2 h-4 w-4" />Save Quote</Button>
+        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleSendQuote}>{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Send Quote</> : <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>}</Button>
+        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleExportPdf}>{hasUnlimitedAccess ? <><FileDown className="mr-2 h-4 w-4" />Export PDF</> : <><Lock className="mr-2 h-4 w-4" />Export PDF (Pro)</>}</Button>
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="ghost" onClick={() => setShowQuoteActions(false)}>Close</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 
   <ChecklistModal
   open={showChecklist}
