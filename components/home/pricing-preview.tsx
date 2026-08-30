@@ -4,15 +4,6 @@ import { Check } from "lucide-react"
 
 const plans = [
   {
-    name: "Free",
-    price: "$0",
-    description: "Try it out at no cost.",
-    features: ["Up to 3 saved quotes", "All pricing tiers", "Mobile friendly"],
-    cta: "Get Started Free",
-    href: "/dashboard",
-    highlight: false,
-  },
-  {
     name: "Pro",
     price: "$15",
     period: "/mo",
@@ -37,7 +28,7 @@ export function PricingPreview() {
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="mx-auto grid max-w-md gap-6">
           {plans.map((plan) => (
             <div
               key={plan.name}

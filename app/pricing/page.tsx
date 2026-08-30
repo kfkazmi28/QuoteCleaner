@@ -15,19 +15,6 @@ import { createClient } from "@/lib/supabase/client"
 
 const plans = [
   {
-    name: "Free",
-    price: { monthly: null },
-    description: "Get started with one quote per week.",
-    features: [
-      { label: "3 quotes per week" },
-      { label: "Save up to 3 quotes per week" },
-      { label: "Instant pricing calculations" },
-    ],
-    cta: "Get Started",
-    href: "/login",
-    highlight: false,
-  },
-  {
     name: "Pro",
     price: { monthly: 8.99 },
     description: "Everything you need to quote without limits.",
@@ -105,8 +92,8 @@ export default function PricingPage() {
 
         {/* Plans */}
         <section className="pb-24">
-          <div className="mx-auto max-w-3xl px-4 sm:px-6">
-            <div className="grid gap-6 sm:grid-cols-2">
+          <div className="mx-auto max-w-xl px-4 sm:px-6">
+            <div className="grid gap-6">
               {plans.filter((plan) => showProPlus || plan.name !== "Pro Plus").map((plan) => {
                 const price = plan.price.monthly
 
@@ -114,7 +101,7 @@ export default function PricingPage() {
                   <div
                     key={plan.name}
                     className={cn(
-                      "relative flex flex-col rounded-2xl border p-6 shadow-sm",
+                      "relative flex flex-col items-center rounded-2xl border p-6 text-center shadow-sm",
                       plan.highlight
                         ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                         : "border-border bg-card text-card-foreground",
@@ -149,7 +136,7 @@ export default function PricingPage() {
 
                       <div className="mt-4">
                         {price !== null && price !== undefined ? (
-                          <div className="flex items-end gap-1">
+                          <div className="flex items-end justify-center gap-1">
                             <span
                               className={cn(
                                 "text-4xl font-black",
@@ -168,7 +155,7 @@ export default function PricingPage() {
                             </span>
                           </div>
                         ) : plan.name === "Free" ? (
-                          <div className="flex items-end gap-1">
+                          <div className="flex items-end justify-center gap-1">
                             <span
                               className={cn(
                                 "text-4xl font-black",
@@ -187,7 +174,7 @@ export default function PricingPage() {
                             </span>
                           </div>
                         ) : (
-                          <div className="flex items-end gap-1">
+                          <div className="flex items-end justify-center gap-1">
                             <span
                               className={cn(
                                 "text-4xl font-black",
@@ -209,7 +196,7 @@ export default function PricingPage() {
                       </div>
                     </div>
 
-                    <ul className="mb-8 flex flex-col gap-2.5">
+                    <ul className="mb-8 flex w-full max-w-sm flex-col gap-2.5 text-left">
                       {plan.features.map((f) => (
                         <li key={f.label} className="flex items-start gap-2.5 text-sm">
                           <Check

@@ -42,7 +42,7 @@ export function DashboardNav() {
   }
 
   const navLinks = [
-    { href: "/dashboard", label: "Calculator" },
+    { href: "/dashboard/calculator", label: "Calculator" },
     { href: "/dashboard/quotes", label: "Saved Quotes" },
     { href: "/dashboard/calendar", label: "Calendar" },
     { href: "/dashboard/contacts", label: "Contacts" },
@@ -68,8 +68,8 @@ export function DashboardNav() {
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+    <header aria-label="Dashboard navigation" className="dashboard-sidebar sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-b-0 md:border-r">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 md:w-full md:max-w-none md:flex-col md:items-stretch md:gap-8 md:px-5 md:py-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Sparkles className="h-4 w-4" />
@@ -78,13 +78,22 @@ export function DashboardNav() {
         </Link>
 
         {isLoggedIn && (
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden flex-col gap-1 md:flex">
+            <Link
+              href="/dashboard"
+              className={cn(
+                "rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-accent hover:text-primary",
+                pathname === "/dashboard" ? "bg-accent text-primary" : "text-foreground",
+              )}
+            >
+              Dashboard
+            </Link>
             {navLinks.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
+                  "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-primary",
                   pathname === l.href ? "text-primary" : "text-muted-foreground",
                 )}
               >
