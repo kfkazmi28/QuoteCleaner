@@ -786,27 +786,22 @@ export default function DashboardPage() {
       <DashboardNav />
 
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="mb-3 inline-flex items-center rounded-full border border-brand-blue/30 bg-brand-blue/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-primary">Pricing workspace</div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-4xl">Cleaning Quote Calculator</h1>
-            <p className="mt-2 max-w-xl text-muted-foreground">Turn a few home details into a quote your team can understand and your customers can trust.</p>
-          </div>
+        <div className="mb-12 max-w-2xl">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
+          <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">Build a professional quote in seconds. Enter a few details and we&apos;ll recommend a price.</p>
         </div>
 
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(24rem,0.78fr)_minmax(0,1.22fr)]">
           {/* Calculator Form */}
-          <section className="h-fit rounded-2xl bg-card p-6 shadow-sm sm:p-8">
-            <div className="mb-8 border-b border-border pb-6">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Quote builder</p>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Home details</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Add the essentials and we&apos;ll calculate a clear, confident quote.</p>
+          <section className="h-fit">
+            <div className="mb-10">
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s price this clean</h2>
             </div>
-            <div className="space-y-8">
-              <div className="space-y-2 rounded-xl border-2 border-brand-lime/70 bg-brand-lime/25 p-4 shadow-sm">
+            <div className="space-y-9">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2"><Label htmlFor="quote-location">Location</Label><span className="text-[11px] text-muted-foreground">City or ZIP code</span></div>
                 <div className="relative">
-                  <Input id="quote-location" placeholder="Enter a city or ZIP code" value={locationQuery} onFocus={() => setShowLocationSuggestions(locationSuggestions.length > 0)} onChange={e => { const value = e.target.value; setLocationQuery(value); setQuoteCity(/\d/.test(value) ? quoteCity : value); setQuoteZip(/^[0-9]{5}$/.test(value) ? value : ""); if (/^[0-9]{5}$/.test(value)) void lookupCityFromZip(value); else setShowLocationSuggestions(false) }} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" autoComplete="off" />
+                  <Input id="quote-location" placeholder="Enter a city or ZIP code" value={locationQuery} onFocus={() => setShowLocationSuggestions(locationSuggestions.length > 0)} onChange={e => { const value = e.target.value; setLocationQuery(value); setQuoteCity(/\d/.test(value) ? quoteCity : value); setQuoteZip(/^[0-9]{5}$/.test(value) ? value : ""); if (/^[0-9]{5}$/.test(value)) void lookupCityFromZip(value); else setShowLocationSuggestions(false) }} className="h-12 bg-transparent text-base shadow-none focus-visible:ring-primary" autoComplete="off" />
                   {isLookingUpZip && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" aria-live="polite">Looking up…</span>}
                   {showLocationSuggestions && locationSuggestions.length > 0 && <div className="absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md" role="listbox" aria-label="Location suggestions">{locationSuggestions.map(suggestion => <button key={suggestion.zip} type="button" className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent" onMouseDown={event => event.preventDefault()} onClick={() => { setLocationQuery(`${suggestion.city}, ${suggestion.state} ${suggestion.zip}`); setQuoteCity(suggestion.city); setQuoteZip(suggestion.zip); setShowLocationSuggestions(false) }}><span className="font-medium text-foreground">{suggestion.city}{suggestion.state ? `, ${suggestion.state}` : ""}</span><span className="text-xs text-muted-foreground">{suggestion.zip}</span></button>)}</div>}
                 </div>
@@ -875,7 +870,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 rounded-xl border border-brand-pink/20 bg-brand-pink/5 p-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <Label htmlFor="bedrooms">Bedrooms *</Label>
                   <Input
@@ -921,7 +916,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-muted/50 p-3">
+              <div className="border-t border-border pt-5">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Hourly Rate</span>
                   <span className="font-medium">${settings.hourlyRate}/hr</span>
@@ -1046,7 +1041,7 @@ export default function DashboardPage() {
                 ) : (
                   <>
                     <Calculator className="mr-2 h-4 w-4" />
-                    Generate Quote
+                    Generate my quote →
                   </>
                 )}
               </Button>
@@ -1064,28 +1059,21 @@ export default function DashboardPage() {
           </section>
 
           {/* Results */}
-          <div className="space-y-5">
-            <div className="relative overflow-visible rounded-2xl border-2 border-brand-pink/40 bg-brand-pink/15 px-5 py-4 shadow-sm">
-              <div className="absolute -bottom-2 left-8 size-4 rotate-45 border-b-2 border-r-2 border-brand-pink/40 bg-brand-pink/15" aria-hidden="true" />
-              <div className="relative flex items-start gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-yellow text-foreground shadow-sm"><Sparkles className="size-5" aria-hidden="true" /></div>
-                <div><p className="font-bold text-foreground">Your clean, your numbers, your next move.</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Pick a quote card to see the pricing details and Profit Planner insights that matter most.</p></div>
-              </div>
-            </div>
+          <div className="space-y-10">
             {results ? (
               <>
                 <div className="flex items-end justify-between gap-4">
-                  <div><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Quote preview</p><h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your recommended quote</h2></div>
+                  <div><h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your quote</h2><p className="mt-2 text-base text-muted-foreground">Based on the home details entered.</p></div>
                   <span className="hidden text-sm text-muted-foreground sm:block">Select any option to use it</span>
                 </div>
                 {(() => {
                   const recommended = oneTimeCleans.find(card => card.key === (preferredPackage || "deep")) ?? oneTimeCleans[1]
                   if (!recommended) return null
                   const isSelected = preferredPackage === recommended.key
-                  return <section className="rounded-2xl border border-primary/30 bg-card p-6 shadow-sm sm:p-8">
+                  return <section className="border-b border-border pb-9 pt-3">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                       <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span><span className="text-sm text-muted-foreground">One-time clean</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><p className="mt-4 text-sm font-medium text-muted-foreground">1 cleaner · {formatHours(recommended.hours)}</p></div>
-                      <div className="sm:text-right"><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => setPreferredPackage(isSelected ? null : recommended.key)} className="mt-5 w-full sm:w-auto">{isSelected ? "Selected quote" : "Select this quote"}</Button></div>
+                      <div className="sm:text-right"><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => setPreferredPackage(isSelected ? null : recommended.key)} className="mt-5 w-full bg-primary sm:w-auto">{isSelected ? "Selected quote" : "Select this quote"}</Button></div>
                     </div>
                   </section>
                 })()}
