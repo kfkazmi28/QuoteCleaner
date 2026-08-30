@@ -796,19 +796,13 @@ export default function DashboardPage() {
 
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(24rem,0.78fr)_minmax(0,1.22fr)]">
           {/* Calculator Form */}
-          <Card className="h-fit overflow-hidden border-brand-blue/30 bg-card shadow-sm">
-            <CardHeader className="border-b border-brand-blue/20 bg-brand-blue/10">
-              <CardTitle className="flex items-center gap-2">
-                <span className="flex size-9 items-center justify-center rounded-lg bg-brand-blue text-primary-foreground">
-                  <Calculator className="size-5" />
-                </span>
-                Home Details
-              </CardTitle>
-              <CardDescription>
-                Fill in the details below to calculate your quote
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 bg-background/60">
+          <section className="h-fit rounded-2xl bg-card p-6 shadow-sm sm:p-8">
+            <div className="mb-8 border-b border-border pb-6">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Quote builder</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Home details</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">Add the essentials and we&apos;ll calculate a clear, confident quote.</p>
+            </div>
+            <div className="space-y-8">
               <div className="space-y-2 rounded-xl border-2 border-brand-lime/70 bg-brand-lime/25 p-4 shadow-sm">
                 <div className="flex items-center justify-between gap-2"><Label htmlFor="quote-location">Location</Label><span className="text-[11px] text-muted-foreground">City or ZIP code</span></div>
                 <div className="relative">
@@ -1066,8 +1060,8 @@ export default function DashboardPage() {
                   </p>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
           {/* Results */}
           <div className="space-y-5">
@@ -1080,95 +1074,23 @@ export default function DashboardPage() {
             </div>
             {results ? (
               <>
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">Your Quote</h2>
-                
-                {/* One-Time Clean */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 rounded-xl border border-brand-yellow/50 bg-brand-yellow/20 px-4 py-4 shadow-sm">
-                    <span className="size-3 rounded-full bg-brand-yellow shadow-sm" />
-                    <p className="text-base font-bold uppercase tracking-wide text-foreground sm:text-lg">One-Time Clean</p>
-                  </div>
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    {oneTimeCleans.map((card) => {
-                      const cardKey = card.key
-                      const isPreferred = preferredPackage === cardKey
-                      return (
-                        <Card
-                          key={cardKey}
-                          onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                          className={`relative h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${
-                            isPreferred ? "border-primary bg-primary text-primary-foreground shadow-lg ring-2 ring-brand-yellow/60" : "border-border bg-card shadow-sm"
-                          }`}
-                        >
-                          {isPreferred && (
-                            <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
-                              Selected
-                            </Badge>
-                          )}
-                          <CardContent className="flex min-h-72 flex-col gap-5 p-6 sm:min-h-80 sm:p-7">
-                            <div className="flex min-w-0 flex-1 flex-col">
-                              <div className="flex items-start justify-between gap-3"><p className={`min-w-0 text-lg font-bold leading-tight sm:text-xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>{isPreferred && <Badge className="shrink-0 bg-brand-yellow text-foreground">Recommended</Badge>}</div>
-                                <p className={`mt-3 flex min-h-20 max-w-none items-start gap-1 text-sm leading-6 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                  <span>{card.subtitle}</span>
-                                </p>
-                                <div className={`mt-auto min-h-16 pt-5 flex flex-wrap content-start gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                  <span>1 cleaner: {formatHours(card.hours)}</span>
-                                  <span>2 cleaners: {formatHours(card.hours / 2)}</span>
-                                </div>
-                              </div>
-<div className={`flex flex-col gap-1 border-t pt-3 ${isPreferred ? "border-primary-foreground/25" : "border-border"}`}>
- <span className={`text-xs font-medium uppercase tracking-wide ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Starting price</span>
- <p className={`text-3xl font-bold leading-none tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
-  </div>
-                          </CardContent>
-                        </Card>
-                      )
-                    })}
-                  </div>
+                <div className="flex items-end justify-between gap-4">
+                  <div><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Quote preview</p><h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your recommended quote</h2></div>
+                  <span className="hidden text-sm text-muted-foreground sm:block">Select any option to use it</span>
                 </div>
-
-                {/* Recurring Clean */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 rounded-xl border border-brand-pink/50 bg-brand-pink/20 px-4 py-3 shadow-sm">
-                    <span className="size-3 rounded-full bg-brand-pink shadow-sm" />
-                    <p className="text-base font-bold uppercase tracking-wide text-foreground sm:text-lg">Recurring Clean</p>
-                  </div>
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    {recurringCleans.map((card) => {
-                      const cardKey = card.key
-                      const isPreferred = preferredPackage === cardKey
-                      return (
-                        <Card
-                          key={cardKey}
-                          onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                          className={`relative h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-lg ring-2 ring-brand-yellow/60" : "border-border bg-card shadow-sm"}`}
-                        >
-                          {isPreferred && (
-                            <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
-                              Selected
-                            </Badge>
-                          )}
-                          <CardContent className="flex min-h-72 flex-col gap-5 p-6 sm:min-h-80 sm:p-7">
-                            <div className="flex min-w-0 flex-1 flex-col">
-                              <div className="flex items-start justify-between gap-3"><p className={`min-w-0 text-lg font-bold leading-tight sm:text-xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>{isPreferred && <Badge className="shrink-0 bg-brand-yellow text-foreground">Recommended</Badge>}</div>
-                                <p className={`mt-3 flex min-h-20 max-w-none items-start gap-1 text-sm leading-6 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                  <span>{card.subtitle}</span>
-                                </p>
-                                <div className={`mt-auto min-h-16 pt-5 flex flex-wrap content-start gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                                  <span>1 cleaner: {formatHours(card.hours)}</span>
-                                  <span>2 cleaners: {formatHours(card.hours / 2)}</span>
-                                </div>
-                              </div>
-<div className={`flex flex-col gap-1 border-t pt-3 ${isPreferred ? "border-primary-foreground/25" : "border-border"}`}>
- <span className={`text-xs font-medium uppercase tracking-wide ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Starting price</span>
- <p className={`text-3xl font-bold leading-none tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
-  </div>
-                          </CardContent>
-                        </Card>
-                      )
-                    })}
-                  </div>
-                </div>
+                {(() => {
+                  const recommended = oneTimeCleans.find(card => card.key === (preferredPackage || "deep")) ?? oneTimeCleans[1]
+                  if (!recommended) return null
+                  const isSelected = preferredPackage === recommended.key
+                  return <section className="rounded-2xl border border-primary/30 bg-card p-6 shadow-sm sm:p-8">
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                      <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span><span className="text-sm text-muted-foreground">One-time clean</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><p className="mt-4 text-sm font-medium text-muted-foreground">1 cleaner · {formatHours(recommended.hours)}</p></div>
+                      <div className="sm:text-right"><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => setPreferredPackage(isSelected ? null : recommended.key)} className="mt-5 w-full sm:w-auto">{isSelected ? "Selected quote" : "Select this quote"}</Button></div>
+                    </div>
+                  </section>
+                })()}
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.filter(card => card.key !== (preferredPackage || "deep")).map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-muted/40"><span><span className="block font-semibold text-foreground">{card.label}</span><span className="block text-sm text-muted-foreground">{card.subtitle} · {formatHours(card.hours)}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-muted/40"><span><span className="block font-semibold text-foreground">{card.label}</span><span className="block text-sm text-muted-foreground">{card.subtitle} · {formatHours(card.hours)}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
 
                 <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
                   <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
