@@ -278,19 +278,7 @@ function SaveQuoteModal({
                     </Button>
                   </div>
                 </div>
-            ) : (
-              <Card className="flex h-full min-h-[300px] items-center justify-center border-dashed">
-                <CardContent className="text-center">
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                    <Calculator className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <p className="font-medium text-muted-foreground">No quote yet</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Fill in the form and click Generate Quote
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            </div>
           </div>
         </div>
       </main>
