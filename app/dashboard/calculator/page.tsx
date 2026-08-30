@@ -761,14 +761,19 @@ export default function DashboardPage() {
       <DashboardNav />
 
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Cleaning Quote Calculator</h1>
-          <p className="mt-1 text-muted-foreground">
-            Enter the home details to generate accurate pricing
-          </p>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center rounded-full border border-brand-blue/30 bg-brand-blue/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-primary">Pricing workspace</div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-4xl">Cleaning Quote Calculator</h1>
+            <p className="mt-2 max-w-xl text-muted-foreground">Turn a few home details into a quote your team can understand and your customers can trust.</p>
+          </div>
+          <div className="hidden rounded-xl border border-brand-yellow/40 bg-brand-yellow/15 px-4 py-3 text-right sm:block">
+            <p className="text-xs font-bold uppercase tracking-wide text-foreground">Fast, clear, confident</p>
+            <p className="mt-1 text-xs text-muted-foreground">Built for busy cleaning teams</p>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-10">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
           {/* Calculator Form */}
           <Card className="h-fit overflow-hidden border-brand-blue/30 bg-card shadow-sm">
             <CardHeader className="border-b border-brand-blue/20 bg-brand-blue/10">
@@ -857,7 +862,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 rounded-xl border border-brand-pink/20 bg-brand-pink/5 p-4">
                 <div className="space-y-2">
                   <Label htmlFor="bedrooms">Bedrooms *</Label>
                   <Input
@@ -1046,7 +1051,11 @@ export default function DashboardPage() {
           </Card>
 
           {/* Results */}
-          <div className="space-y-4">
+          <div className="space-y-5">
+            <div className="flex items-center justify-between rounded-xl border border-brand-yellow/40 bg-brand-yellow/15 px-4 py-3">
+              <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-foreground">Your results</p><p className="mt-1 text-sm text-muted-foreground">Compare options before you send.</p></div>
+              <div className="flex size-9 items-center justify-center rounded-full bg-brand-pink/30 text-primary"><Sparkles className="size-4" aria-hidden="true" /></div>
+            </div>
             <div className="relative overflow-visible rounded-2xl border-2 border-brand-pink/40 bg-brand-pink/15 px-5 py-4 shadow-sm">
               <div className="absolute -bottom-2 left-8 size-4 rotate-45 border-b-2 border-r-2 border-brand-pink/40 bg-brand-pink/15" aria-hidden="true" />
               <div className="relative flex items-start gap-3">
