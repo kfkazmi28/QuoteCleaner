@@ -767,10 +767,6 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-4xl">Cleaning Quote Calculator</h1>
             <p className="mt-2 max-w-xl text-muted-foreground">Turn a few home details into a quote your team can understand and your customers can trust.</p>
           </div>
-          <div className="hidden rounded-xl border border-brand-yellow/40 bg-brand-yellow/15 px-4 py-3 text-right sm:block">
-            <p className="text-xs font-bold uppercase tracking-wide text-foreground">Fast, clear, confident</p>
-            <p className="mt-1 text-xs text-muted-foreground">Built for busy cleaning teams</p>
-          </div>
         </div>
 
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
@@ -1052,10 +1048,6 @@ export default function DashboardPage() {
 
           {/* Results */}
           <div className="space-y-5">
-            <div className="flex items-center justify-between rounded-xl border border-brand-yellow/40 bg-brand-yellow/15 px-4 py-3">
-              <div><p className="text-xs font-bold uppercase tracking-[0.14em] text-foreground">Your results</p><p className="mt-1 text-sm text-muted-foreground">Compare options before you send.</p></div>
-              <div className="flex size-9 items-center justify-center rounded-full bg-brand-pink/30 text-primary"><Sparkles className="size-4" aria-hidden="true" /></div>
-            </div>
             <div className="relative overflow-visible rounded-2xl border-2 border-brand-pink/40 bg-brand-pink/15 px-5 py-4 shadow-sm">
               <div className="absolute -bottom-2 left-8 size-4 rotate-45 border-b-2 border-r-2 border-brand-pink/40 bg-brand-pink/15" aria-hidden="true" />
               <div className="relative flex items-start gap-3">
