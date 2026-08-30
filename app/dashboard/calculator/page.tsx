@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { usePricingSettings, defaultSettings } from "@/contexts/pricing-settings-context"
 import { Calculator, Sparkles, Lock, Info, Check, Bookmark, Send, FileDown, Pencil, Trash2, Plus, FolderOpen, ChevronDown, BookmarkPlus, MoreHorizontal } from "lucide-react"
-import { getSavedCalculators, saveCalculator, deleteCalculator, renameCalculator, type SavedCalculator } from "@/app/actions/calculators"
+import { getSavedCalculators, getCalculatorFolders, createCalculatorFolder, moveCalculator, saveCalculator, deleteCalculator, renameCalculator, type SavedCalculator, type CalculatorFolder } from "@/app/actions/calculators"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -376,6 +376,10 @@ export default function DashboardPage() {
   const [defaultSenderName, setDefaultSenderName] = useState<string | null>(null)
   const [preferredPackage, setPreferredPackage] = useState<string | null>(null)
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
+  const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
+  const [bookmarksOpen, setBookmarksOpen] = useState(false)
+  const [newFolderName, setNewFolderName] = useState("")
+  const [newFolderColor, setNewFolderColor] = useState("#0f766e")
   const [showSaveCalculatorModal, setShowSaveCalculatorModal] = useState(false)
   const [newCalculatorName, setNewCalculatorName] = useState("")
   const [savingCalculator, setSavingCalculator] = useState(false)
@@ -443,7 +447,10 @@ export default function DashboardPage() {
 
   // Load saved calculators on mount
   useEffect(() => {
-    getSavedCalculators().then(({ data }) => setSavedCalculators(data))
+    Promise.all([getSavedCalculators(), getCalculatorFolders()]).then(([calculators, folders]) => {
+      setSavedCalculators(calculators.data)
+      setCalculatorFolders(folders.data)
+    })
   }, [])
 
   // Load real subscription + day pass status from Supabase on mount
@@ -552,6 +559,23 @@ export default function DashboardPage() {
       toast.success("Renamed successfully")
       setRenamingCalcId(null)
     }
+  }
+
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) return
+    const { data, error } = await createCalculatorFolder(newFolderName, newFolderColor)
+    if (error) toast.error(error)
+    else if (data) {
+      setCalculatorFolders(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+      setNewFolderName("")
+      toast.success(`Created "${data.name}"`)
+    }
+  }
+
+  const handleMoveCalculator = async (calc: SavedCalculator, folderId: string | null) => {
+    const { error } = await moveCalculator(calc.id, folderId)
+    if (error) toast.error(error)
+    else setSavedCalculators(prev => prev.map(item => item.id === calc.id ? { ...item, folder_id: folderId } : item))
   }
 
   const handleSaveCalculator = async () => {
@@ -1450,6 +1474,34 @@ export default function DashboardPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <div className={cn("fixed right-0 top-1/2 z-40 flex -translate-y-1/2 items-stretch transition-transform", bookmarksOpen ? "translate-x-0" : "translate-x-[calc(100%-2.75rem)]")}>
+        <button type="button" onClick={() => setBookmarksOpen(prev => !prev)} className="flex w-11 flex-col items-center justify-center gap-2 rounded-l-xl bg-primary py-5 text-primary-foreground shadow-lg" aria-label="Toggle saved calculators">
+          <Bookmark className="h-5 w-5" />
+          <span className="[writing-mode:vertical-rl] text-xs font-semibold">Saved</span>
+        </button>
+        <aside className="w-80 max-w-[calc(100vw-2.75rem)] border border-border bg-background p-4 shadow-xl" aria-label="Saved calculators">
+          <div className="flex items-center justify-between">
+            <div><h2 className="font-semibold">Saved Calculators</h2><p className="text-xs text-muted-foreground">Organize your pricing settings</p></div>
+            <Button variant="ghost" size="icon" onClick={() => setBookmarksOpen(false)} aria-label="Close saved calculators"><ChevronDown className="h-4 w-4 rotate-90" /></Button>
+          </div>
+          <div className="mt-4 flex gap-2">
+            <Input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyDown={e => e.key === "Enter" && handleCreateFolder()} placeholder="New folder" className="h-9" />
+            <input type="color" value={newFolderColor} onChange={e => setNewFolderColor(e.target.value)} className="h-9 w-9 rounded border border-input bg-background p-1" aria-label="Folder color" />
+            <Button size="icon" onClick={handleCreateFolder} aria-label="Create folder"><Plus className="h-4 w-4" /></Button>
+          </div>
+          <div className="mt-4 max-h-[60vh] space-y-3 overflow-y-auto">
+            {calculatorFolders.map(folder => (
+              <section key={folder.id}>
+                <h3 className="flex items-center gap-2 text-sm font-medium"><span className="h-3 w-3 rounded-full" style={{ backgroundColor: folder.color }} />{folder.name}</h3>
+                <div className="mt-1 space-y-1 pl-5">{savedCalculators.filter(calc => calc.folder_id === folder.id).map(calc => <div key={calc.id} className="flex items-center gap-1"><button type="button" onClick={() => handleLoadCalculator(calc)} className="min-w-0 flex-1 truncate rounded px-2 py-1.5 text-left text-sm hover:bg-accent">{calc.name}</button><select value={calc.folder_id ?? ""} onChange={e => handleMoveCalculator(calc, e.target.value || null)} className="w-6 bg-transparent text-xs" aria-label={`Move ${calc.name}`}><option value="">•</option>{calculatorFolders.map(target => <option key={target.id} value={target.id}>{target.name}</option>)}</select></div>)}</div>
+              </section>
+            ))}
+            <section><h3 className="text-sm font-medium">Unfiled</h3><div className="mt-1 space-y-1">{savedCalculators.filter(calc => !calc.folder_id).map(calc => <div key={calc.id} className="flex items-center gap-1"><button type="button" onClick={() => handleLoadCalculator(calc)} className="min-w-0 flex-1 truncate rounded px-2 py-1.5 text-left text-sm hover:bg-accent">{calc.name}</button><select value={calc.folder_id ?? ""} onChange={e => handleMoveCalculator(calc, e.target.value || null)} className="w-6 bg-transparent text-xs" aria-label={`Move ${calc.name}`}><option value="">•</option>{calculatorFolders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}</select></div>)}</div></section>
+            {!savedCalculators.length && <p className="py-5 text-center text-sm text-muted-foreground">No saved calculators yet.</p>}
+          </div>
+        </aside>
+      </div>
     </div>
   )
 }

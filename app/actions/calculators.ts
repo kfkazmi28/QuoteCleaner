@@ -9,6 +9,15 @@ export interface SavedCalculator {
   settings: PricingSettings
   created_at: string
   updated_at: string
+  folder_id?: string | null
+}
+
+export interface CalculatorFolder {
+  id: string
+  name: string
+  color: string
+  created_at: string
+  updated_at: string
 }
 
 export async function getSavedCalculators(): Promise<{ data: SavedCalculator[]; error?: string }> {
@@ -68,6 +77,31 @@ export async function saveCalculator(
   }
 
   return { data }
+}
+
+export async function getCalculatorFolders(): Promise<{ data: CalculatorFolder[]; error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: [], error: "Not authenticated" }
+  const { data, error } = await supabase.from("calculator_folders").select("id,name,color,created_at,updated_at").eq("user_id", user.id).order("name")
+  return { data: data ?? [], error: error?.message }
+}
+
+export async function createCalculatorFolder(name: string, color: string): Promise<{ data?: CalculatorFolder; error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+  if (!name.trim()) return { error: "Folder name is required" }
+  const { data, error } = await supabase.from("calculator_folders").insert({ user_id: user.id, name: name.trim(), color }).select("id,name,color,created_at,updated_at").single()
+  return { data: data ?? undefined, error: error?.message }
+}
+
+export async function moveCalculator(id: string, folderId: string | null): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+  const { error } = await supabase.from("saved_calculators").update({ folder_id: folderId, updated_at: new Date().toISOString() }).eq("id", id).eq("user_id", user.id)
+  return { error: error?.message }
 }
 
 export async function renameCalculator(id: string, newName: string): Promise<{ error?: string }> {
