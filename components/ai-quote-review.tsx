@@ -5,7 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { ChevronDown, Loader2, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
-type QuoteReviewInput = { squareFootage: number; bedrooms: number; bathrooms: number; serviceType: string; cleaningLevel: string; recurringFrequency: string; pets: number; addOns: string[]; estimatedHours: number; notes: string; checklist: unknown; totalPrice: number }
+type QuoteReviewInput = { squareFootage: number; bedrooms: number; bathrooms: number; city: string; zip: string; serviceType: string; cleaningLevel: string; recurringFrequency: string; pets: number; addOns: string[]; estimatedHours: number; notes: string; checklist: unknown; totalPrice: number }
 type QuoteReview = { confidenceScore: number; estimatedMarketPriceRange: { min: number; max: number }; pricingFeedback: string; suggestedUpsells: string[]; missingServices: string[]; estimatedLaborHours: number; estimatedProfit: number; summary: string }
 
 export function AIQuoteReview({ quote }: { quote: QuoteReviewInput }) {

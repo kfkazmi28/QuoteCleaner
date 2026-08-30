@@ -26,6 +26,8 @@ export interface QuoteReviewInput {
   squareFootage: number
   bedrooms: number
   bathrooms: number
+  city?: string
+  zip?: string
   serviceType: string
   cleaningLevel: string
   recurringFrequency: string
