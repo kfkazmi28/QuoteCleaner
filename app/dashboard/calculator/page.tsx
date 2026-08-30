@@ -1061,7 +1061,6 @@ export default function DashboardPage() {
               <>
   <div>
     <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Quote summary</p>
-    <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your quote</h2>
     <p className="mt-2 text-base text-muted-foreground">Choose the cleaning service that best fits this home.</p>
   </div>
                 {(() => {
