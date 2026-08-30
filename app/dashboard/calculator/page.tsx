@@ -770,24 +770,28 @@ export default function DashboardPage() {
 
         <div className="flex flex-col gap-10">
           {/* Calculator Form */}
-          <Card className="h-fit">
-            <CardHeader>
+          <Card className="h-fit overflow-hidden border-brand-blue/30 bg-card shadow-sm">
+            <CardHeader className="border-b border-brand-blue/20 bg-brand-blue/10">
               <CardTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-primary" />
+                <span className="flex size-9 items-center justify-center rounded-lg bg-brand-blue text-primary-foreground">
+                  <Calculator className="size-5" />
+                </span>
                 Home Details
               </CardTitle>
               <CardDescription>
                 Fill in the details below to calculate your quote
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="quote-city">City</Label>
-                <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="quote-zip">ZIP Code</Label>
-                <Input id="quote-zip" inputMode="numeric" placeholder="e.g., 78701" value={quoteZip} onChange={e => setQuoteZip(e.target.value)} />
+            <CardContent className="space-y-6 bg-background/60">
+              <div className="grid gap-4 rounded-xl border border-brand-blue/20 bg-brand-blue/5 p-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="quote-city">City</Label>
+                  <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="quote-zip">ZIP Code</Label>
+                  <Input id="quote-zip" inputMode="numeric" placeholder="e.g., 78701" value={quoteZip} onChange={e => setQuoteZip(e.target.value)} />
+                </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -1048,8 +1052,11 @@ export default function DashboardPage() {
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">Your Quote</h2>
                 
                 {/* One-Time Clean */}
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "oklch(0.72 0.15 80)" }}>One-Time Clean</p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-brand-yellow" />
+                    <p className="text-xs font-bold uppercase tracking-wide text-foreground">One-Time Clean</p>
+                  </div>
                   <div className="grid gap-3 md:grid-cols-3">
                     {oneTimeCleans.map((card) => {
                       const cardKey = card.key
@@ -1087,8 +1094,11 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Recurring Clean */}
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "oklch(0.72 0.15 80)" }}>Recurring Clean</p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-brand-pink" />
+                    <p className="text-xs font-bold uppercase tracking-wide text-foreground">Recurring Clean</p>
+                  </div>
                   <div className="grid gap-3 md:grid-cols-3">
                     {recurringCleans.map((card) => {
                       const cardKey = card.key
@@ -1123,7 +1133,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <Card className="border-primary/20 bg-primary/5">
+                <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
                   <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h3 className="font-semibold text-foreground">Cleaning Checklist</h3>
