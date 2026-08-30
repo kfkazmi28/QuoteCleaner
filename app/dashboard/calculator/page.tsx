@@ -129,6 +129,7 @@ function SaveQuoteModal({
   const isAddressComplete = fields.streetAddress.trim() && fields.city.trim() && fields.state.trim() && fields.zip.trim()
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
@@ -281,7 +282,10 @@ function SaveQuoteModal({
             </div>
           </div>
         </div>
-      </main>
+        </form>
+      </DialogContent>
+    </Dialog>
+      <main></main>
 
       <ChecklistModal
         open={showDeepClean}
@@ -519,6 +523,6 @@ function SaveQuoteModal({
           </div>
         </aside>
       </div>
-    </div>
+    </>
   )
 }
