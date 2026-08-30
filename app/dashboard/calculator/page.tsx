@@ -1064,7 +1064,7 @@ export default function DashboardPage() {
     <p className="mt-2 text-base text-muted-foreground">Choose the cleaning service that best fits this home.</p>
   </div>
                 {(() => {
-                  const recommended = oneTimeCleans.find(card => card.key === preferredPackage) ?? oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
+                  const recommended = priceCards.find(card => card.key === preferredPackage) ?? oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
                   if (!recommended) return null
                   return <section className="border-b border-border pb-9 pt-3">
                     <div className="flex flex-col gap-6">
