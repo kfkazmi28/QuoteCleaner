@@ -1094,7 +1094,7 @@ export default function DashboardPage() {
                   />
                 )}
                 <div className="flex flex-col items-start gap-4">
-                  <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
+                  <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide options ↑" : "Compare Options →"}</button>
                   {preferredPackage && <button type="button" onClick={() => setShowChecklist(true)} className="text-left text-sm font-semibold text-primary hover:underline">Open Checklist →</button>}
                   <Button type="button" onClick={() => { setPreferredPackage(preferredPackage ?? "deep"); setShowQuoteActions(true) }} className="w-full bg-primary sm:w-auto">Use this quote →</Button>
                 </div>
