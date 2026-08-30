@@ -15,19 +15,6 @@ import { createClient } from "@/lib/supabase/client"
 
 const plans = [
   {
-    name: "Free",
-    price: { monthly: null },
-    description: "Get started with one quote per week.",
-    features: [
-      { label: "3 quotes per week" },
-      { label: "Save up to 3 quotes per week" },
-      { label: "Instant pricing calculations" },
-    ],
-    cta: "Get Started",
-    href: "/login",
-    highlight: false,
-  },
-  {
     name: "Pro",
     price: { monthly: 8.99 },
     description: "Everything you need to quote without limits.",
@@ -105,8 +92,8 @@ export default function PricingPage() {
 
         {/* Plans */}
         <section className="pb-24">
-          <div className="mx-auto max-w-3xl px-4 sm:px-6">
-            <div className="grid gap-6 sm:grid-cols-2">
+          <div className="mx-auto max-w-xl px-4 sm:px-6">
+            <div className="grid gap-6">
               {plans.filter((plan) => showProPlus || plan.name !== "Pro Plus").map((plan) => {
                 const price = plan.price.monthly
 
