@@ -1073,7 +1073,7 @@ export default function DashboardPage() {
                     <span className="size-2 rounded-full bg-brand-yellow" />
                     <p className="text-xs font-bold uppercase tracking-wide text-foreground">One-Time Clean</p>
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
                     {oneTimeCleans.map((card) => {
                       const cardKey = card.key
                       const isPreferred = preferredPackage === cardKey
@@ -1118,7 +1118,7 @@ export default function DashboardPage() {
                     <span className="size-2 rounded-full bg-brand-pink" />
                     <p className="text-xs font-bold uppercase tracking-wide text-foreground">Recurring Clean</p>
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
                     {recurringCleans.map((card) => {
                       const cardKey = card.key
                       const isPreferred = preferredPackage === cardKey
