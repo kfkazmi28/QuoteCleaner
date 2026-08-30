@@ -1052,10 +1052,11 @@ export default function DashboardPage() {
           <div className="space-y-10">
             {results ? (
               <>
-                <div className="flex items-end justify-between gap-4">
-                  <div><h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your quote</h2><p className="mt-2 text-base text-muted-foreground">Based on the home details entered.</p></div>
-                  <span className="hidden text-sm text-muted-foreground sm:block">Select any option to use it</span>
-                </div>
+  <div>
+    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Quote summary</p>
+    <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your quote</h2>
+    <p className="mt-2 text-base text-muted-foreground">Choose the cleaning service that best fits this home.</p>
+  </div>
                 {(() => {
                   const recommended = oneTimeCleans.find(card => card.key === preferredPackage) ?? oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
                   if (!recommended) return null
