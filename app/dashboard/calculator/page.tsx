@@ -1066,26 +1066,6 @@ export default function DashboardPage() {
                     </div>
                   </section>
                 })()}
-                <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
-                {showCompare && <div className="space-y-8">
-                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
-                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section></div>}
-
-                {preferredPackage && <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
-                  <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <h3 className="font-semibold text-foreground">Cleaning Checklist</h3>
-                      <p className="text-sm text-muted-foreground">Review and customize what&apos;s included in your cleaning service.</p>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-  onClick={() => setShowChecklist(true)}
-                    >
-                      Open Checklist
-                    </Button>
-                  </CardContent>
-                </Card>}
 
                 {preferredPackage && results && (
                   <AIQuoteReview
@@ -1106,6 +1086,26 @@ export default function DashboardPage() {
                     }}
                   />
                 )}
+                <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
+                {showCompare && <div className="space-y-8">
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section></div>}
+
+                {preferredPackage && <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
+                  <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="font-semibold text-foreground">Cleaning Checklist</h3>
+                      <p className="text-sm text-muted-foreground">Review and customize what&apos;s included in your cleaning service.</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+  onClick={() => setShowChecklist(true)}
+                    >
+                      Open Checklist
+                    </Button>
+                  </CardContent>
+                </Card>}
 
                 {preferredPackage && <div className="flex flex-col gap-2">
                   <Button onClick={handleSaveQuote} variant="outline" className="w-full">
