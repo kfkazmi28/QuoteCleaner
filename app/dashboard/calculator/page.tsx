@@ -1073,7 +1073,7 @@ export default function DashboardPage() {
                     <span className="size-2 rounded-full bg-brand-yellow" />
                     <p className="text-xs font-bold uppercase tracking-wide text-foreground">One-Time Clean</p>
                   </div>
-                  <div className="grid gap-3 md:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {oneTimeCleans.map((card) => {
                       const cardKey = card.key
                       const isPreferred = preferredPackage === cardKey
@@ -1090,8 +1090,8 @@ export default function DashboardPage() {
                               Selected
                             </Badge>
                           )}
-                          <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
-                            <div className="flex min-w-0 h-full flex-col">
+                          <CardContent className="flex min-h-52 flex-col gap-4 p-5 sm:min-h-56 sm:p-6">
+                            <div className="flex min-w-0 flex-1 flex-col">
                               <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>{card.subtitle}</span>
@@ -1101,7 +1101,10 @@ export default function DashboardPage() {
                                   <span>2 cleaners: {formatHours(card.hours / 2)}</span>
                                 </div>
                               </div>
-                            <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
+                            <div className={`flex items-baseline justify-between border-t pt-3 ${isPreferred ? "border-primary-foreground/25" : "border-border"}`}>
+                              <span className={`text-xs font-medium uppercase tracking-wide ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Starting price</span>
+                              <p className={`text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
+                            </div>
                           </CardContent>
                         </Card>
                       )
@@ -1115,7 +1118,7 @@ export default function DashboardPage() {
                     <span className="size-2 rounded-full bg-brand-pink" />
                     <p className="text-xs font-bold uppercase tracking-wide text-foreground">Recurring Clean</p>
                   </div>
-                  <div className="grid gap-3 md:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {recurringCleans.map((card) => {
                       const cardKey = card.key
                       const isPreferred = preferredPackage === cardKey
@@ -1130,8 +1133,8 @@ export default function DashboardPage() {
                               Selected
                             </Badge>
                           )}
-                          <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
-                            <div className="flex min-w-0 h-full flex-col">
+                          <CardContent className="flex min-h-52 flex-col gap-4 p-5 sm:min-h-56 sm:p-6">
+                            <div className="flex min-w-0 flex-1 flex-col">
                               <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>{card.subtitle}</span>
@@ -1141,7 +1144,10 @@ export default function DashboardPage() {
                                   <span>2 cleaners: {formatHours(card.hours / 2)}</span>
                                 </div>
                               </div>
-                            <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
+                            <div className={`flex items-baseline justify-between border-t pt-3 ${isPreferred ? "border-primary-foreground/25" : "border-border"}`}>
+                              <span className={`text-xs font-medium uppercase tracking-wide ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Starting price</span>
+                              <p className={`text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
+                            </div>
                           </CardContent>
                         </Card>
                       )
