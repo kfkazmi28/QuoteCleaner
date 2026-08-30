@@ -360,6 +360,24 @@ export default function DashboardPage() {
   const [sqftUnit, setSqftUnit] = useState<"sqft" | "sqm">("sqft")
   const [quoteCity, setQuoteCity] = useState("")
   const [quoteZip, setQuoteZip] = useState("")
+  const [isLookingUpZip, setIsLookingUpZip] = useState(false)
+  const lookupCityFromZip = async (zip: string) => {
+    const normalizedZip = zip.replace(/\D/g, "").slice(0, 5)
+    setQuoteZip(normalizedZip)
+    if (normalizedZip.length !== 5) return
+    setIsLookingUpZip(true)
+    try {
+      const response = await fetch(`https://api.zippopotam.us/us/${normalizedZip}`)
+      if (!response.ok) return
+      const data = await response.json() as { places?: { [key: string]: string }[] }
+      const city = data.places?.[0]?.["place name"]
+      if (city) setQuoteCity(city)
+    } catch {
+      // Keep manual city entry available if lookup is unavailable.
+    } finally {
+      setIsLookingUpZip(false)
+    }
+  }
   const [showPaywall, setShowPaywall] = useState(false)
   const [showCreditConfirm, setShowCreditConfirm] = useState(false)
   const [isCalculating, setIsCalculating] = useState(false)
@@ -782,14 +800,14 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 bg-background/60">
-              <div className="grid gap-4 rounded-xl border-2 border-brand-lime/70 bg-brand-lime/25 p-4 shadow-sm sm:grid-cols-2">
+              <div className="grid grid-cols-2 items-end gap-4 rounded-xl border-2 border-brand-lime/70 bg-brand-lime/25 p-4 shadow-sm">
                 <div className="space-y-2">
-                  <Label htmlFor="quote-city">City</Label>
+                  <div className="flex items-center justify-between gap-2"><Label htmlFor="quote-city">City</Label><span className="text-[11px] text-muted-foreground">Auto-filled from ZIP</span></div>
                   <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="quote-zip">ZIP Code</Label>
-                  <Input id="quote-zip" inputMode="numeric" placeholder="e.g., 78701" value={quoteZip} onChange={e => setQuoteZip(e.target.value)} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" />
+                  <div className="relative"><Input id="quote-zip" inputMode="numeric" maxLength={5} placeholder="e.g., 78701" value={quoteZip} onChange={e => { void lookupCityFromZip(e.target.value) }} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" />{isLookingUpZip && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" aria-live="polite">Looking up…</span>}</div>
                 </div>
               </div>
               <div className="space-y-2">
