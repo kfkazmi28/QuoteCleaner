@@ -89,7 +89,7 @@ export default function PricingSettingsPage() {
     return (
       <div className="min-h-screen bg-muted/30">
         <DashboardNav />
-        <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+        <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
           <div className="flex items-center justify-center py-20">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>
@@ -102,7 +102,7 @@ export default function PricingSettingsPage() {
     <div className="min-h-screen bg-muted/30">
       <DashboardNav />
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
         <Link
           href="/dashboard"
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
