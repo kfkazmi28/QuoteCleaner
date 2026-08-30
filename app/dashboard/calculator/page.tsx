@@ -775,13 +775,6 @@ export default function DashboardPage() {
               <CardDescription>
                 Fill in the details below to calculate your quote
               </CardDescription>
-              {/* Saved calculator controls */}
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Button type="button" size="sm" className="gap-2" onClick={() => setShowSaveCalculatorModal(true)}>
-                  <BookmarkPlus className="h-4 w-4" />
-                  Save Calculator
-                </Button>
-              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
@@ -996,6 +989,17 @@ export default function DashboardPage() {
                   })()}
                 </div>
               </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowSaveCalculatorModal(true)}
+                className="w-full gap-2"
+                size="lg"
+              >
+                <BookmarkPlus className="h-4 w-4" />
+                Save Calculator
+              </Button>
 
               <Button
                 onClick={calculateQuote}
