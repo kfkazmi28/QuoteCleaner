@@ -794,7 +794,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(24rem,0.78fr)_minmax(0,1.22fr)]">
           {/* Calculator Form */}
           <Card className="h-fit overflow-hidden border-brand-blue/30 bg-card shadow-sm">
             <CardHeader className="border-b border-brand-blue/20 bg-brand-blue/10">
@@ -1097,7 +1097,7 @@ export default function DashboardPage() {
                           key={cardKey}
                           onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
                           className={`relative h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${
-                            isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"
+                            isPreferred ? "border-primary bg-primary text-primary-foreground shadow-lg ring-2 ring-brand-yellow/60" : "border-border bg-card shadow-sm"
                           }`}
                         >
                           {isPreferred && (
@@ -1107,8 +1107,8 @@ export default function DashboardPage() {
                           )}
                           <CardContent className="flex min-h-64 flex-col gap-4 p-5 sm:min-h-72 sm:p-6">
                             <div className="flex min-w-0 flex-1 flex-col">
-                              <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
-                                <p className={`mt-2 flex min-h-20 max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                              <div className="flex items-start justify-between gap-3"><p className={`min-w-0 text-lg font-bold leading-tight sm:text-xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>{isPreferred && <Badge className="shrink-0 bg-brand-yellow text-foreground">Recommended</Badge>}</div>
+                                <p className={`mt-3 flex min-h-20 max-w-none items-start gap-1 text-sm leading-6 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>{card.subtitle}</span>
                                 </p>
                                 <div className={`mt-auto min-h-16 pt-5 flex flex-wrap content-start gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
@@ -1141,7 +1141,7 @@ export default function DashboardPage() {
                         <Card
                           key={cardKey}
                           onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                          className={`relative h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
+                          className={`relative h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-lg ring-2 ring-brand-yellow/60" : "border-border bg-card shadow-sm"}`}
                         >
                           {isPreferred && (
                             <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
@@ -1150,8 +1150,8 @@ export default function DashboardPage() {
                           )}
                           <CardContent className="flex min-h-64 flex-col gap-4 p-5 sm:min-h-72 sm:p-6">
                             <div className="flex min-w-0 flex-1 flex-col">
-                              <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
-                                <p className={`mt-2 flex min-h-20 max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                              <div className="flex items-start justify-between gap-3"><p className={`min-w-0 text-lg font-bold leading-tight sm:text-xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>{isPreferred && <Badge className="shrink-0 bg-brand-yellow text-foreground">Recommended</Badge>}</div>
+                                <p className={`mt-3 flex min-h-20 max-w-none items-start gap-1 text-sm leading-6 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>{card.subtitle}</span>
                                 </p>
                                 <div className={`mt-auto min-h-16 pt-5 flex flex-wrap content-start gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
