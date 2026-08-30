@@ -1098,21 +1098,7 @@ export default function DashboardPage() {
                 <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.map(card => <button key={card.key} type="button" onClick={() => { setPreferredPackage(card.key); setShowQuoteActions(false) }} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
                 <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => { setPreferredPackage(card.key); setShowQuoteActions(false) }} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section></div>}
 
-                {preferredPackage && <Card className="border-border bg-transparent shadow-none">
-                  <CardContent className="flex flex-col gap-3 px-0 py-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground">Cleaning Checklist</h3>
-                      <p className="text-sm text-muted-foreground">Review and customize what&apos;s included in your cleaning service.</p>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-  onClick={() => setShowChecklist(true)}
-                    >
-                      Open Checklist
-                    </Button>
-                  </CardContent>
-                </Card>}
+                {preferredPackage && <button type="button" onClick={() => setShowChecklist(true)} className="text-left text-sm font-semibold text-primary hover:underline">Open Checklist →</button>}
 
 
               </>
