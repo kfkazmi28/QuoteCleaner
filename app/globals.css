@@ -15,6 +15,7 @@
   --brand-blue: oklch(0.62 0.12 225);
   --brand-yellow: oklch(0.82 0.16 90);
   --brand-pink: oklch(0.78 0.10 350);
+  --brand-lime: oklch(0.88 0.20 115);
   --secondary: oklch(0.96 0.02 175);
   --secondary-foreground: oklch(0.35 0.08 175);
   --muted: oklch(0.96 0.01 220);
@@ -92,6 +93,7 @@
   --color-brand-blue: var(--brand-blue);
   --color-brand-yellow: var(--brand-yellow);
   --color-brand-pink: var(--brand-pink);
+  --color-brand-lime: var(--brand-lime);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);

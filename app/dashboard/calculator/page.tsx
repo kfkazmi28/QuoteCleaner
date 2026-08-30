@@ -782,14 +782,14 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 bg-background/60">
-              <div className="grid gap-4 rounded-xl border border-brand-blue/20 bg-brand-blue/5 p-4 sm:grid-cols-2">
+              <div className="grid gap-4 rounded-xl border-2 border-brand-lime/70 bg-brand-lime/25 p-4 shadow-sm sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="quote-city">City</Label>
-                  <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} />
+                  <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="quote-zip">ZIP Code</Label>
-                  <Input id="quote-zip" inputMode="numeric" placeholder="e.g., 78701" value={quoteZip} onChange={e => setQuoteZip(e.target.value)} />
+                  <Input id="quote-zip" inputMode="numeric" placeholder="e.g., 78701" value={quoteZip} onChange={e => setQuoteZip(e.target.value)} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" />
                 </div>
               </div>
               <div className="space-y-2">
