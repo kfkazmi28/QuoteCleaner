@@ -1047,6 +1047,13 @@ export default function DashboardPage() {
 
           {/* Results */}
           <div className="space-y-4">
+            <div className="relative overflow-visible rounded-2xl border-2 border-brand-pink/40 bg-brand-pink/15 px-5 py-4 shadow-sm">
+              <div className="absolute -bottom-2 left-8 size-4 rotate-45 border-b-2 border-r-2 border-brand-pink/40 bg-brand-pink/15" aria-hidden="true" />
+              <div className="relative flex items-start gap-3">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-yellow text-foreground shadow-sm"><Sparkles className="size-5" aria-hidden="true" /></div>
+                <div><p className="font-bold text-foreground">Your clean, your numbers, your next move.</p><p className="mt-1 text-sm leading-relaxed text-muted-foreground">Pick a quote card to see the pricing details and Profit Planner insights that matter most.</p></div>
+              </div>
+            </div>
             {results ? (
               <>
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">Your Quote</h2>
