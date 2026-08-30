@@ -1081,7 +1081,7 @@ export default function DashboardPage() {
                         <Card
                           key={cardKey}
                           onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                          className={`relative cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${
+                          className={`relative h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${
                             isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"
                           }`}
                         >
@@ -1090,13 +1090,13 @@ export default function DashboardPage() {
                               Selected
                             </Badge>
                           )}
-                          <CardContent className="flex min-h-52 flex-col gap-4 p-5 sm:min-h-56 sm:p-6">
+                          <CardContent className="flex min-h-64 flex-col gap-4 p-5 sm:min-h-72 sm:p-6">
                             <div className="flex min-w-0 flex-1 flex-col">
                               <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
-                                <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                <p className={`mt-2 flex min-h-20 max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>{card.subtitle}</span>
                                 </p>
-                                <div className={`mt-auto pt-5 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                <div className={`mt-auto min-h-16 pt-5 flex flex-wrap content-start gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>1 cleaner: {formatHours(card.hours)}</span>
                                   <span>2 cleaners: {formatHours(card.hours / 2)}</span>
                                 </div>
@@ -1126,20 +1126,20 @@ export default function DashboardPage() {
                         <Card
                           key={cardKey}
                           onClick={() => setPreferredPackage(isPreferred ? null : cardKey)}
-                          className={`relative cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
+                          className={`relative h-full cursor-pointer transition-all hover:shadow-md hover:border-primary/50 ${isPreferred ? "border-primary bg-primary text-primary-foreground shadow-md" : "border-border bg-card"}`}
                         >
                           {isPreferred && (
                             <Badge variant="outline" className="absolute -top-2 left-4 gap-1 border-primary bg-background text-primary">
                               Selected
                             </Badge>
                           )}
-                          <CardContent className="flex min-h-52 flex-col gap-4 p-5 sm:min-h-56 sm:p-6">
+                          <CardContent className="flex min-h-64 flex-col gap-4 p-5 sm:min-h-72 sm:p-6">
                             <div className="flex min-w-0 flex-1 flex-col">
                               <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
-                                <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                <p className={`mt-2 flex min-h-20 max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>{card.subtitle}</span>
                                 </p>
-                                <div className={`mt-auto pt-5 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                <div className={`mt-auto min-h-16 pt-5 flex flex-wrap content-start gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>1 cleaner: {formatHours(card.hours)}</span>
                                   <span>2 cleaners: {formatHours(card.hours / 2)}</span>
                                 </div>
