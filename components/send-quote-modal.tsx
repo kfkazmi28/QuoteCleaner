@@ -16,6 +16,8 @@ import { Send, MessageSquare, Mail, Save } from "lucide-react"
 import { PhoneInput } from "@/components/phone-input"
 import { toast } from "sonner"
 import { updateQuote } from "@/app/actions/quotes"
+import { getClientContacts } from "@/app/actions/contacts"
+import type { ClientContact } from "@/lib/contacts-types"
 import { COMPANY_NAME, EMAIL_FOOTER_TEXT, WEBSITE_URL, SUPPORT_EMAIL } from "@/lib/company-config"
 
 export interface SendQuoteData {
@@ -119,6 +121,20 @@ export function SendQuoteModal({
     clientPhone: "",
   })
   const [saving, setSaving] = useState(false)
+  const [clientContacts, setClientContacts] = useState<ClientContact[]>([])
+  const [contactsLoaded, setContactsLoaded] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+
+  const loadContacts = async () => {
+    if (contactsLoaded) return
+    const contacts = await getClientContacts()
+    setClientContacts(contacts.filter(contact => contact.is_active !== false))
+    setContactsLoaded(true)
+  }
+
+  const matchingContacts = clientContacts.filter(savedContact =>
+    savedContact.name.toLowerCase().includes(contact.clientName.toLowerCase())
+  ).slice(0, 6)
 
   useEffect(() => {
     if (data) {
@@ -201,15 +217,28 @@ export function SendQuoteModal({
                   className="h-8 text-sm"
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="relative flex flex-col gap-1.5">
                 <Label htmlFor="sq-client-name" className="text-sm text-muted-foreground">Client Name</Label>
                 <Input
                   id="sq-client-name"
                   value={contact.clientName}
-                  onChange={e => setContact(c => ({ ...c, clientName: e.target.value }))}
-                  placeholder="Client full name"
+                  onFocus={() => { void loadContacts(); setShowSuggestions(true) }}
+                  onChange={e => { setContact(c => ({ ...c, clientName: e.target.value })); setShowSuggestions(true); void loadContacts() }}
+                  onBlur={() => window.setTimeout(() => setShowSuggestions(false), 150)}
+                  placeholder="Start typing a client name"
                   className="h-8 text-sm"
+                  autoComplete="off"
                 />
+                {showSuggestions && contact.clientName.trim() && matchingContacts.length > 0 && (
+                  <div className="absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md" role="listbox" aria-label="Client contacts">
+                    {matchingContacts.map(client => (
+                      <button key={client.id} type="button" className="flex w-full flex-col gap-0.5 px-3 py-2 text-left text-sm hover:bg-accent" onMouseDown={event => event.preventDefault()} onClick={() => { setContact(c => ({ ...c, clientName: client.name, clientEmail: client.email ?? "", clientPhone: client.phone ?? "" })); setShowSuggestions(false) }}>
+                        <span className="font-medium text-foreground">{client.name}</span>
+                        <span className="text-xs text-muted-foreground">{[client.email, client.phone].filter(Boolean).join(" · ") || "No email or phone saved"}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="sq-client-email" className="text-sm text-muted-foreground">Client Email</Label>
