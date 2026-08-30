@@ -1084,11 +1084,11 @@ export default function DashboardPage() {
                 
                 {/* One-Time Clean */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 rounded-xl border border-brand-yellow/50 bg-brand-yellow/20 px-4 py-3 shadow-sm">
+                  <div className="flex items-center gap-3 rounded-xl border border-brand-yellow/50 bg-brand-yellow/20 px-4 py-4 shadow-sm">
                     <span className="size-3 rounded-full bg-brand-yellow shadow-sm" />
                     <p className="text-base font-bold uppercase tracking-wide text-foreground sm:text-lg">One-Time Clean</p>
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
+                  <div className="grid gap-5 sm:grid-cols-2">
                     {oneTimeCleans.map((card) => {
                       const cardKey = card.key
                       const isPreferred = preferredPackage === cardKey
@@ -1105,7 +1105,7 @@ export default function DashboardPage() {
                               Selected
                             </Badge>
                           )}
-                          <CardContent className="flex min-h-64 flex-col gap-4 p-5 sm:min-h-72 sm:p-6">
+                          <CardContent className="flex min-h-72 flex-col gap-5 p-6 sm:min-h-80 sm:p-7">
                             <div className="flex min-w-0 flex-1 flex-col">
                               <div className="flex items-start justify-between gap-3"><p className={`min-w-0 text-lg font-bold leading-tight sm:text-xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>{isPreferred && <Badge className="shrink-0 bg-brand-yellow text-foreground">Recommended</Badge>}</div>
                                 <p className={`mt-3 flex min-h-20 max-w-none items-start gap-1 text-sm leading-6 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
@@ -1133,7 +1133,7 @@ export default function DashboardPage() {
                     <span className="size-3 rounded-full bg-brand-pink shadow-sm" />
                     <p className="text-base font-bold uppercase tracking-wide text-foreground sm:text-lg">Recurring Clean</p>
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
+                  <div className="grid gap-5 sm:grid-cols-2">
                     {recurringCleans.map((card) => {
                       const cardKey = card.key
                       const isPreferred = preferredPackage === cardKey
@@ -1148,7 +1148,7 @@ export default function DashboardPage() {
                               Selected
                             </Badge>
                           )}
-                          <CardContent className="flex min-h-64 flex-col gap-4 p-5 sm:min-h-72 sm:p-6">
+                          <CardContent className="flex min-h-72 flex-col gap-5 p-6 sm:min-h-80 sm:p-7">
                             <div className="flex min-w-0 flex-1 flex-col">
                               <div className="flex items-start justify-between gap-3"><p className={`min-w-0 text-lg font-bold leading-tight sm:text-xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>{isPreferred && <Badge className="shrink-0 bg-brand-yellow text-foreground">Recommended</Badge>}</div>
                                 <p className={`mt-3 flex min-h-20 max-w-none items-start gap-1 text-sm leading-6 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
