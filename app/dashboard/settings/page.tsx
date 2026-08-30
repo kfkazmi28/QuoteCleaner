@@ -76,7 +76,7 @@ export default function PricingSettingsPage() {
   const handleSave = () => {
     updateSettings(localSettings)
     toast.success("Pricing settings updated")
-    router.push("/dashboard")
+    router.push("/dashboard/calculator")
   }
 
   const handleReset = () => {
