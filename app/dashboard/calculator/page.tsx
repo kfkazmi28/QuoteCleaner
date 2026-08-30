@@ -360,6 +360,9 @@ export default function DashboardPage() {
   const [sqftUnit, setSqftUnit] = useState<"sqft" | "sqm">("sqft")
   const [quoteCity, setQuoteCity] = useState("")
   const [quoteZip, setQuoteZip] = useState("")
+  const [locationQuery, setLocationQuery] = useState("")
+  const [locationSuggestions, setLocationSuggestions] = useState<{ city: string; state: string; zip: string }[]>([])
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false)
   const [isLookingUpZip, setIsLookingUpZip] = useState(false)
   const lookupCityFromZip = async (zip: string) => {
     const normalizedZip = zip.replace(/\D/g, "").slice(0, 5)
@@ -370,8 +373,14 @@ export default function DashboardPage() {
       const response = await fetch(`https://api.zippopotam.us/us/${normalizedZip}`)
       if (!response.ok) return
       const data = await response.json() as { places?: { [key: string]: string }[] }
-      const city = data.places?.[0]?.["place name"]
-      if (city) setQuoteCity(city)
+      const place = data.places?.[0]
+      const city = place?.["place name"]
+      const state = place?.["state abbreviation"] || place?.state || ""
+      if (city) {
+        setQuoteCity(city)
+        setLocationSuggestions([{ city, state, zip: normalizedZip }])
+        setShowLocationSuggestions(true)
+      }
     } catch {
       // Keep manual city entry available if lookup is unavailable.
     } finally {
@@ -800,14 +809,12 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 bg-background/60">
-              <div className="grid grid-cols-2 items-end gap-4 rounded-xl border-2 border-brand-lime/70 bg-brand-lime/25 p-4 shadow-sm">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2"><Label htmlFor="quote-city">City</Label><span className="text-[11px] text-muted-foreground">Auto-filled from ZIP</span></div>
-                  <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="quote-zip">ZIP Code</Label>
-                  <div className="relative"><Input id="quote-zip" inputMode="numeric" maxLength={5} placeholder="e.g., 78701" value={quoteZip} onChange={e => { void lookupCityFromZip(e.target.value) }} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" />{isLookingUpZip && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" aria-live="polite">Looking up…</span>}</div>
+              <div className="space-y-2 rounded-xl border-2 border-brand-lime/70 bg-brand-lime/25 p-4 shadow-sm">
+                <div className="flex items-center justify-between gap-2"><Label htmlFor="quote-location">Location</Label><span className="text-[11px] text-muted-foreground">City or ZIP code</span></div>
+                <div className="relative">
+                  <Input id="quote-location" placeholder="Enter a city or ZIP code" value={locationQuery} onFocus={() => setShowLocationSuggestions(locationSuggestions.length > 0)} onChange={e => { const value = e.target.value; setLocationQuery(value); setQuoteCity(/\d/.test(value) ? quoteCity : value); setQuoteZip(/^[0-9]{5}$/.test(value) ? value : ""); if (/^[0-9]{5}$/.test(value)) void lookupCityFromZip(value); else setShowLocationSuggestions(false) }} className="border-brand-lime/70 bg-brand-lime/10 font-medium shadow-sm focus-visible:ring-brand-lime" autoComplete="off" />
+                  {isLookingUpZip && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" aria-live="polite">Looking up…</span>}
+                  {showLocationSuggestions && locationSuggestions.length > 0 && <div className="absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md" role="listbox" aria-label="Location suggestions">{locationSuggestions.map(suggestion => <button key={suggestion.zip} type="button" className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-accent" onMouseDown={event => event.preventDefault()} onClick={() => { setLocationQuery(`${suggestion.city}, ${suggestion.state} ${suggestion.zip}`); setQuoteCity(suggestion.city); setQuoteZip(suggestion.zip); setShowLocationSuggestions(false) }}><span className="font-medium text-foreground">{suggestion.city}{suggestion.state ? `, ${suggestion.state}` : ""}</span><span className="text-xs text-muted-foreground">{suggestion.zip}</span></button>)}</div>}
                 </div>
               </div>
               <div className="space-y-2">
