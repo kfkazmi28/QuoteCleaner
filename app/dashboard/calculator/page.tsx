@@ -380,6 +380,7 @@ export default function DashboardPage() {
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
   const [newFolderName, setNewFolderName] = useState("")
   const [newFolderColor, setNewFolderColor] = useState("#0f766e")
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null)
   const [showSaveCalculatorModal, setShowSaveCalculatorModal] = useState(false)
   const [newCalculatorName, setNewCalculatorName] = useState("")
   const [saveFolderId, setSaveFolderId] = useState<string>("")
@@ -1408,11 +1409,16 @@ export default function DashboardPage() {
           <div className="mt-4 max-h-[60vh] space-y-3 overflow-y-auto">
             {calculatorFolders.map(folder => (
               <section key={folder.id}>
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: folder.color }} />
-                  <Input defaultValue={folder.name} onBlur={async e => { const name = e.target.value.trim(); if (!name || name === folder.name) return; const result = await updateCalculatorFolder(folder.id, { name }); if (result.error) toast.error(result.error); else setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, name } : item).sort((a, b) => a.name.localeCompare(b.name))) }} className="h-8 min-w-0 flex-1 border-transparent px-1 text-sm font-medium shadow-none focus-visible:border-input" aria-label={`Rename ${folder.name}`} />
-                  <input type="color" value={folder.color} onChange={async e => { const color = e.target.value; setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, color } : item)); const result = await updateCalculatorFolder(folder.id, { color }); if (result.error) toast.error(result.error) }} className="h-7 w-7 shrink-0 rounded border border-input bg-background p-0.5" aria-label={`Recolor ${folder.name}`} />
-                </div>
+  <div className="flex items-center gap-2">
+  <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: folder.color }} />
+  {editingFolderId === folder.id ? <>
+    <Input autoFocus defaultValue={folder.name} onBlur={async e => { const name = e.target.value.trim(); if (name && name !== folder.name) { const result = await updateCalculatorFolder(folder.id, { name }); if (result.error) toast.error(result.error); else setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, name } : item).sort((a, b) => a.name.localeCompare(b.name))) } setEditingFolderId(null) }} className="h-8 min-w-0 flex-1" aria-label={`Rename ${folder.name}`} />
+    <input type="color" value={folder.color} onChange={async e => { const color = e.target.value; setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, color } : item)); const result = await updateCalculatorFolder(folder.id, { color }); if (result.error) toast.error(result.error) }} className="h-7 w-7 shrink-0 rounded border border-input bg-background p-0.5" aria-label={`Recolor ${folder.name}`} />
+  </> : <>
+    <h3 className="min-w-0 flex-1 truncate text-sm font-medium">{folder.name}</h3>
+    <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setEditingFolderId(folder.id)} aria-label={`Edit ${folder.name}`}><Pencil className="h-3.5 w-3.5" /></Button>
+  </>}
+  </div>
                 <div className="mt-1 space-y-1 pl-5">{savedCalculators.filter(calc => calc.folder_id === folder.id).map(calc => <div key={calc.id} className="flex items-center gap-1">{renamingCalcId === calc.id ? <Input autoFocus value={renameValue} onChange={e => setRenameValue(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleRenameCalculator(calc); if (e.key === "Escape") setRenamingCalcId(null) }} className="h-8 min-w-0 flex-1" aria-label={`Rename ${calc.name}`} /> : <button type="button" onClick={() => handleLoadCalculator(calc)} className="min-w-0 flex-1 truncate rounded px-2 py-1.5 text-left text-sm hover:bg-accent">{calc.name}</button>}<Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => { setRenameValue(calc.name); setRenamingCalcId(calc.id) }} aria-label={`Edit ${calc.name}`}><Pencil className="h-3.5 w-3.5" /></Button><select value={calc.folder_id ?? ""} onChange={e => handleMoveCalculator(calc, e.target.value || null)} className="w-6 bg-transparent text-xs" aria-label={`Move ${calc.name}`}><option value="">•</option>{calculatorFolders.map(target => <option key={target.id} value={target.id}>{target.name}</option>)}</select></div>)}</div>
               </section>
             ))}
