@@ -1127,16 +1127,15 @@ export default function DashboardPage() {
                               Selected
                             </Badge>
                           )}
-                          <CardContent className="flex min-h-28 items-center justify-between gap-4 p-5">
-                            <div className="flex items-center gap-3">
-                              <div>
-                                <p className={`text-base font-semibold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
+                          <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
+                            <div className="min-w-0">
+                              <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <TooltipProvider delayDuration={100}>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <button type="button" className={`flex items-center gap-1 text-sm mt-0.5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                      <button type="button" className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                         <span>{card.subtitle}</span>
-                                        <Info className="h-3 w-3 shrink-0 text-primary" />
+                                        <Info className={`mt-0.5 h-3 w-3 shrink-0 ${isPreferred ? "text-primary-foreground" : "text-primary"}`} />
                                       </button>
                                     </TooltipTrigger>
                                     <TooltipContent side="top" showArrow={false} className="bg-white text-foreground border border-border shadow-md rounded-lg px-2.5 py-1.5 space-y-0.5 text-[11px]">
@@ -1148,7 +1147,7 @@ export default function DashboardPage() {
                                 </TooltipProvider>
                               </div>
                             </div>
-                            <p className={`shrink-0 text-3xl font-bold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
+                            <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
                           </CardContent>
                         </Card>
                       )
@@ -1174,16 +1173,15 @@ export default function DashboardPage() {
                               Selected
                             </Badge>
                           )}
-                          <CardContent className="flex min-h-28 items-center justify-between gap-4 p-5">
-                            <div className="flex items-center gap-3">
-                              <div>
-                                <p className={`text-base font-semibold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
+                          <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
+                            <div className="min-w-0">
+                              <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <TooltipProvider delayDuration={100}>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <button type="button" className={`flex items-center gap-1 text-sm mt-0.5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                      <button type="button" className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                         <span>{card.subtitle}</span>
-                                        <Info className="h-3 w-3 shrink-0 text-primary" />
+                                        <Info className={`mt-0.5 h-3 w-3 shrink-0 ${isPreferred ? "text-primary-foreground" : "text-primary"}`} />
                                       </button>
                                     </TooltipTrigger>
                                     <TooltipContent side="top" showArrow={false} className="bg-white text-foreground border border-border shadow-md rounded-lg px-2.5 py-1.5 space-y-0.5 text-[11px]">
@@ -1195,7 +1193,7 @@ export default function DashboardPage() {
                                 </TooltipProvider>
                               </div>
                             </div>
-                            <p className={`shrink-0 text-3xl font-bold ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
+                            <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
                           </CardContent>
                         </Card>
                       )
