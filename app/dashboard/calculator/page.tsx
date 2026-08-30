@@ -363,9 +363,7 @@ export default function DashboardPage() {
   const [showPaywall, setShowPaywall] = useState(false)
   const [showCreditConfirm, setShowCreditConfirm] = useState(false)
   const [isCalculating, setIsCalculating] = useState(false)
-  const [showDeepClean, setShowDeepClean] = useState(false)
-  const [showMoveIn, setShowMoveIn] = useState(false)
-  const [showStandardClean, setShowStandardClean] = useState(false)
+  const [showChecklist, setShowChecklist] = useState(false)
   const [customDeepClean, setCustomDeepClean] = useState(DEEP_CLEAN_CHECKLIST)
   const [customMoveIn, setCustomMoveIn] = useState(MOVE_IN_CHECKLIST)
   const [customStandardClean, setCustomStandardClean] = useState(STANDARD_CLEAN_CHECKLIST)
@@ -1156,11 +1154,7 @@ export default function DashboardPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => {
-                        if (preferredPackage === "deep") setShowDeepClean(true)
-                        else if (preferredPackage === "move") setShowMoveIn(true)
-                        else setShowStandardClean(true)
-                      }}
+  onClick={() => setShowChecklist(true)}
                     >
                       Open Checklist
                     </Button>
@@ -1226,39 +1220,18 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      <ChecklistModal
-        open={showDeepClean}
-        onClose={() => setShowDeepClean(false)}
-        title="Deep Clean Checklist"
-        description="Everything included in a deep clean service"
-        checklist={customDeepClean}
-        onSave={(updated) => {
-          setCustomDeepClean(updated)
-          toast.success("Deep clean checklist updated")
-        }}
-      />
-      <ChecklistModal
-        open={showMoveIn}
-        onClose={() => setShowMoveIn(false)}
-        title="Move In / Move Out Checklist"
-        description="Everything included in a move in or move out clean"
-        checklist={customMoveIn}
-        onSave={(updated) => {
-          setCustomMoveIn(updated)
-          toast.success("Move in/out checklist updated")
-        }}
-      />
-      <ChecklistModal
-        open={showStandardClean}
-        onClose={() => setShowStandardClean(false)}
-        title="Standard Cleaning Checklist"
-        description="Everything included in a standard cleaning"
-        checklist={customStandardClean}
-        onSave={(updated) => {
-          setCustomStandardClean(updated)
-          toast.success("Standard clean checklist updated")
-        }}
-      />
+  <ChecklistModal
+  open={showChecklist}
+  onClose={() => setShowChecklist(false)}
+  title="Cleaning Checklists"
+  description="Choose a service checklist to review or customize"
+  checklist={customStandardClean}
+  checklistOptions={[
+  { key: "move", label: "Move In / Out", title: "Move In / Move Out Checklist", description: "Everything included in a move in or move out clean", checklist: customMoveIn, onSave: (updated) => { setCustomMoveIn(updated); toast.success("Move in/out checklist updated") } },
+  { key: "deep", label: "Deep Clean", title: "Deep Clean Checklist", description: "Everything included in a deep clean service", checklist: customDeepClean, onSave: (updated) => { setCustomDeepClean(updated); toast.success("Deep clean checklist updated") } },
+  { key: "standard", label: "Standard", title: "Standard Cleaning Checklist", description: "Everything included in a standard cleaning", checklist: customStandardClean, onSave: (updated) => { setCustomStandardClean(updated); toast.success("Standard clean checklist updated") } },
+  ]}
+  />
 
       <SaveQuoteModal
         open={showSaveModal}

@@ -196,6 +196,7 @@ export function ChecklistModal({
   description,
   checklist,
   onSave,
+  checklistOptions,
 }: {
   open: boolean
   onClose: () => void
@@ -203,16 +204,22 @@ export function ChecklistModal({
   description: string
   checklist: ChecklistSection[]
   onSave?: (updated: ChecklistSection[]) => void
+  checklistOptions?: { key: string; label: string; title: string; description: string; checklist: ChecklistSection[]; onSave?: (updated: ChecklistSection[]) => void }[]
 }) {
   const [editing, setEditing] = useState(false)
-  const [localList, setLocalList] = useState(checklist)
+  const [activeKey, setActiveKey] = useState(checklistOptions?.[0]?.key ?? "default")
+  const activeOption = checklistOptions?.find(option => option.key === activeKey)
+  const activeChecklist = activeOption?.checklist ?? checklist
+  const activeTitle = activeOption?.title ?? title
+  const activeDescription = activeOption?.description ?? description
+  const [localList, setLocalList] = useState(activeChecklist)
   const [newItemText, setNewItemText] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    setLocalList(checklist)
+    setLocalList(activeChecklist)
     setEditing(false)
     setNewItemText({})
-  }, [checklist, open])
+  }, [activeChecklist, open])
 
   const handleDeleteItem = (sectionIdx: number, itemIdx: number) => {
     setLocalList(prev =>
@@ -234,12 +241,13 @@ export function ChecklistModal({
   }
 
   const handleSave = () => {
-    onSave?.(localList)
+    if (activeOption?.onSave) activeOption.onSave(localList)
+    else onSave?.(localList)
     setEditing(false)
   }
 
   const handleCancel = () => {
-    setLocalList(checklist)
+    setLocalList(activeChecklist)
     setEditing(false)
     setNewItemText({})
   }
@@ -250,9 +258,9 @@ export function ChecklistModal({
         <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
+              <DialogTitle className="text-lg font-semibold">{activeTitle}</DialogTitle>
               <DialogDescription className="mt-0.5 text-sm text-muted-foreground">
-                {description}
+                {activeDescription}
               </DialogDescription>
             </div>
             {onSave && !editing && (
@@ -263,6 +271,13 @@ export function ChecklistModal({
           </div>
         </DialogHeader>
 
+        {checklistOptions && (
+          <div className="grid grid-cols-3 gap-1 border-b border-border bg-muted/30 p-2">
+            {checklistOptions.map(option => (
+              <button key={option.key} type="button" onClick={() => { setActiveKey(option.key); setEditing(false) }} className={`rounded-md px-2 py-2 text-xs font-semibold transition-colors ${activeKey === option.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`} aria-pressed={activeKey === option.key}>{option.label}</button>
+            ))}
+          </div>
+        )}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           <div className="space-y-6">
             {localList.map((group, sectionIdx) => (
