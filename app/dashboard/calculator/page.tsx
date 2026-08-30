@@ -800,7 +800,7 @@ export default function DashboardPage() {
 
         <div className="grid items-start gap-10 lg:grid-cols-[minmax(24rem,0.78fr)_minmax(0,1.22fr)]">
           {/* Calculator Form */}
-          <section className="h-fit">
+          <section className="h-fit rounded-2xl border border-primary/15 bg-primary/5 p-6 sm:p-8">
             <div className="mb-10">
               <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s price this clean</h2>
             </div>
@@ -1055,7 +1055,7 @@ export default function DashboardPage() {
           </section>
 
           {/* Results */}
-          <div className="space-y-10">
+          <div className="space-y-10 rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
             {results ? (
               <>
   <div>
