@@ -1146,7 +1146,6 @@ export default function DashboardPage() {
                                   </Tooltip>
                                 </TooltipProvider>
                               </div>
-                            </div>
                             <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
                           </CardContent>
                         </Card>
@@ -1192,7 +1191,6 @@ export default function DashboardPage() {
                                   </Tooltip>
                                 </TooltipProvider>
                               </div>
-                            </div>
                             <p className={`self-center text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
                           </CardContent>
                         </Card>
