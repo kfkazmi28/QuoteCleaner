@@ -4,7 +4,8 @@ import { DashboardNav } from "@/components/dashboard-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getSavedQuotes } from "@/app/actions/quotes"
 import { getInvoices } from "@/app/actions/invoices"
-import { getUpcomingEvents } from "@/app/actions/calendar"
+import { getUpcomingEvents, getDashboardChartEvents } from "@/app/actions/calendar"
+import { DashboardRevenueChart } from "@/components/dashboard-revenue-chart"
 import { getClientContacts } from "@/app/actions/contacts"
 import { createClient } from "@/lib/supabase/server"
 
@@ -19,13 +20,18 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   const savedQuotes = quotes ?? []
   const events = upcomingEvents.data ?? []
+  const chartYear = new Date().getFullYear()
+  const chartMonth = new Date().getMonth() + 1
+  const chartFrom = `${chartYear}-${String(chartMonth).padStart(2, "0")}-01`
+  const chartTo = `${chartYear}-${String(chartMonth).padStart(2, "0")}-${String(new Date(chartYear, chartMonth, 0).getDate()).padStart(2, "0")}`
+  const { data: chartEvents } = await getDashboardChartEvents(chartFrom, chartTo)
   const revenue = invoices.filter((invoice) => invoice.status === "paid").reduce((sum, invoice) => sum + Number(invoice.amount_total || 0), 0)
   const outstanding = invoices.filter((invoice) => invoice.status === "sent").reduce((sum, invoice) => sum + Number(invoice.amount_due || 0), 0)
   const bookedJobs = events.filter((event) => event.status !== "canceled").length
   const reminders = events.map((event) => ({
     time: `${event.scheduled_date}${event.start_time ? ` · ${String(event.start_time).slice(0, 5)}` : ""}`,
-    title: `${event.event_type === "job" ? event.package_name || "Cleaning job" : event.event_type} · ${event.client_name || "Client"}`,
-    type: event.event_type === "job" ? "Upcoming job" : "Calendar event",
+    title: `${event.event_type === "quote-linked" ? event.package_name || "Cleaning job" : event.event_type} · ${event.client_name || "Client"}`,
+    type: event.event_type === "quote-linked" ? "Upcoming job" : "Calendar event",
   }))
   const displayName = user?.user_metadata?.first_name || user?.email?.split("@")[0] || "there"
   return (
@@ -56,6 +62,10 @@ export default async function DashboardPage() {
             </Card>
           ))}
         </section>
+
+        <div className="mt-6">
+          <DashboardRevenueChart events={chartEvents ?? []} year={chartYear} month={chartMonth} />
+        </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_1fr]">
           <Card>

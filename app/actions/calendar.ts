@@ -86,6 +86,23 @@ export async function getCalendarEvents(year: number, month: number) {
   return { data: data as CalendarEvent[] | null, error: error?.message ?? null }
 }
 
+export async function getDashboardChartEvents(from: string, to: string) {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) return { data: null, error: "Not authenticated" }
+
+  const { data, error } = await supabase
+    .from("calendar_events")
+    .select("scheduled_date, package_price, status")
+    .eq("user_id", user.id)
+    .gte("scheduled_date", from)
+    .lte("scheduled_date", to)
+    .neq("status", "canceled")
+    .order("scheduled_date", { ascending: true })
+
+  return { data: data as { scheduled_date: string; package_price: number | null; status: string }[] | null, error: error?.message ?? null }
+}
+
 export async function getUpcomingEvents(limit = 5) {
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
