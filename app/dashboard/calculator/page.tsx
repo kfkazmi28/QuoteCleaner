@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { usePricingSettings, defaultSettings } from "@/contexts/pricing-settings-context"
 import { Calculator, Sparkles, Lock, Info, Check, Bookmark, Send, FileDown, Pencil, Trash2, Plus, FolderOpen, ChevronDown, BookmarkPlus, MoreHorizontal } from "lucide-react"
-import { getSavedCalculators, getCalculatorFolders, createCalculatorFolder, moveCalculator, saveCalculator, deleteCalculator, renameCalculator, type SavedCalculator, type CalculatorFolder } from "@/app/actions/calculators"
+import { getSavedCalculators, getCalculatorFolders, createCalculatorFolder, updateCalculatorFolder, moveCalculator, saveCalculator, deleteCalculator, renameCalculator, type SavedCalculator, type CalculatorFolder } from "@/app/actions/calculators"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -382,6 +382,7 @@ export default function DashboardPage() {
   const [newFolderColor, setNewFolderColor] = useState("#0f766e")
   const [showSaveCalculatorModal, setShowSaveCalculatorModal] = useState(false)
   const [newCalculatorName, setNewCalculatorName] = useState("")
+  const [saveFolderId, setSaveFolderId] = useState<string>("")
   const [savingCalculator, setSavingCalculator] = useState(false)
 
   const searchParams = useSearchParams()
@@ -584,7 +585,7 @@ export default function DashboardPage() {
       return
     }
     setSavingCalculator(true)
-    const { data, error } = await saveCalculator(newCalculatorName.trim(), settings)
+    const { data, error } = await saveCalculator(newCalculatorName.trim(), settings, saveFolderId || null)
     setSavingCalculator(false)
     if (error) {
       toast.error(error)
@@ -1452,7 +1453,14 @@ export default function DashboardPage() {
                 onKeyDown={e => e.key === "Enter" && handleSaveCalculator()}
               />
             </div>
-            <div className="rounded-lg bg-muted/50 p-3 text-sm">
+              <div className="space-y-2">
+                <Label htmlFor="save-folder">Folder</Label>
+                <select id="save-folder" value={saveFolderId} onChange={e => setSaveFolderId(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                  <option value="">Unfiled</option>
+                  {calculatorFolders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
+                </select>
+              </div>
+              <div className="rounded-lg bg-muted/50 p-3 text-sm">
               <p className="font-medium text-foreground">Current Settings Preview</p>
               <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-muted-foreground">
                 <span>Hourly Rate:</span>
@@ -1493,7 +1501,11 @@ export default function DashboardPage() {
           <div className="mt-4 max-h-[60vh] space-y-3 overflow-y-auto">
             {calculatorFolders.map(folder => (
               <section key={folder.id}>
-                <h3 className="flex items-center gap-2 text-sm font-medium"><span className="h-3 w-3 rounded-full" style={{ backgroundColor: folder.color }} />{folder.name}</h3>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: folder.color }} />
+                  <Input defaultValue={folder.name} onBlur={async e => { const name = e.target.value.trim(); if (!name || name === folder.name) return; const result = await updateCalculatorFolder(folder.id, { name }); if (result.error) toast.error(result.error); else setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, name } : item).sort((a, b) => a.name.localeCompare(b.name))) }} className="h-8 min-w-0 flex-1 border-transparent px-1 text-sm font-medium shadow-none focus-visible:border-input" aria-label={`Rename ${folder.name}`} />
+                  <input type="color" value={folder.color} onChange={async e => { const color = e.target.value; setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, color } : item)); const result = await updateCalculatorFolder(folder.id, { color }); if (result.error) toast.error(result.error) }} className="h-7 w-7 shrink-0 rounded border border-input bg-background p-0.5" aria-label={`Recolor ${folder.name}`} />
+                </div>
                 <div className="mt-1 space-y-1 pl-5">{savedCalculators.filter(calc => calc.folder_id === folder.id).map(calc => <div key={calc.id} className="flex items-center gap-1"><button type="button" onClick={() => handleLoadCalculator(calc)} className="min-w-0 flex-1 truncate rounded px-2 py-1.5 text-left text-sm hover:bg-accent">{calc.name}</button><select value={calc.folder_id ?? ""} onChange={e => handleMoveCalculator(calc, e.target.value || null)} className="w-6 bg-transparent text-xs" aria-label={`Move ${calc.name}`}><option value="">•</option>{calculatorFolders.map(target => <option key={target.id} value={target.id}>{target.name}</option>)}</select></div>)}</div>
               </section>
             ))}
