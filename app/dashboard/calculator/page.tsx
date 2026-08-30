@@ -358,6 +358,8 @@ export default function DashboardPage() {
   const setChildren = (v: string) => updateHomeDetails({ children: v })
 
   const [sqftUnit, setSqftUnit] = useState<"sqft" | "sqm">("sqft")
+  const [quoteCity, setQuoteCity] = useState("")
+  const [quoteZip, setQuoteZip] = useState("")
   const [showPaywall, setShowPaywall] = useState(false)
   const [showCreditConfirm, setShowCreditConfirm] = useState(false)
   const [isCalculating, setIsCalculating] = useState(false)
@@ -779,6 +781,14 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="quote-city">City</Label>
+                <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="quote-zip">ZIP Code</Label>
+                <Input id="quote-zip" inputMode="numeric" placeholder="e.g., 78701" value={quoteZip} onChange={e => setQuoteZip(e.target.value)} />
+              </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="sqft">{sqftUnit === "sqft" ? "Square Footage" : "Square Meters"} *</Label>
