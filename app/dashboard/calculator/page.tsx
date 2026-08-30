@@ -1093,12 +1093,13 @@ export default function DashboardPage() {
                     }}
                   />
                 )}
-                <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
+                <div className="flex flex-col items-start gap-4">
+                  <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
+                  {preferredPackage && <button type="button" onClick={() => setShowChecklist(true)} className="text-left text-sm font-semibold text-primary hover:underline">Open Checklist →</button>}
+                </div>
                 {showCompare && <div className="space-y-8">
                 <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.map(card => <button key={card.key} type="button" onClick={() => { setPreferredPackage(card.key); setShowQuoteActions(false) }} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
                 <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => { setPreferredPackage(card.key); setShowQuoteActions(false) }} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section></div>}
-
-                {preferredPackage && <button type="button" onClick={() => setShowChecklist(true)} className="text-left text-sm font-semibold text-primary hover:underline">Open Checklist →</button>}
 
 
               </>
