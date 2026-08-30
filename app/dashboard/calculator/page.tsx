@@ -1101,10 +1101,10 @@ export default function DashboardPage() {
                                   <span>2 cleaners: {formatHours(card.hours / 2)}</span>
                                 </div>
                               </div>
-                            <div className={`flex items-baseline justify-between border-t pt-3 ${isPreferred ? "border-primary-foreground/25" : "border-border"}`}>
-                              <span className={`text-xs font-medium uppercase tracking-wide ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Starting price</span>
-                              <p className={`text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
-                            </div>
+<div className={`flex flex-col gap-1 border-t pt-3 ${isPreferred ? "border-primary-foreground/25" : "border-border"}`}>
+ <span className={`text-xs font-medium uppercase tracking-wide ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Starting price</span>
+ <p className={`text-3xl font-bold leading-none tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
+  </div>
                           </CardContent>
                         </Card>
                       )
@@ -1144,10 +1144,10 @@ export default function DashboardPage() {
                                   <span>2 cleaners: {formatHours(card.hours / 2)}</span>
                                 </div>
                               </div>
-                            <div className={`flex items-baseline justify-between border-t pt-3 ${isPreferred ? "border-primary-foreground/25" : "border-border"}`}>
-                              <span className={`text-xs font-medium uppercase tracking-wide ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Starting price</span>
-                              <p className={`text-3xl font-bold tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
-                            </div>
+<div className={`flex flex-col gap-1 border-t pt-3 ${isPreferred ? "border-primary-foreground/25" : "border-border"}`}>
+ <span className={`text-xs font-medium uppercase tracking-wide ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Starting price</span>
+ <p className={`text-3xl font-bold leading-none tracking-tight sm:text-4xl ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>${card.price}</p>
+  </div>
                           </CardContent>
                         </Card>
                       )
