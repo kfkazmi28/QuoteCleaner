@@ -783,10 +783,12 @@ export default function DashboardPage() {
   const cleanLevelLabel = ({ "1": "Light Clean", "2": "Medium Clean", "3": "Heavy Clean" } as Record<string, string>)[cleanLevel] ?? cleanLevel
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <DashboardNav />
-
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
+  <div className="relative min-h-screen overflow-hidden bg-muted/30">
+  <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[url('/images/cleaning-hero-accent.png')] bg-cover bg-[center_bottom] opacity-20" />
+  <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-gradient-to-b from-background/80 via-background/90 to-muted/30" />
+  <DashboardNav />
+  
+  <main className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
         <div className="mb-12 max-w-2xl">
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">Build a professional quote in seconds. Enter a few details and we&apos;ll recommend a price.</p>
