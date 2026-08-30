@@ -1069,7 +1069,7 @@ export default function DashboardPage() {
                   return <section className="border-b border-border pb-9 pt-3">
                     <div className="flex flex-col gap-6">
                       <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><div className="mt-4 flex flex-col gap-1 text-sm font-medium text-muted-foreground"><span>1 cleaner · {formatHours(recommended.hours)}</span><span>2 cleaners · {formatHours(recommended.hours / 2)}</span></div></div>
-                      <div><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => { setPreferredPackage(recommended.key); setShowQuoteActions(true) }} className="mt-5 w-full bg-primary sm:w-auto">Use this quote →</Button></div>
+                      <div><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p></div>
                     </div>
                   </section>
                 })()}
@@ -1094,6 +1094,7 @@ export default function DashboardPage() {
                   />
                 )}
                 <div className="flex flex-col items-start gap-4">
+                  <Button type="button" onClick={() => { setPreferredPackage(preferredPackage ?? "deep"); setShowQuoteActions(true) }} className="w-full bg-primary sm:w-auto">Use this quote →</Button>
                   <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
                   {preferredPackage && <button type="button" onClick={() => setShowChecklist(true)} className="text-left text-sm font-semibold text-primary hover:underline">Open Checklist →</button>}
                 </div>
