@@ -1059,8 +1059,8 @@ export default function DashboardPage() {
                 
                 {/* One-Time Clean */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-brand-yellow" />
+                  <div className="flex items-center gap-3 rounded-xl border border-brand-yellow/50 bg-brand-yellow/20 px-4 py-3 shadow-sm">
+                    <span className="size-3 rounded-full bg-brand-yellow shadow-sm" />
                     <p className="text-base font-bold uppercase tracking-wide text-foreground sm:text-lg">One-Time Clean</p>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
@@ -1104,8 +1104,8 @@ export default function DashboardPage() {
 
                 {/* Recurring Clean */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-brand-pink" />
+                  <div className="flex items-center gap-3 rounded-xl border border-brand-pink/50 bg-brand-pink/20 px-4 py-3 shadow-sm">
+                    <span className="size-3 rounded-full bg-brand-pink shadow-sm" />
                     <p className="text-base font-bold uppercase tracking-wide text-foreground sm:text-lg">Recurring Clean</p>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
