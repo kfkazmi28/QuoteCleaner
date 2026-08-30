@@ -1070,8 +1070,7 @@ export default function DashboardPage() {
                   return <section className="border-b border-border pb-9 pt-3">
                     <div className="flex flex-col gap-6">
                       <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span><span className="text-sm text-muted-foreground">{recommended.key === "deep" ? "Deep clean" : recommended.key === "move" ? "Move in / move out" : recommended.key === "standard" ? "Standard clean" : "One-time clean"}</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium text-muted-foreground"><span>1 cleaner · {formatHours(recommended.hours)}</span><span>2 cleaners · {formatHours(recommended.hours / 2)}</span></div></div>
-                      <div><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => { setPreferredPackage(recommended.key); setShowQuoteActions(true) }} className="mt-5 w-full bg-primary sm:w-auto">Use this quote →</Button>
-                        {showQuoteActions && <div className="mt-4 flex max-w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-start"><Button type="button" onClick={handleSaveQuote} variant="outline" className="w-full sm:w-auto"><Bookmark className="mr-2 h-4 w-4" />Save Quote</Button><Button type="button" onClick={handleSendQuote} variant="outline" className="w-full sm:w-auto">{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Send Quote</> : <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>}</Button><Button type="button" onClick={handleExportPdf} variant="outline" className="w-full sm:w-auto">{hasUnlimitedAccess ? <><FileDown className="mr-2 h-4 w-4" />Export PDF</> : <><Lock className="mr-2 h-4 w-4" />Export PDF (Pro)</>}</Button></div>}</div>
+                      <div><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => { setPreferredPackage(recommended.key); setShowQuoteActions(true) }} className="mt-5 w-full bg-primary sm:w-auto">Use this quote →</Button></div>
                     </div>
                   </section>
                 })()}
@@ -1134,6 +1133,23 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+  <Dialog open={showQuoteActions} onOpenChange={setShowQuoteActions}>
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle>What would you like to do?</DialogTitle>
+        <DialogDescription>Choose an option for this quote, or close this window to keep reviewing it.</DialogDescription>
+      </DialogHeader>
+      <div className="flex flex-col gap-3 pt-2">
+        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleSaveQuote}><Bookmark className="mr-2 h-4 w-4" />Save Quote</Button>
+        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleSendQuote}>{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Send Quote</> : <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>}</Button>
+        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleExportPdf}>{hasUnlimitedAccess ? <><FileDown className="mr-2 h-4 w-4" />Export PDF</> : <><Lock className="mr-2 h-4 w-4" />Export PDF (Pro)</>}</Button>
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="ghost" onClick={() => setShowQuoteActions(false)}>Close</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 
   <ChecklistModal
   open={showChecklist}
