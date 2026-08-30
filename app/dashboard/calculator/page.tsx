@@ -402,6 +402,7 @@ export default function DashboardPage() {
   const [isDayPassLoading, setIsDayPassLoading] = useState(false)
   const [defaultSenderName, setDefaultSenderName] = useState<string | null>(null)
   const [preferredPackage, setPreferredPackage] = useState<string | null>(null)
+  const [showCompare, setShowCompare] = useState(false)
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
@@ -1020,17 +1021,6 @@ export default function DashboardPage() {
               </div>
 
               <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowSaveCalculatorModal(true)}
-                className="w-full gap-2"
-                size="lg"
-              >
-                <BookmarkPlus className="h-4 w-4" />
-                Save Calculator
-              </Button>
-
-              <Button
                 onClick={calculateQuote}
                 className="w-full"
                 size="lg"
@@ -1067,20 +1057,21 @@ export default function DashboardPage() {
                   <span className="hidden text-sm text-muted-foreground sm:block">Select any option to use it</span>
                 </div>
                 {(() => {
-                  const recommended = oneTimeCleans.find(card => card.key === (preferredPackage || "deep")) ?? oneTimeCleans[1]
+                  const recommended = oneTimeCleans.find(card => card.key === "deep") ?? oneTimeCleans[1]
                   if (!recommended) return null
-                  const isSelected = preferredPackage === recommended.key
                   return <section className="border-b border-border pb-9 pt-3">
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                       <div><div className="mb-3 flex items-center gap-2"><span className="rounded-full bg-brand-yellow px-3 py-1 text-xs font-bold uppercase tracking-wide text-foreground">Recommended</span><span className="text-sm text-muted-foreground">One-time clean</span></div><h3 className="text-3xl font-bold text-foreground sm:text-5xl">{recommended.label}</h3><p className="mt-3 text-base text-muted-foreground">{recommended.subtitle}</p><p className="mt-4 text-sm font-medium text-muted-foreground">1 cleaner · {formatHours(recommended.hours)}</p></div>
-                      <div className="sm:text-right"><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => setPreferredPackage(isSelected ? null : recommended.key)} className="mt-5 w-full bg-primary sm:w-auto">{isSelected ? "Selected quote" : "Select this quote"}</Button></div>
+                      <div className="sm:text-right"><p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">Starting price</p><p className="mt-1 text-5xl font-bold tracking-tight text-foreground">${recommended.price}</p><Button type="button" onClick={() => setPreferredPackage(recommended.key)} className="mt-5 w-full bg-primary sm:w-auto">Use this quote →</Button></div>
                     </div>
                   </section>
                 })()}
+                <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide other prices ↑" : "Compare other prices →"}</button>
+                {showCompare && <div className="space-y-8">
                 <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Other one-time services</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Compare</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{oneTimeCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span><span className="block text-sm text-muted-foreground">{card.subtitle} · {formatHours(card.hours)}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
-                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span><span className="block text-sm text-muted-foreground">{card.subtitle} · {formatHours(card.hours)}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section>
+                <section className="space-y-4"><div className="flex items-center justify-between"><h3 className="text-lg font-bold text-foreground">Recurring options</h3><span className="text-xs uppercase tracking-wide text-muted-foreground">Save with repeat service</span></div><div className="divide-y divide-border rounded-xl border border-border bg-card">{recurringCleans.map(card => <button key={card.key} type="button" onClick={() => setPreferredPackage(card.key)} className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors ${preferredPackage === card.key ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/30" : "hover:bg-muted/40"}`}><span><span className="block font-semibold text-foreground">{card.label}</span><span className="block text-sm text-muted-foreground">{card.subtitle} · {formatHours(card.hours)}</span></span><span className="text-xl font-bold text-foreground">${card.price}</span></button>)}</div></section></div>}
 
-                <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
+                {preferredPackage && <Card className="border-brand-yellow/40 bg-brand-yellow/10 shadow-sm">
                   <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h3 className="font-semibold text-foreground">Cleaning Checklist</h3>
@@ -1094,7 +1085,7 @@ export default function DashboardPage() {
                       Open Checklist
                     </Button>
                   </CardContent>
-                </Card>
+                </Card>}
 
                 {preferredPackage && results && (
                   <AIQuoteReview
@@ -1116,7 +1107,7 @@ export default function DashboardPage() {
                   />
                 )}
 
-                <div className="flex flex-col gap-2">
+                {preferredPackage && <div className="flex flex-col gap-2">
                   <Button onClick={handleSaveQuote} variant="outline" className="w-full">
                     <Bookmark className="mr-2 h-4 w-4" />Save Quote
                   </Button>
@@ -1136,7 +1127,7 @@ export default function DashboardPage() {
                       )}
                     </Button>
                   </div>
-                </div>
+                </div>}
               </>
             ) : (
               <Card className="flex h-full min-h-[300px] items-center justify-center border-dashed">
