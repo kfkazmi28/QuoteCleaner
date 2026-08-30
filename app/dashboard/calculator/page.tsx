@@ -28,6 +28,7 @@ import { ChecklistModal, STANDARD_CLEAN_CHECKLIST as _STANDARD_CLEAN_CHECKLIST, 
 import { AddressAutocomplete } from "@/components/address-autocomplete"
 import { PhoneInput } from "@/components/phone-input"
 import { exportQuotePdf } from "@/lib/export-quote-pdf"
+import { AIQuoteReview } from "@/components/ai-quote-review"
 
 // Use shared checklist constants from the extracted component
 const STANDARD_CLEAN_CHECKLIST = _STANDARD_CLEAN_CHECKLIST
@@ -1201,6 +1202,25 @@ export default function DashboardPage() {
                     </Button>
                   </CardContent>
                 </Card>
+
+                {preferredPackage && results && (
+                  <AIQuoteReview
+                    quote={{
+                      squareFootage: toSqFt(squareFootage),
+                      bedrooms: Number(bedrooms) || 0,
+                      bathrooms: Number(bathrooms) || 0,
+                      serviceType: preferredPackage,
+                      cleaningLevel: cleanLevel,
+                      recurringFrequency: preferredPackage,
+                      pets: Number(pets) || 0,
+                      addOns: [],
+                      estimatedHours: priceCards.find((card) => card.key === preferredPackage)?.hours ?? results.totalHours,
+                      notes: "",
+                      checklist: { standard: customStandardClean, deep: customDeepClean, move: customMoveIn },
+                      totalPrice: priceCards.find((card) => card.key === preferredPackage)?.price ?? 0,
+                    }}
+                  />
+                )}
 
                 <div className="flex flex-col gap-2">
                   <Button onClick={handleSaveQuote} variant="outline" className="w-full">

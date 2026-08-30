@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const input = quoteReviewSchemaInput.parse(body)
-    const review = await reviewQuote(input)
+    const review = await reviewQuote({ ...input, checklist: input.checklist ?? {} })
     return NextResponse.json(review)
   } catch (error) {
     console.error("[v0] Quote review failed:", error)
