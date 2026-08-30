@@ -784,17 +784,21 @@ export default function DashboardPage() {
 
   return (
   <div className="relative min-h-screen overflow-hidden bg-muted/30">
-  <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[url('/images/cleaning-hero-accent.png')] bg-cover bg-[center_bottom] opacity-20" />
-  <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-gradient-to-b from-background/80 via-background/90 to-muted/30" />
   <DashboardNav />
   
   <main className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
-        <div className="mb-12 max-w-2xl">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
-          <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">Build a professional quote in seconds. Enter a few details and we&apos;ll recommend a price.</p>
+        <div className="mb-10 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <div className="relative h-40 overflow-hidden sm:h-48">
+            <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/cleaning-tools-banner-v2.png')] bg-cover bg-center" />
+            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/35 to-transparent" />
+            <div className="relative flex h-full max-w-xl flex-col justify-end gap-2 p-6 sm:p-8">
+              <h1 className="text-3xl font-bold tracking-tight text-primary-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
+              <p className="max-w-lg text-sm leading-6 text-primary-foreground/85 sm:text-base">Build a professional quote in seconds. Enter a few details and we&apos;ll recommend a price.</p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(24rem,0.78fr)_minmax(0,1.22fr)]">
+        <div className="grid items-start gap-10 lg:grid-cols-[minmax(24rem,0.78fr)_minmax(0,1.22fr)]">
           {/* Calculator Form */}
           <section className="h-fit">
             <div className="mb-10">
