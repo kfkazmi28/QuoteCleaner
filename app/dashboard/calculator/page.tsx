@@ -1127,12 +1127,12 @@ export default function DashboardPage() {
                             </Badge>
                           )}
                           <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
-                            <div className="min-w-0">
+                            <div className="flex min-w-0 h-full flex-col">
                               <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>{card.subtitle}</span>
                                 </p>
-                                <div className={`mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                <div className={`mt-auto pt-5 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>1 cleaner: {formatHours(card.hours)}</span>
                                   <span>2 cleaners: {formatHours(card.hours / 2)}</span>
                                 </div>
@@ -1164,12 +1164,12 @@ export default function DashboardPage() {
                             </Badge>
                           )}
                           <CardContent className="grid min-h-28 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 p-5 sm:min-h-32 sm:p-6">
-                            <div className="min-w-0">
+                            <div className="flex min-w-0 h-full flex-col">
                               <p className={`text-base font-semibold leading-tight sm:text-lg ${isPreferred ? "text-primary-foreground" : "text-foreground"}`}>{card.label}</p>
                                 <p className={`mt-2 flex max-w-52 items-start gap-1 text-sm leading-5 ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>{card.subtitle}</span>
                                 </p>
-                                <div className={`mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                <div className={`mt-auto pt-5 flex flex-wrap gap-x-3 gap-y-1 text-xs ${isPreferred ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                                   <span>1 cleaner: {formatHours(card.hours)}</span>
                                   <span>2 cleaners: {formatHours(card.hours / 2)}</span>
                                 </div>
