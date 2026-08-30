@@ -18,6 +18,8 @@ const quoteReviewSchemaInput = z.object({
   squareFootage: z.number().nonnegative(),
   bedrooms: z.number().nonnegative(),
   bathrooms: z.number().nonnegative(),
+  city: z.string().max(100).optional().default(""),
+  zip: z.string().max(20).optional().default(""),
   serviceType: z.string().max(100),
   cleaningLevel: z.string().max(50),
   recurringFrequency: z.string().max(50),

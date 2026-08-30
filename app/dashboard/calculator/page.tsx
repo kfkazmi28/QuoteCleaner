@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { usePricingSettings, defaultSettings } from "@/contexts/pricing-settings-context"
 import { Calculator, Sparkles, Lock, Info, Check, Bookmark, Send, FileDown, Pencil, Trash2, Plus, FolderOpen, ChevronDown, BookmarkPlus, MoreHorizontal } from "lucide-react"
-import { getSavedCalculators, saveCalculator, deleteCalculator, renameCalculator, type SavedCalculator } from "@/app/actions/calculators"
+import { getSavedCalculators, getCalculatorFolders, createCalculatorFolder, updateCalculatorFolder, moveCalculator, saveCalculator, deleteCalculator, renameCalculator, type SavedCalculator, type CalculatorFolder } from "@/app/actions/calculators"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -358,6 +358,8 @@ export default function DashboardPage() {
   const setChildren = (v: string) => updateHomeDetails({ children: v })
 
   const [sqftUnit, setSqftUnit] = useState<"sqft" | "sqm">("sqft")
+  const [quoteCity, setQuoteCity] = useState("")
+  const [quoteZip, setQuoteZip] = useState("")
   const [showPaywall, setShowPaywall] = useState(false)
   const [showCreditConfirm, setShowCreditConfirm] = useState(false)
   const [isCalculating, setIsCalculating] = useState(false)
@@ -376,8 +378,14 @@ export default function DashboardPage() {
   const [defaultSenderName, setDefaultSenderName] = useState<string | null>(null)
   const [preferredPackage, setPreferredPackage] = useState<string | null>(null)
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
+  const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
+  const [bookmarksOpen, setBookmarksOpen] = useState(false)
+  const [newFolderName, setNewFolderName] = useState("")
+  const [newFolderColor, setNewFolderColor] = useState("#0f766e")
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null)
   const [showSaveCalculatorModal, setShowSaveCalculatorModal] = useState(false)
   const [newCalculatorName, setNewCalculatorName] = useState("")
+  const [saveFolderId, setSaveFolderId] = useState<string>("")
   const [savingCalculator, setSavingCalculator] = useState(false)
 
   const searchParams = useSearchParams()
@@ -443,7 +451,10 @@ export default function DashboardPage() {
 
   // Load saved calculators on mount
   useEffect(() => {
-    getSavedCalculators().then(({ data }) => setSavedCalculators(data))
+    Promise.all([getSavedCalculators(), getCalculatorFolders()]).then(([calculators, folders]) => {
+      setSavedCalculators(calculators.data)
+      setCalculatorFolders(folders.data)
+    })
   }, [])
 
   // Load real subscription + day pass status from Supabase on mount
@@ -554,13 +565,31 @@ export default function DashboardPage() {
     }
   }
 
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) return undefined
+    const { data, error } = await createCalculatorFolder(newFolderName, newFolderColor)
+    if (error) toast.error(error)
+    else if (data) {
+      setCalculatorFolders(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+      setNewFolderName("")
+      toast.success(`Created "${data.name}"`)
+    }
+    return data
+  }
+
+  const handleMoveCalculator = async (calc: SavedCalculator, folderId: string | null) => {
+    const { error } = await moveCalculator(calc.id, folderId)
+    if (error) toast.error(error)
+    else setSavedCalculators(prev => prev.map(item => item.id === calc.id ? { ...item, folder_id: folderId } : item))
+  }
+
   const handleSaveCalculator = async () => {
     if (!newCalculatorName.trim()) {
       toast.error("Please enter a name")
       return
     }
     setSavingCalculator(true)
-    const { data, error } = await saveCalculator(newCalculatorName.trim(), settings)
+    const { data, error } = await saveCalculator(newCalculatorName.trim(), settings, saveFolderId || null)
     setSavingCalculator(false)
     if (error) {
       toast.error(error)
@@ -750,117 +779,16 @@ export default function DashboardPage() {
               <CardDescription>
                 Fill in the details below to calculate your quote
               </CardDescription>
-              {/* Saved Calculators Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="mt-3 w-fit gap-2">
-                    <FolderOpen className="h-4 w-4" />
-                    Access Saved Calculators
-                    <ChevronDown className="h-3 w-3 opacity-60" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-64">
-                  {savedCalculators.length === 0 ? (
-                    <div className="px-3 py-4 text-center text-sm text-muted-foreground">
-                      <p>No saved calculators yet.</p>
-                      <p className="mt-1 text-xs">Save your current settings below.</p>
-                    </div>
-                  ) : (
-                    savedCalculators.map(calc => (
-                      <div key={calc.id} className="px-1 py-0.5">
-                        {renamingCalcId === calc.id ? (
-                          /* Inline rename row */
-                          <div className="flex items-center gap-1.5 px-2 py-1.5" onClick={e => e.stopPropagation()}>
-                            <input
-                              autoFocus
-                              className="flex-1 rounded border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                              value={renameValue}
-                              onChange={e => setRenameValue(e.target.value)}
-                              onKeyDown={e => {
-                                if (e.key === "Enter") handleRenameCalculator(calc)
-                                if (e.key === "Escape") setRenamingCalcId(null)
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleRenameCalculator(calc)}
-                              className="rounded px-2 py-1 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90"
-                            >
-                              Save
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setRenamingCalcId(null)}
-                              className="rounded px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          /* Normal row */
-                          <div className="flex items-center justify-between gap-1 rounded-sm hover:bg-accent">
-                            <button
-                              type="button"
-                              onClick={() => handleLoadCalculator(calc)}
-                              className="flex-1 px-2 py-1.5 text-left"
-                            >
-                              <p className="text-sm font-medium">{calc.name}</p>
-                              <p className="text-xs text-muted-foreground">${calc.settings.hourlyRate}/hr</p>
-                            </button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button
-                                  type="button"
-                                  onClick={e => e.stopPropagation()}
-                                  className="mr-1 rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                >
-                                  <MoreHorizontal className="h-3.5 w-3.5" />
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-36">
-                                <DropdownMenuItem
-                                  onClick={e => {
-                                    e.stopPropagation()
-                                    setRenameValue(calc.name)
-                                    setRenamingCalcId(calc.id)
-                                  }}
-                                  className="gap-2"
-                                >
-                                  <Pencil className="h-3.5 w-3.5" />
-                                  Rename
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={e => {
-                                    e.stopPropagation()
-                                    handleDeleteCalculator(calc)
-                                  }}
-                                  className="gap-2 text-destructive focus:text-destructive"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setNewCalculatorName("")
-                      setShowSaveCalculatorModal(true)
-                    }}
-                    className="gap-2"
-                  >
-                    <BookmarkPlus className="h-4 w-4" />
-                    Save Current Settings
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="quote-city">City</Label>
+                <Input id="quote-city" placeholder="e.g., Austin" value={quoteCity} onChange={e => setQuoteCity(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="quote-zip">ZIP Code</Label>
+                <Input id="quote-zip" inputMode="numeric" placeholder="e.g., 78701" value={quoteZip} onChange={e => setQuoteZip(e.target.value)} />
+              </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="sqft">{sqftUnit === "sqft" ? "Square Footage" : "Square Meters"} *</Label>
@@ -1073,6 +1001,17 @@ export default function DashboardPage() {
                   })()}
                 </div>
               </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowSaveCalculatorModal(true)}
+                className="w-full gap-2"
+                size="lg"
+              >
+                <BookmarkPlus className="h-4 w-4" />
+                Save Calculator
+              </Button>
 
               <Button
                 onClick={calculateQuote}
@@ -1428,7 +1367,19 @@ export default function DashboardPage() {
                 onKeyDown={e => e.key === "Enter" && handleSaveCalculator()}
               />
             </div>
-            <div className="rounded-lg bg-muted/50 p-3 text-sm">
+              <div className="space-y-2">
+                <Label htmlFor="save-folder">Folder</Label>
+                <select id="save-folder" value={saveFolderId} onChange={e => setSaveFolderId(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                  <option value="">Unfiled</option>
+                  {calculatorFolders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
+                </select>
+                <div className="flex gap-2">
+                  <Input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} placeholder="Create new folder" className="h-9" />
+                  <input type="color" value={newFolderColor} onChange={e => setNewFolderColor(e.target.value)} className="h-9 w-10 rounded border border-input bg-background p-1" aria-label="New folder color" />
+                  <Button type="button" variant="outline" size="sm" onClick={async () => { await handleCreateFolder(); }} disabled={!newFolderName.trim()}>Create</Button>
+                </div>
+              </div>
+              <div className="rounded-lg bg-muted/50 p-3 text-sm">
               <p className="font-medium text-foreground">Current Settings Preview</p>
               <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-muted-foreground">
                 <span>Hourly Rate:</span>
@@ -1450,6 +1401,43 @@ export default function DashboardPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <div className={cn("fixed right-0 top-1/2 z-40 flex -translate-y-1/2 items-stretch transition-transform", bookmarksOpen ? "translate-x-0" : "translate-x-[calc(100%-2.75rem)]")}>
+        <button type="button" onClick={() => setBookmarksOpen(prev => !prev)} className="flex w-11 flex-col items-center justify-center gap-2 rounded-l-xl bg-primary py-5 text-primary-foreground shadow-lg" aria-label="Toggle saved calculators">
+          <Bookmark className="h-5 w-5" />
+          <span className="[writing-mode:vertical-rl] text-xs font-semibold">Saved</span>
+        </button>
+        <aside className="w-80 max-w-[calc(100vw-2.75rem)] border border-border bg-background p-4 shadow-xl" aria-label="Saved calculators">
+          <div className="mb-4 flex gap-2">
+            <Input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyDown={e => e.key === "Enter" && handleCreateFolder()} placeholder="New folder" className="h-9" />
+            <input type="color" value={newFolderColor} onChange={e => setNewFolderColor(e.target.value)} className="h-9 w-9 rounded border border-input bg-background p-1" aria-label="Folder color" />
+            <Button size="icon" onClick={handleCreateFolder} aria-label="Create folder"><Plus className="h-4 w-4" /></Button>
+          </div>
+          <div className="flex items-center justify-between">
+            <div><h2 className="font-semibold">Saved Calculators</h2><p className="text-xs text-muted-foreground">Organize your pricing settings</p></div>
+            <Button variant="ghost" size="icon" onClick={() => setBookmarksOpen(false)} aria-label="Close saved calculators"><ChevronDown className="h-4 w-4 rotate-90" /></Button>
+          </div>
+          <div className="mt-4 max-h-[60vh] space-y-3 overflow-y-auto">
+            {calculatorFolders.map(folder => (
+              <section key={folder.id}>
+  <div className="flex items-center gap-2">
+  <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: folder.color }} />
+  {editingFolderId === folder.id ? <>
+    <Input autoFocus defaultValue={folder.name} onBlur={async e => { const name = e.target.value.trim(); if (name && name !== folder.name) { const result = await updateCalculatorFolder(folder.id, { name }); if (result.error) toast.error(result.error); else setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, name } : item).sort((a, b) => a.name.localeCompare(b.name))) } setEditingFolderId(null) }} className="h-8 min-w-0 flex-1" aria-label={`Rename ${folder.name}`} />
+    <input type="color" value={folder.color} onChange={async e => { const color = e.target.value; setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, color } : item)); const result = await updateCalculatorFolder(folder.id, { color }); if (result.error) toast.error(result.error) }} className="h-7 w-7 shrink-0 rounded border border-input bg-background p-0.5" aria-label={`Recolor ${folder.name}`} />
+  </> : <>
+    <h3 className="min-w-0 flex-1 truncate text-sm font-medium">{folder.name}</h3>
+    <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setEditingFolderId(folder.id)} aria-label={`Edit ${folder.name}`}><Pencil className="h-3.5 w-3.5" /></Button>
+  </>}
+  </div>
+                <div className="mt-1 space-y-1 pl-5">{savedCalculators.filter(calc => calc.folder_id === folder.id).map(calc => <div key={calc.id} className="flex items-center gap-1">{renamingCalcId === calc.id ? <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1"><Input autoFocus value={renameValue} onChange={e => setRenameValue(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleRenameCalculator(calc); if (e.key === "Escape") setRenamingCalcId(null) }} className="h-8 min-w-24 flex-1" aria-label={`Rename ${calc.name}`} /><select value={calc.folder_id ?? ""} onChange={e => handleMoveCalculator(calc, e.target.value || null)} className="h-8 max-w-28 rounded-md border border-input bg-background px-1 text-xs" aria-label={`Move ${calc.name}`}><option value="">Unfiled</option>{calculatorFolders.map(target => <option key={target.id} value={target.id}>{target.name}</option>)}</select><Button type="button" variant="outline" size="sm" className="h-8 px-2 text-xs" disabled={!newFolderName.trim()} onClick={async () => { const created = await handleCreateFolder(); if (created) await handleMoveCalculator(calc, created.id) }}>New folder</Button></div> : <button type="button" onClick={() => handleLoadCalculator(calc)} className="min-w-0 flex-1 truncate rounded px-2 py-1.5 text-left text-sm hover:bg-accent">{calc.name}</button>}<div className="flex items-center gap-1"><Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => { setRenameValue(calc.name); setNewFolderName(""); setRenamingCalcId(renamingCalcId === calc.id ? null : calc.id) }} aria-label={`Edit ${calc.name}`}><Pencil className="h-3.5 w-3.5" /></Button>{renamingCalcId === calc.id && <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-destructive" onClick={() => handleDeleteCalculator(calc)} aria-label={`Delete ${calc.name}`}><Trash2 className="h-3.5 w-3.5" /></Button>}</div></div>)}</div>
+              </section>
+            ))}
+            <section><h3 className="text-sm font-medium">Unfiled</h3><div className="mt-1 space-y-1">{savedCalculators.filter(calc => !calc.folder_id).map(calc => <div key={calc.id} className="flex items-center gap-1">{renamingCalcId === calc.id ? <Input autoFocus value={renameValue} onChange={e => setRenameValue(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleRenameCalculator(calc); if (e.key === "Escape") setRenamingCalcId(null) }} className="h-8 min-w-0 flex-1" aria-label={`Rename ${calc.name}`} /> : <button type="button" onClick={() => handleLoadCalculator(calc)} className="min-w-0 flex-1 truncate rounded px-2 py-1.5 text-left text-sm hover:bg-accent">{calc.name}</button>}<Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => { setRenameValue(calc.name); setRenamingCalcId(calc.id) }} aria-label={`Edit ${calc.name}`}><Pencil className="h-3.5 w-3.5" /></Button><select value={calc.folder_id ?? ""} onChange={e => handleMoveCalculator(calc, e.target.value || null)} className="w-6 bg-transparent text-xs" aria-label={`Move ${calc.name}`}><option value="">•</option>{calculatorFolders.map(folder => <option key={folder.id} value={folder.id}>{folder.name}</option>)}</select></div>)}</div></section>
+            {!savedCalculators.length && <p className="py-5 text-center text-sm text-muted-foreground">No saved calculators yet.</p>}
+          </div>
+        </aside>
+      </div>
     </div>
   )
 }
