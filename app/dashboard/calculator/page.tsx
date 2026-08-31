@@ -844,7 +844,7 @@ export default function DashboardPage() {
   
   <main className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
         <div className="mb-10 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="relative h-52 overflow-hidden sm:h-64">
+          <div className="relative h-44 overflow-hidden sm:h-52">
                 <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/cleaning-tools-banner-v2.png')] bg-cover bg-[center_72%]" />
                 <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-foreground/65 via-foreground/25 to-transparent" />
             <div className="relative flex h-full max-w-xl flex-col justify-end gap-2 p-6 sm:p-8">
