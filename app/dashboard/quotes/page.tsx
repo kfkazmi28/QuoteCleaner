@@ -1235,7 +1235,8 @@ export default function SavedQuotesPage() {
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col gap-1 min-w-0">
-                      <CardTitle className="text-base leading-snug">{quote.quote_name}</CardTitle>
+                      {quote.client_name && <CardTitle className="text-base leading-snug">{quote.client_name}</CardTitle>}
+                      {quote.home_address && <p className="truncate text-xs text-muted-foreground">{quote.home_address}</p>}
                       {(scheduledQuoteIds.has(quote.id) || quote.status === "completed") && (() => {
                         const event = scheduledEventsMap.get(quote.id)
                         const pastAppointment = scheduledQuoteIds.has(quote.id) && isAppointmentPast(quote.id)
