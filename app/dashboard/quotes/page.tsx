@@ -1174,7 +1174,7 @@ export default function SavedQuotesPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-3">
             {[1, 2, 3].map(i => (
               <Card key={i} className="animate-pulse">
                 <CardHeader>
@@ -1225,11 +1225,11 @@ export default function SavedQuotesPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-3">
             {filteredQuotes.map(quote => (
               <Card
                 key={quote.id}
-                className="flex flex-col transition-shadow hover:shadow-md cursor-pointer"
+                className="flex w-full flex-row items-center transition-shadow hover:shadow-md cursor-pointer"
                 onClick={() => setViewQuote(quote)}
               >
                 <CardHeader className="pb-3">
