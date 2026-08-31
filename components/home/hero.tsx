@@ -11,7 +11,7 @@ export function Hero() {
       <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-brand-blue/20 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-chart-2/15 blur-3xl" />
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <div>
+        <div className="pt-4 sm:pt-0">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-primary shadow-sm">
             <Sparkles className="h-4 w-4" /> Built for cleaning businesses
           </div>
