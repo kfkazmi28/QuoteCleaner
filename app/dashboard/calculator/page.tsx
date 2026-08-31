@@ -845,9 +845,7 @@ export default function DashboardPage() {
             <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/cleaning-tools-banner-v2.png')] bg-cover bg-center" />
             <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/35 to-transparent" />
             <div className="relative flex h-full max-w-xl flex-col justify-end gap-2 p-6 sm:p-8">
-              {activeSavedCalculator && <p className="w-fit rounded-md bg-orange-500 px-3 py-1 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-sm">Saved calculator</p>}
               <h1 className="text-3xl font-bold tracking-tight text-primary-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
-              {activeSavedCalculator && <p className="text-base font-semibold text-orange-300">Using: {activeSavedCalculator}</p>}
               <p className="max-w-lg text-sm leading-6 text-primary-foreground/85 sm:text-base">Build a professional quote in seconds. Enter a few details and we&apos;ll recommend a price.</p>
             </div>
           </div>
@@ -859,7 +857,7 @@ export default function DashboardPage() {
             <div className="mb-10">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s price this clean</h2>
-                {activeSavedCalculator && <div className="rounded-md bg-orange-500 px-3 py-1.5 text-sm font-bold text-white">Saved calculator: {activeSavedCalculator}</div>}
+                {activeSavedCalculator && <div className="rounded-md bg-orange-500 px-3 py-1.5 text-sm font-bold text-white">Saved Calculator: {activeSavedCalculator.replace(/\s*[/>&]+\s*/g, " > ")}</div>}
               </div>
             </div>
             <div className="space-y-9">
