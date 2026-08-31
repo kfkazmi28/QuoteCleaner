@@ -1144,6 +1144,26 @@ export default function SavedQuotesPage() {
           </Button>
         </div>
 
+        {/* Open quote summary */}
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-4">
+              <p className="text-sm font-medium text-muted-foreground">Open quotes</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : openQuotes.length}</p>
+            </CardContent>
+          </Card>
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-4">
+              <p className="text-sm font-medium text-muted-foreground">Total open price</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : formatCurrency(openQuotes.reduce((total, quote) => {
+                const packageKey = preferredPackages[quote.id] || "standard"
+                const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
+                return total + (Number(price) || 0)
+              }, 0))}</p>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Migration banner — shown when status column is missing */}
         {statusColumnReady === false && (
           <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/30">
