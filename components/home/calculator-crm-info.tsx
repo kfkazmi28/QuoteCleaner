@@ -71,11 +71,6 @@ export function CalculatorCrmInfo() {
         />
         <div className="absolute inset-0 bg-primary/5 mix-blend-multiply" />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background" />
-        <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
-          <p className="font-hand text-balance text-4xl font-medium tracking-wide text-white drop-shadow-sm sm:text-6xl lg:text-7xl">
-            Loved by cleaning pros
-          </p>
-        </div>
       </div>
     </section>
   )
