@@ -887,7 +887,7 @@ function ScheduleModal({
                   </span>
                   <span className="text-muted-foreground/50">·</span>
                   <span className="font-medium text-foreground">
-                    2 cleaners — {Math.ceil((estimatedHours / 2) * 2) / 2} hrs
+                    2 cleaners — {Math.ceil(((estimatedHours ?? 0) / 2) * 2) / 2} hrs
                   </span>
                 </div>
               ) : (
@@ -975,16 +975,18 @@ export default function SavedQuotesPage() {
     const newPref = currentPref === pkgKey ? "" : pkgKey
     setPreferredPackages(prev => ({ ...prev, [quoteId]: newPref }))
     // Persist to database
-    updateQuote(quoteId, { preferred_package: newPref || null })
+    updateQuote(quoteId, { preferred_package: newPref || undefined })
   }
 
   const handleDelete = (id: string) => {
+    const previousQuotes = quotes
+    setQuotes(prev => prev.filter(q => q.id !== id))
     startTransition(async () => {
       const { error } = await deleteQuote(id)
       if (error) {
-        toast.error("Failed to delete quote")
+        setQuotes(previousQuotes)
+        toast.error(`Failed to delete quote: ${error}`)
       } else {
-        setQuotes(prev => prev.filter(q => q.id !== id))
         toast.success("Quote deleted")
       }
     })
@@ -1342,7 +1344,7 @@ export default function SavedQuotesPage() {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
-                            onClick={() => handleDelete(quote.id)}
+                            onSelect={(event) => { event.preventDefault(); handleDelete(quote.id) }}
                             disabled={isPending}
                             className="text-destructive focus:text-destructive"
                           >
