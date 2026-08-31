@@ -939,6 +939,7 @@ export default function SavedQuotesPage() {
   const [invoiceQuote, setInvoiceQuote] = useState<SavedQuote | null>(null)
   const [invoicedQuoteIds, setInvoicedQuoteIds] = useState<Set<string>>(new Set())
   const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [selectedQuoteIds, setSelectedQuoteIds] = useState<Set<string>>(new Set())
   const [columnFilters, setColumnFilters] = useState({ client: "", cleaning: "", date: "", price: "" })
   const [sortConfig, setSortConfig] = useState<{ key: "client" | "address" | "cleaning" | "date" | "price"; direction: "asc" | "desc" }>({ key: "date", direction: "desc" })
 
@@ -980,6 +981,24 @@ export default function SavedQuotesPage() {
         toast.error(`Failed to delete quote: ${error}`)
       } else {
         toast.success("Quote deleted")
+      }
+    })
+  }
+
+  const handleDeleteSelected = () => {
+    if (!selectedQuoteIds.size) return
+    const ids = [...selectedQuoteIds]
+    const previousQuotes = quotes
+    setQuotes(prev => prev.filter(q => !selectedQuoteIds.has(q.id)))
+    setSelectedQuoteIds(new Set())
+    startTransition(async () => {
+      const results = await Promise.all(ids.map(id => deleteQuote(id)))
+      const failed = results.find(result => result.error)
+      if (failed?.error) {
+        setQuotes(previousQuotes)
+        toast.error(`Failed to delete selected quotes: ${failed.error}`)
+      } else {
+        toast.success(`${ids.length} quote${ids.length === 1 ? "" : "s"} deleted`)
       }
     })
   }
@@ -1272,7 +1291,28 @@ export default function SavedQuotesPage() {
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning Type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("price")}>Price <span aria-hidden="true">{sortConfig.key === "price" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>{activeTab === "open" ? "Quote Date" : "Cleaning Date"} <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
-                <span className="text-right">Actions</span>
+                <div className="flex items-center justify-end gap-2">
+                  {activeTab === "open" && (
+                    <>
+                      <input
+                        type="checkbox"
+                        aria-label="Select all open quotes"
+                        checked={displayQuotes.length > 0 && displayQuotes.every(quote => selectedQuoteIds.has(quote.id))}
+                        onChange={() => setSelectedQuoteIds(prev => {
+                          const next = new Set(prev)
+                          const allSelected = displayQuotes.every(quote => next.has(quote.id))
+                          displayQuotes.forEach(quote => allSelected ? next.delete(quote.id) : next.add(quote.id))
+                          return next
+                        })}
+                        className="h-4 w-4 rounded border-input accent-primary"
+                      />
+                      <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label="Delete selected open quotes" disabled={!selectedQuoteIds.size || isPending} onClick={handleDeleteSelected}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                  <span>Actions</span>
+                </div>
               </div>
             {displayQuotes.map(quote => (
               <Card
@@ -1290,6 +1330,20 @@ export default function SavedQuotesPage() {
                     </div>
                     {/* Keep the row aligned with the table header's spacer column. */}
                     <span aria-hidden="true" />
+                    {activeTab === "open" && (
+                      <input
+                        type="checkbox"
+                        aria-label={`Select ${quote.client_name || quote.quote_name}`}
+                        checked={selectedQuoteIds.has(quote.id)}
+                        onChange={() => setSelectedQuoteIds(prev => {
+                          const next = new Set(prev)
+                          next.has(quote.id) ? next.delete(quote.id) : next.add(quote.id)
+                          return next
+                        })}
+                        onClick={e => e.stopPropagation()}
+                        className="h-4 w-4 rounded border-input accent-primary"
+                      />
+                    )}
                     {/* Stop propagation so card click doesn't fire */}
                     <div className="hidden" onClick={e => e.stopPropagation()}>
                       <DropdownMenu>
