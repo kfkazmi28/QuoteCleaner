@@ -1420,7 +1420,9 @@ export default function SavedQuotesPage() {
                   <div className="contents">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <CalendarIcon className="h-3 w-3 shrink-0" />
-                      {formatDate(quote.created_at)}
+                      {activeTab === "scheduled" && scheduledEventsMap.get(quote.id)?.scheduled_date
+                        ? `Cleaning date: ${formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)}`
+                        : formatDate(quote.created_at)}
                     </p>
                     {/* Completed tab: show when the cleaning happened */}
                     {activeTab === "completed" && (() => {
