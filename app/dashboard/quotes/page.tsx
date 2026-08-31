@@ -64,7 +64,7 @@ import { PhoneInput } from "@/components/phone-input"
 import { exportQuotePdf } from "@/lib/export-quote-pdf"
 import { ChecklistModal, getDefaultChecklist, getChecklistTitle, getChecklistDescription, type ChecklistSection } from "@/components/checklist-modal"
 import { CreateInvoiceModal } from "@/components/create-invoice-modal"
-import { getInvoiceByQuoteId } from "@/app/actions/invoices"
+import { getInvoiceByQuoteId, getInvoices, type Invoice } from "@/app/actions/invoices"
 
 interface SavedQuote {
   id: string
@@ -128,6 +128,8 @@ function ViewQuoteModal({
   onSend,
   onExport,
   onPhotosUpdated,
+  selectedCleaning,
+  selectedPrice,
 }: {
   quote: SavedQuote | null
   onClose: () => void
@@ -136,6 +138,8 @@ function ViewQuoteModal({
   onSend: (q: SavedQuote) => void
   onExport: (q: SavedQuote) => void
   onPhotosUpdated: (quoteId: string, photos: string[]) => void
+  selectedCleaning: string
+  selectedPrice: number
 }) {
   const [photos, setPhotos] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
@@ -236,27 +240,10 @@ function ViewQuoteModal({
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">Pricing</p>
             <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1.5 text-sm">
-              {[
-                { label: "Standard (one-time)", value: quote.result_standard },
-                { label: "Deep Clean", value: quote.result_deep_clean },
-                { label: "Move In / Move Out", value: quote.result_move_in },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-medium">{formatCurrency(value)}</span>
-                </div>
-              ))}
-              <div className="my-1 h-px bg-border" />
-              {[
-                { label: "Monthly recurring", value: quote.result_monthly },
-                { label: "Bi-weekly recurring", value: quote.result_biweekly },
-                { label: "Weekly recurring", value: quote.result_weekly },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-medium">{formatCurrency(value)}</span>
-                </div>
-              ))}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{selectedCleaning}</span>
+                <span className="font-semibold">{formatCurrency(selectedPrice)}</span>
+              </div>
             </div>
           </div>
 
@@ -780,7 +767,7 @@ function ScheduleModal({
               </select>
             </div>
 
-            {/* Editable package name + price — shown once a package is selected */}
+            {/* Editable package name + price �� shown once a package is selected */}
             {selectedPackage && (
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
@@ -945,12 +932,14 @@ export default function SavedQuotesPage() {
   const [scheduleQuote, setScheduleQuote] = useState<SavedQuote | null>(null)
   const [scheduledQuoteIds, setScheduledQuoteIds] = useState<Set<string>>(new Set())
   const [scheduledEventsMap, setScheduledEventsMap] = useState<Map<string, ScheduledEventInfo>>(new Map())
-  const [activeTab, setActiveTab] = useState<"open" | "scheduled" | "completed" | "archived">("open")
+  const [activeTab, setActiveTab] = useState<"open" | "scheduled" | "completed">("open")
   const [isPending, startTransition] = useTransition()
   const [statusColumnReady, setStatusColumnReady] = useState<boolean | null>(null)
   const [checklistModalQuote, setChecklistModalQuote] = useState<SavedQuote | null>(null)
   const [invoiceQuote, setInvoiceQuote] = useState<SavedQuote | null>(null)
   const [invoicedQuoteIds, setInvoicedQuoteIds] = useState<Set<string>>(new Set())
+  const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [selectedQuoteIds, setSelectedQuoteIds] = useState<Set<string>>(new Set())
   const [columnFilters, setColumnFilters] = useState({ client: "", cleaning: "", date: "", price: "" })
   const [sortConfig, setSortConfig] = useState<{ key: "client" | "address" | "cleaning" | "date" | "price"; direction: "asc" | "desc" }>({ key: "date", direction: "desc" })
 
@@ -968,8 +957,9 @@ export default function SavedQuotesPage() {
       setLoading(false)
     })
     getScheduledQuoteIds().then(ids => setScheduledQuoteIds(ids))
-    getScheduledEventsMap().then(map => setScheduledEventsMap(map))
-    // Check if DB has the status column
+  getScheduledEventsMap().then(map => setScheduledEventsMap(map))
+  getInvoices().then(setInvoices)
+  // Check if DB has the status column
     checkQuoteStatusColumn().then(ready => setStatusColumnReady(ready))
   }, [])
 
@@ -991,6 +981,24 @@ export default function SavedQuotesPage() {
         toast.error(`Failed to delete quote: ${error}`)
       } else {
         toast.success("Quote deleted")
+      }
+    })
+  }
+
+  const handleDeleteSelected = () => {
+    if (!selectedQuoteIds.size) return
+    const ids = [...selectedQuoteIds]
+    const previousQuotes = quotes
+    setQuotes(prev => prev.filter(q => !selectedQuoteIds.has(q.id)))
+    setSelectedQuoteIds(new Set())
+    startTransition(async () => {
+      const results = await Promise.all(ids.map(id => deleteQuote(id)))
+      const failed = results.find(result => result.error)
+      if (failed?.error) {
+        setQuotes(previousQuotes)
+        toast.error(`Failed to delete selected quotes: ${failed.error}`)
+      } else {
+        toast.success(`${ids.length} quote${ids.length === 1 ? "" : "s"} deleted`)
       }
     })
   }
@@ -1056,12 +1064,9 @@ export default function SavedQuotesPage() {
   const completedQuotes = quotes.filter(q =>
     !q.archived && (q.status === "completed" || (scheduledQuoteIds.has(q.id) && isAppointmentPast(q.id)))
   )
-  const archivedQuotes = quotes.filter(q => q.archived)
-
   const filteredQuotes = activeTab === "open" ? openQuotes
-    : activeTab === "scheduled" ? scheduledQuotes
-    : activeTab === "completed" ? completedQuotes
-    : archivedQuotes
+  : activeTab === "scheduled" ? scheduledQuotes
+  : completedQuotes
 
   const displayQuotes = useMemo(() => {
     const selectedPrice = (q: SavedQuote) => {
@@ -1084,23 +1089,44 @@ export default function SavedQuotesPage() {
 
   const setSort = (key: typeof sortConfig.key) => setSortConfig(prev => ({ key, direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc" }))
 
-  const quoteToSendData = (q: SavedQuote): SendQuoteData => ({
-    quoteId: q.id,
-    quoteName: q.quote_name,
-    homeAddress: q.home_address,
-    clientName: q.client_name,
-    clientEmail: q.client_email,
-    clientPhone: q.client_phone,
-    generatedBy: q.quote_generated_by,
-    notes: q.notes,
-    resultStandard: q.result_standard,
-    resultDeepClean: q.result_deep_clean,
-    resultMoveIn: q.result_move_in,
-    resultMonthly: q.result_monthly,
-    resultBiweekly: q.result_biweekly,
-    resultWeekly: q.result_weekly,
-    createdAt: q.created_at,
-  })
+  const quoteToSendData = (q: SavedQuote): SendQuoteData => {
+    const packageKey = preferredPackages[q.id] || q.preferred_package || "standard"
+    const packageLabels: Record<string, string> = {
+      move: "Move In / Move Out",
+      deep: "Deep Clean",
+      standard: "Standard Clean",
+      monthly: "Monthly",
+      biweekly: "Bi-weekly",
+      weekly: "Weekly",
+    }
+    const checklist = q.checklist_data?.[packageKey as "standard" | "deep" | "move"]
+    return {
+      quoteId: q.id,
+      quoteName: q.quote_name,
+      selectedTier: packageLabels[packageKey] || q.quote_name,
+      homeAddress: q.home_address,
+      homeVariables: {
+        squareFootage: q.square_footage,
+        bedrooms: q.bedrooms,
+        bathrooms: q.bathrooms,
+        pets: q.pets,
+        children: q.children,
+      },
+      clientName: q.client_name,
+      clientEmail: q.client_email,
+      clientPhone: q.client_phone,
+      generatedBy: q.quote_generated_by,
+      notes: q.notes,
+      checklist: checklist?.length ? checklist : undefined,
+      resultStandard: q.result_standard,
+      resultDeepClean: q.result_deep_clean,
+      resultMoveIn: q.result_move_in,
+      resultMonthly: q.result_monthly,
+      resultBiweekly: q.result_biweekly,
+      resultWeekly: q.result_weekly,
+      createdAt: q.created_at,
+    }
+  }
 
   const handleExport = async (q: SavedQuote) => {
     await exportQuotePdf(quoteToSendData(q))
@@ -1131,9 +1157,30 @@ export default function SavedQuotesPage() {
               {loading ? "Loading..." : `${quotes.length} saved quote${quotes.length !== 1 ? "s" : ""}`}
             </p>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/dashboard">Back to Calculator</Link>
-          </Button>
+        </div>
+
+        {/* Tab-aware quote summary */}
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-4">
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Scheduled cleanings" : activeTab === "completed" ? "Completed quotes" : "Open quotes"}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? scheduledQuotes.length : activeTab === "completed" ? completedQuotes.filter(quote => quote.client_name).length : openQuotes.length}</p>
+            </CardContent>
+          </Card>
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-4">
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Total scheduled price" : activeTab === "completed" ? "Total completed price" : "Total open price"}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? formatCurrency(scheduledQuotes.reduce((total, quote) => {
+                const packageKey = preferredPackages[quote.id] || "standard"
+                const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
+                return total + (Number(price) || 0)
+              }, 0)) : formatCurrency((activeTab === "completed" ? completedQuotes.filter(quote => quote.client_name) : openQuotes).reduce((total, quote) => {
+                const packageKey = preferredPackages[quote.id] || "standard"
+                const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
+                return total + (Number(price) || 0)
+              }, 0))}</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Migration banner — shown when status column is missing */}
@@ -1183,17 +1230,6 @@ export default function SavedQuotesPage() {
             Completed
             {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({completedQuotes.length})</span>}
           </button>
-          <button
-            onClick={() => setActiveTab("archived")}
-            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === "archived"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Archived
-            {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({archivedQuotes.length})</span>}
-          </button>
         </div>
 
         {/* Content */}
@@ -1216,9 +1252,7 @@ export default function SavedQuotesPage() {
           <Card className="flex min-h-[320px] flex-col items-center justify-center border-dashed text-center">
             <CardContent className="flex flex-col items-center gap-3 pt-10">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-                {activeTab === "archived" ? (
-                  <Archive className="h-7 w-7 text-muted-foreground" />
-                ) : activeTab === "scheduled" ? (
+                {activeTab === "scheduled" ? (
                   <CalendarCheck className="h-7 w-7 text-muted-foreground" />
                 ) : activeTab === "completed" ? (
                   <CheckCircle2 className="h-7 w-7 text-muted-foreground" />
@@ -1227,15 +1261,12 @@ export default function SavedQuotesPage() {
                 )}
               </div>
               <p className="text-base font-medium text-foreground">
-                {activeTab === "archived" ? "No archived quotes"
-                  : activeTab === "scheduled" ? "No scheduled quotes"
+{activeTab === "scheduled" ? "No scheduled quotes"
                   : activeTab === "completed" ? "No completed quotes"
                   : "No open quotes"}
               </p>
               <p className="max-w-xs text-sm text-muted-foreground">
-                {activeTab === "archived"
-                  ? "Archived quotes will appear here."
-                  : activeTab === "scheduled"
+{activeTab === "scheduled"
                   ? "Schedule a job from an open quote to see it here."
                   : activeTab === "completed"
                   ? "Quotes are moved here automatically once their appointment date has passed, or when marked as completed."
@@ -1252,12 +1283,33 @@ export default function SavedQuotesPage() {
           <div className="flex flex-col gap-3">
             <div className="overflow-x-auto rounded-md border border-border">
               <div className="grid min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(100px,0.8fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("client")}>Client name <span aria-hidden="true">{sortConfig.key === "client" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("client")}>Client Name <span aria-hidden="true">{sortConfig.key === "client" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <span aria-hidden="true" />
-                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning Type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("price")}>Price <span aria-hidden="true">{sortConfig.key === "price" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
-                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>Quote date <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
-                <span className="text-right">Actions</span>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>{activeTab === "open" ? "Quote Date" : "Cleaning Date"} <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <div className="flex items-center justify-end gap-2">
+                  <span>Actions</span>
+                  {activeTab === "open" && (
+                    <>
+                      <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label="Delete selected open quotes" disabled={!selectedQuoteIds.size || isPending} onClick={handleDeleteSelected}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <input
+                        type="checkbox"
+                        aria-label="Select all open quotes"
+                        checked={displayQuotes.length > 0 && displayQuotes.every(quote => selectedQuoteIds.has(quote.id))}
+                        onChange={() => setSelectedQuoteIds(prev => {
+                          const next = new Set(prev)
+                          const allSelected = displayQuotes.every(quote => next.has(quote.id))
+                          displayQuotes.forEach(quote => allSelected ? next.delete(quote.id) : next.add(quote.id))
+                          return next
+                        })}
+                        className="h-4 w-4 rounded border-input accent-primary"
+                      />
+                    </>
+                  )}
+                </div>
               </div>
             {displayQuotes.map(quote => (
               <Card
@@ -1271,45 +1323,12 @@ export default function SavedQuotesPage() {
                     <div className="flex flex-col gap-1 min-w-0">
                       {quote.client_name && <CardTitle className="text-base leading-snug">{quote.client_name}</CardTitle>}
                       {quote.home_address && <p className="truncate text-xs text-muted-foreground">{quote.home_address}</p>}
-                      {(scheduledQuoteIds.has(quote.id) || quote.status === "completed") && (() => {
-                        const event = scheduledEventsMap.get(quote.id)
-                        const pastAppointment = scheduledQuoteIds.has(quote.id) && isAppointmentPast(quote.id)
-                        const isCompleted = quote.status === "completed" || pastAppointment
-                        const isUpcoming = scheduledQuoteIds.has(quote.id) && !pastAppointment
-                        return (
-                          <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              {isCompleted ? (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                                  <CheckCircle2 className="h-2.5 w-2.5" /> Completed
-                                </span>
-                              ) : (
-                                <>
-                                  <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                                    style={{ background: "oklch(0.60 0.15 175 / 0.12)", color: "oklch(0.42 0.13 175)" }}>
-                                    <CalendarCheck className="h-2.5 w-2.5" /> Scheduled
-                                  </span>
-                                  {isUpcoming && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 text-blue-600 px-2 py-0.5 text-[10px] font-semibold">
-                                      Upcoming
-                                    </span>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                            {event && (
-                              <p className="text-[11px] text-muted-foreground">
-                                {new Date(event.scheduled_date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                                {event.start_time && ` at ${event.start_time.slice(0, 5)}`}
-                                {event.package_name && ` · ${event.package_name}`}
-                              </p>
-                            )}
-                          </div>
-                        )
-                      })()}
+
                     </div>
+                    {/* Keep the row aligned with the table header's spacer column. */}
+                    <span aria-hidden="true" />
                     {/* Stop propagation so card click doesn't fire */}
-                    <div className="shrink-0" onClick={e => e.stopPropagation()}>
+                    <div className="hidden" onClick={e => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -1419,35 +1438,11 @@ export default function SavedQuotesPage() {
                   <div className="contents">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <CalendarIcon className="h-3 w-3 shrink-0" />
-                      {formatDate(quote.created_at)}
+                      {activeTab === "scheduled" && scheduledEventsMap.get(quote.id)?.scheduled_date
+                        ? formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)
+                        : formatDate(quote.created_at)}
                     </p>
-                    {/* Completed tab: show when the cleaning happened */}
-                    {activeTab === "completed" && (() => {
-                      const event = scheduledEventsMap.get(quote.id)
-                      if (event?.scheduled_date) {
-                        const d = new Date(event.scheduled_date + "T12:00:00")
-                        const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                        return (
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            Cleaned on {label}
-                          </p>
-                        )
-                      }
-                      // No scheduled event — manually marked completed
-                      const fallbackDate = (quote as any).completed_at ?? quote.updated_at
-                      if (fallbackDate) {
-                        const label = new Date(fallbackDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                        return (
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            Marked completed on {label}
-                          </p>
-                        )
-                      }
-                      return null
-                    })()}
-                    <div className="flex items-center justify-between gap-1 lg:justify-end" onClick={e => e.stopPropagation()}>
+                    <div className="col-start-6 flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1473,6 +1468,20 @@ export default function SavedQuotesPage() {
                       >
                         <Eye className="mr-1 h-3 w-3" />View
                       </Button>
+                      {activeTab === "open" && (
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${quote.client_name || quote.quote_name}`}
+                          checked={selectedQuoteIds.has(quote.id)}
+                          onChange={() => setSelectedQuoteIds(prev => {
+                            const next = new Set(prev)
+                            next.has(quote.id) ? next.delete(quote.id) : next.add(quote.id)
+                            return next
+                          })}
+                          onClick={e => e.stopPropagation()}
+                          className="ml-1 h-4 w-4 rounded border-input accent-primary"
+                        />
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -1491,6 +1500,8 @@ export default function SavedQuotesPage() {
         onLoad={handleLoad}
         onSend={q => { setViewQuote(null); setSendQuote(q) }}
         onExport={handleExport}
+        selectedCleaning={viewQuote ? ({ move: "Move In/Out", deep: "Deep Clean", standard: "Standard", monthly: "Monthly", biweekly: "Bi-weekly", weekly: "Weekly" } as Record<string, string>)[preferredPackages[viewQuote.id] || "standard"] : ""}
+        selectedPrice={viewQuote ? ({ move: viewQuote.result_move_in, deep: viewQuote.result_deep_clean, standard: viewQuote.result_standard, monthly: viewQuote.result_monthly, biweekly: viewQuote.result_biweekly, weekly: viewQuote.result_weekly } as Record<string, number>)[preferredPackages[viewQuote.id] || "standard"] ?? viewQuote.result_standard : 0}
         onPhotosUpdated={(quoteId, photos) => {
           setQuotes(prev => prev.map(q => q.id === quoteId ? { ...q, photos } : q))
           setViewQuote(prev => prev && prev.id === quoteId ? { ...prev, photos } : prev)

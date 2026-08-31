@@ -28,11 +28,33 @@ export default async function DashboardPage() {
   const revenue = invoices.filter((invoice) => invoice.status === "paid").reduce((sum, invoice) => sum + Number(invoice.amount_total || 0), 0)
   const outstanding = invoices.filter((invoice) => invoice.status === "sent").reduce((sum, invoice) => sum + Number(invoice.amount_due || 0), 0)
   const bookedJobs = events.filter((event) => event.status !== "canceled").length
-  const reminders = events.map((event) => ({
-    time: `${event.scheduled_date}${event.start_time ? ` · ${String(event.start_time).slice(0, 5)}` : ""}`,
-    title: `${event.event_type === "quote-linked" ? event.package_name || "Cleaning job" : event.event_type} · ${event.client_name || "Client"}`,
-    type: event.event_type === "quote-linked" ? "Upcoming job" : "Calendar event",
-  }))
+  const formatReminderDate = (value?: string | null) => {
+    if (!value) return ""
+    const [year, month, day] = String(value).split("T")[0].split("-")
+    if (!year || !month || !day) return String(value)
+    return `${month}/${day}/${year}`
+  }
+  const formatReminderTime = (value?: string | null) => {
+    if (!value) return ""
+    const [rawHour, rawMinute] = String(value).slice(0, 5).split(":")
+    const hour = Number(rawHour)
+    if (Number.isNaN(hour)) return ""
+    const period = hour >= 12 ? "pm" : "am"
+    const displayHour = hour % 12 === 0 ? 12 : hour % 12
+    const minute = rawMinute && rawMinute !== "00" ? `:${rawMinute}` : ""
+    return `${displayHour}${minute}${period}`
+  }
+  const reminders = events.map((event) => {
+    const dateLabel = formatReminderDate(event.scheduled_date)
+    const startLabel = formatReminderTime(event.start_time)
+    const endLabel = formatReminderTime(event.end_time)
+    const timeRange = startLabel ? (endLabel ? `${startLabel}-${endLabel}` : startLabel) : ""
+    return {
+      time: [dateLabel, timeRange].filter(Boolean).join(" · "),
+      title: `${event.event_type === "quote-linked" ? event.package_name || "Cleaning job" : event.event_type} · ${event.client_name || "Client"}`,
+      type: event.event_type === "quote-linked" ? "Upcoming job" : "Calendar event",
+    }
+  })
   const displayName = user?.user_metadata?.first_name || user?.email?.split("@")[0] || "there"
   return (
     <div className="min-h-screen bg-muted/30">
