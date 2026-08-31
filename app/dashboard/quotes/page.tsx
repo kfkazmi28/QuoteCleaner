@@ -1290,7 +1290,7 @@ export default function SavedQuotesPage() {
                 <span aria-hidden="true" />
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning Type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("price")}>Price <span aria-hidden="true">{sortConfig.key === "price" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
-                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>{activeTab === "scheduled" ? "Cleaning Date" : "Quote Date"} <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>{activeTab === "open" ? "Quote Date" : "Cleaning Date"} <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <span className="text-right">Actions</span>
               </div>
             {displayQuotes.map(quote => (
