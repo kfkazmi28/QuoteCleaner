@@ -1226,13 +1226,18 @@ export default function SavedQuotesPage() {
           </Card>
         ) : (
           <div className="flex flex-col gap-3">
+            <div className="hidden items-center rounded-md bg-muted/50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground lg:flex">
+              <span className="w-[30%]">Client name / address</span>
+              <span className="w-[28%]">Cleaning type / price</span>
+              <span className="w-[42%] text-right">Quote date / actions</span>
+            </div>
             {filteredQuotes.map(quote => (
               <Card
                 key={quote.id}
-                className="flex w-full min-w-0 flex-col overflow-hidden transition-shadow hover:shadow-md cursor-pointer"
+                className="flex w-full min-w-0 flex-col overflow-hidden transition-shadow hover:shadow-md cursor-pointer lg:flex-row lg:items-center"
                 onClick={() => setViewQuote(quote)}
               >
-                <CardHeader className="w-full min-w-0 pb-3">
+                <CardHeader className="w-full min-w-0 border-b border-border pb-3 lg:w-[30%] lg:border-b-0 lg:border-r lg:px-5 lg:py-4">
                   <div className="flex min-w-0 items-start justify-between gap-2">
                     <div className="flex flex-col gap-1 min-w-0">
                       {quote.client_name && <CardTitle className="text-base leading-snug">{quote.client_name}</CardTitle>}
@@ -1358,7 +1363,7 @@ export default function SavedQuotesPage() {
                   </div>
                 </CardHeader>
 
-                <CardContent className="flex w-full min-w-0 flex-1 flex-col gap-3">
+                <CardContent className="flex w-full min-w-0 flex-1 flex-col gap-3 lg:w-[28%] lg:flex-none lg:px-5 lg:py-4">
 
                   {/* Selected cleaning tier */}
                   {(() => {
@@ -1385,7 +1390,7 @@ export default function SavedQuotesPage() {
 
 
                   {/* Footer */}
-                  <div className="mt-auto flex flex-col gap-1.5">
+                  <div className="mt-auto flex flex-col gap-3 lg:w-[42%] lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:px-5 lg:py-4">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <CalendarIcon className="h-3 w-3 shrink-0" />
                       Quoted on {formatDate(quote.created_at)}
@@ -1416,7 +1421,7 @@ export default function SavedQuotesPage() {
                       }
                       return null
                     })()}
-                    <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center justify-between gap-1 lg:justify-end" onClick={e => e.stopPropagation()}>
                       <Button
                         variant="ghost"
                         size="sm"
