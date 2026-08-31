@@ -1188,6 +1188,7 @@ export default function DashboardPage() {
         selectedTier={priceCards.find(card => card.key === preferredPackage)?.label ?? "Selected cleaning service"}
         initialClient={selectedClientFields}
         pricingSummary={[
+          { label: "Estimated labor", value: formatHours(priceCards.find(card => card.key === preferredPackage)?.hours ?? results.totalHours) },
           { label: "Sq ft", value: squareFootage || "—" },
           { label: "Clean level", value: cleanLevel || "—" },
           { label: "Beds", value: bedrooms || "—" },
