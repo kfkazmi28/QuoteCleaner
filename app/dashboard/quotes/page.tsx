@@ -1401,8 +1401,7 @@ export default function SavedQuotesPage() {
                     }[selectedKey as "move" | "deep" | "standard" | "monthly" | "biweekly" | "weekly"]
                     return (
                       <div className="min-w-0" onClick={e => e.stopPropagation()}>
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">Selected cleaning</p>
-                        <div className="mt-2 flex items-center justify-between gap-4">
+                        <div className="flex items-center justify-between gap-4">
                           <span className="text-base font-medium text-foreground">{selectedPackage?.label}</span>
                           <span className="text-lg font-semibold text-primary">{formatCurrency(selectedPackage?.price)}</span>
                         </div>
