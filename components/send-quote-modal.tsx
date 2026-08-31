@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -138,8 +139,13 @@ export function SendQuoteModal({
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-h-[92vh] overflow-y-auto p-0 sm:max-w-2xl">
-        <DialogHeader className="border-b border-border px-6 py-6">
-          <DialogTitle className="text-2xl">Share Quote</DialogTitle>
+        <DialogHeader className="relative isolate overflow-hidden border-b border-border bg-secondary px-6 py-7">
+          <Image src="/images/cleaning-brand-pattern.png" alt="" fill sizes="672px" className="pointer-events-none absolute inset-0 -z-20 h-full w-full scale-125 object-cover object-center opacity-70" />
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-secondary/90 via-background/75 to-accent/70" />
+          <div className="mb-3 inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-background/80 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary shadow-sm">
+            <Sparkles className="h-3.5 w-3.5" /> CleanQuote Pro
+          </div>
+          <DialogTitle className="text-2xl font-bold tracking-tight sm:text-3xl">Share Quote</DialogTitle>
           <DialogDescription>
             <span className="sr-only">Quote sharing options</span>
           </DialogDescription>
