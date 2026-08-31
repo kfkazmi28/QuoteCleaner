@@ -429,6 +429,7 @@ export default function DashboardPage() {
   const [newContactAddress, setNewContactAddress] = useState("")
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
   const [activeSavedCalculator, setActiveSavedCalculator] = useState<string | null>(null)
+  const [activeSavedCalculatorFolder, setActiveSavedCalculatorFolder] = useState<string | null>(null)
   const calculatorInitializedRef = useRef(false)
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
@@ -448,6 +449,8 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isLoaded || calculatorInitializedRef.current) return
     calculatorInitializedRef.current = true
+    setActiveSavedCalculator(null)
+    setActiveSavedCalculatorFolder(null)
     updateHomeDetails(defaultHomeDetails)
     updateQuoteResults(null)
     setSqftUnit("sqft")
@@ -604,6 +607,7 @@ export default function DashboardPage() {
 
   const handleLoadCalculator = (calc: SavedCalculator) => {
     setActiveSavedCalculator(calc.name)
+    setActiveSavedCalculatorFolder(calculatorFolders.find(folder => folder.id === calc.folder_id)?.name ?? null)
     updateSettings(calc.settings)
     updateQuoteResults(null) // Clear results when loading new settings
     toast.success(`Loaded "${calc.name}" settings`)
@@ -857,7 +861,7 @@ export default function DashboardPage() {
             <div className="mb-10">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s price this clean</h2>
-                {activeSavedCalculator && <div className="rounded-md bg-orange-500 px-3 py-1.5 text-sm font-bold text-white">Saved Calculator: {activeSavedCalculator.replace(/\s*[/>&]+\s*/g, " > ")}</div>}
+                {activeSavedCalculator && <div className="rounded-md bg-orange-500 px-3 py-1.5 text-sm font-bold text-white">Saved Calculator: {activeSavedCalculatorFolder ? `${activeSavedCalculatorFolder} > ` : ""}{activeSavedCalculator.replace(/\s*[/>&]+\s*/g, " > ")}</div>}
               </div>
             </div>
             <div className="space-y-9">
@@ -1071,6 +1075,7 @@ export default function DashboardPage() {
               onClick={() => {
                 resetToDefaults()
                 setActiveSavedCalculator(null)
+                setActiveSavedCalculatorFolder(null)
                 updateQuoteResults(null)
                 toast.success("Pricing settings reset")
               }}
