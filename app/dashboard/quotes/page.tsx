@@ -1295,6 +1295,9 @@ export default function SavedQuotesPage() {
                   <span>Actions</span>
                   {activeTab === "open" && (
                     <>
+                      <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label="Delete selected open quotes" disabled={!selectedQuoteIds.size || isPending} onClick={handleDeleteSelected}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                       <input
                         type="checkbox"
                         aria-label="Select all open quotes"
@@ -1307,9 +1310,6 @@ export default function SavedQuotesPage() {
                         })}
                         className="h-4 w-4 rounded border-input accent-primary"
                       />
-                      <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label="Delete selected open quotes" disabled={!selectedQuoteIds.size || isPending} onClick={handleDeleteSelected}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </>
                   )}
                 </div>
