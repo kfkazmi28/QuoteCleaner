@@ -10,22 +10,8 @@ export function exportQuotePdf(data: SendQuoteData): void {
   const selectedName = data.selectedTier || data.quoteName || "Quote"
   const selectedKey = selectedName.toLowerCase()
   params.set("name", selectedName)
-  params.set("description", data.tierDescription || "Professional cleaning service")
   const selectedPrice = selectedKey.includes("deep") ? data.resultDeepClean : selectedKey.includes("move") ? data.resultMoveIn : selectedKey.includes("monthly") ? data.resultMonthly : selectedKey.includes("bi") ? data.resultBiweekly : selectedKey.includes("weekly") ? data.resultWeekly : data.resultStandard
   params.set("price", String(selectedPrice ?? 0))
-  params.set("address", data.homeAddress ?? "")
-  if (data.homeVariables) params.set("homeVariables", JSON.stringify(data.homeVariables))
-  if (data.clientName)   params.set("clientName",   data.clientName)
-  if (data.clientEmail)  params.set("clientEmail",  data.clientEmail)
-  if (data.clientPhone)  params.set("clientPhone",  data.clientPhone)
-  if (data.generatedBy)  params.set("generatedBy",  data.generatedBy)
-  if (data.notes)        params.set("notes",        data.notes)
-  if (data.createdAt)    params.set("date",         data.createdAt)
-  if (data.checklist?.length) params.set("checklist", JSON.stringify(data.checklist))
-  if (data.estimatedHours != null) {
-    params.set("laborOne", String(data.estimatedHours))
-    params.set("laborTwo", String(data.estimatedHours / 2))
-  }
 
   params.set("standard",  String(data.resultStandard  ?? 0))
   params.set("deep",      String(data.resultDeepClean ?? 0))
