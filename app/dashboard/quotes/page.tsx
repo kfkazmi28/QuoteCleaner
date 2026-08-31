@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -408,12 +409,12 @@ function EditQuoteModal({
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="eq-notes">Notes <span className="text-xs text-muted-foreground">(optional)</span></Label>
-                <textarea
+                <Textarea
                   id="eq-notes"
-                  rows={2}
+                  rows={4}
+                  placeholder="Add notes about this quote..."
                   value={fields.notes}
                   onChange={set("notes")}
-                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
                 />
               </div>
             </div>
