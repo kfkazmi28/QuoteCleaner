@@ -837,7 +837,7 @@ export default function DashboardPage() {
             </div>
             <div className="space-y-9">
               <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2"><Label htmlFor="quote-location">Location</Label><span className="text-[11px] text-muted-foreground">City or ZIP code</span></div>
+                <div className="flex items-center justify-between gap-2"><Label htmlFor="quote-location">Location</Label></div>
                 <div className="relative">
                   <Input id="quote-location" placeholder="Enter a city or ZIP code" value={locationQuery} onFocus={() => setShowLocationSuggestions(locationSuggestions.length > 0)} onChange={e => { const value = e.target.value; setLocationQuery(value); setQuoteCity(/\d/.test(value) ? quoteCity : value); setQuoteZip(/^[0-9]{5}$/.test(value) ? value : ""); if (/^[0-9]{5}$/.test(value)) void lookupCityFromZip(value); else setShowLocationSuggestions(false) }} className="h-12 bg-transparent text-base shadow-none focus-visible:ring-primary" autoComplete="off" />
                   {isLookingUpZip && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" aria-live="polite">Looking up…</span>}
