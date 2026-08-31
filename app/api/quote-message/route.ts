@@ -11,9 +11,10 @@ export async function POST(request: Request) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.7,
-      messages: [{ role: "system", content: `Write a polished client-facing cleaning quote message in a ${tone.toLowerCase()} tone. Include the client name when supplied, service, price, home details, estimated time, and business name. Keep it concise. Return only the message text.` }, { role: "user", content: JSON.stringify(body) }],
+      messages: [{ role: "system", content: `Write a polished client-facing cleaning quote message in a ${tone.toLowerCase()} tone. Include the client name when supplied, service, price, home details, estimated time, and business name. Keep it concise. Use plain text only: do not use Markdown, asterisks, bold markers, bullet symbols, or formatting syntax. Return only the message text.` }, { role: "user", content: JSON.stringify(body) }],
     })
-    return NextResponse.json({ message: completion.choices[0]?.message.content?.trim() || "" })
+    const message = completion.choices[0]?.message.content?.trim() || ""
+    return NextResponse.json({ message: message.replace(/\*+/g, "").replace(/^\s*[-•]\s*/gm, "") })
   } catch {
     return NextResponse.json({ error: "Unable to generate message" }, { status: 500 })
   }

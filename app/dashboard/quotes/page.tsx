@@ -887,7 +887,7 @@ function ScheduleModal({
                   </span>
                   <span className="text-muted-foreground/50">·</span>
                   <span className="font-medium text-foreground">
-                    2 cleaners — {Math.ceil((estimatedHours / 2) * 2) / 2} hrs
+                    2 cleaners — {Math.ceil(((estimatedHours ?? 0) / 2) * 2) / 2} hrs
                   </span>
                 </div>
               ) : (
@@ -975,16 +975,18 @@ export default function SavedQuotesPage() {
     const newPref = currentPref === pkgKey ? "" : pkgKey
     setPreferredPackages(prev => ({ ...prev, [quoteId]: newPref }))
     // Persist to database
-    updateQuote(quoteId, { preferred_package: newPref || null })
+    updateQuote(quoteId, { preferred_package: newPref || undefined })
   }
 
   const handleDelete = (id: string) => {
+    const previousQuotes = quotes
+    setQuotes(prev => prev.filter(q => q.id !== id))
     startTransition(async () => {
       const { error } = await deleteQuote(id)
       if (error) {
-        toast.error("Failed to delete quote")
+        setQuotes(previousQuotes)
+        toast.error(`Failed to delete quote: ${error}`)
       } else {
-        setQuotes(prev => prev.filter(q => q.id !== id))
         toast.success("Quote deleted")
       }
     })
@@ -1233,7 +1235,8 @@ export default function SavedQuotesPage() {
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col gap-1 min-w-0">
-                      <CardTitle className="text-base leading-snug">{quote.quote_name}</CardTitle>
+                      {quote.client_name && <CardTitle className="text-base leading-snug">{quote.client_name}</CardTitle>}
+                      {quote.home_address && <p className="truncate text-xs text-muted-foreground">{quote.home_address}</p>}
                       {(scheduledQuoteIds.has(quote.id) || quote.status === "completed") && (() => {
                         const event = scheduledEventsMap.get(quote.id)
                         const pastAppointment = scheduledQuoteIds.has(quote.id) && isAppointmentPast(quote.id)
@@ -1342,7 +1345,7 @@ export default function SavedQuotesPage() {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
-                            onClick={() => handleDelete(quote.id)}
+                            onSelect={(event) => { event.preventDefault(); handleDelete(quote.id) }}
                             disabled={isPending}
                             className="text-destructive focus:text-destructive"
                           >
@@ -1353,100 +1356,31 @@ export default function SavedQuotesPage() {
                       </DropdownMenu>
                     </div>
                   </div>
-                  {quote.client_name && (
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <User className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{quote.client_name}</span>
-                    </div>
-                  )}
-                  {quote.client_phone && (
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Phone className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{quote.client_phone}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3 shrink-0" />
-                    <span className="truncate">{quote.home_address}</span>
-                  </div>
                 </CardHeader>
 
                 <CardContent className="flex flex-1 flex-col gap-3">
 
-                  {/* Key prices */}
-                  <div className="rounded-md border border-border bg-muted/30 px-3 py-2 space-y-2 text-sm" onClick={e => e.stopPropagation()}>
-                    {/* One-Time Clean */}
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">One-Time Clean</p>
-                      {[
-                        { key: "move", label: "Move In/Out", price: quote.result_move_in },
-                        { key: "deep", label: "Deep Clean", price: quote.result_deep_clean },
-                        { key: "standard", label: "Standard", price: quote.result_standard },
-                      ].map(pkg => {
-                        const isSelected = preferredPackages[quote.id] === pkg.key
-                        return (
-                          <button
-                            key={pkg.key}
-                            type="button"
-                            onClick={() => handlePreferredPackageChange(quote.id, pkg.key)}
-                            className={`flex w-full items-center justify-between rounded px-1.5 py-0.5 -mx-1.5 transition-colors ${
-                              isSelected 
-                                ? "bg-primary/10 text-primary" 
-                                : "hover:bg-muted"
-                            }`}
-                          >
-                            <span className={isSelected ? "font-medium" : "text-muted-foreground"}>{pkg.label}</span>
-                            <span className="font-medium">{formatCurrency(pkg.price)}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                    {/* Recurring Clean */}
-                    <div className="space-y-1 border-t border-border pt-2">
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">Recurring Clean</p>
-                      {[
-                        { key: "monthly", label: "Monthly", price: quote.result_monthly },
-                        { key: "biweekly", label: "Bi-weekly", price: quote.result_biweekly },
-                        { key: "weekly", label: "Weekly", price: quote.result_weekly },
-                      ].map(pkg => {
-                        const isSelected = preferredPackages[quote.id] === pkg.key
-                        return (
-                          <button
-                            key={pkg.key}
-                            type="button"
-                            onClick={() => handlePreferredPackageChange(quote.id, pkg.key)}
-                            className={`flex w-full items-center justify-between rounded px-1.5 py-0.5 -mx-1.5 transition-colors ${
-                              isSelected 
-                                ? "bg-primary/10 text-primary" 
-                                : "hover:bg-muted"
-                            }`}
-                          >
-                            <span className={isSelected ? "font-medium" : "text-muted-foreground"}>{pkg.label}</span>
-                            <span className="font-medium">{formatCurrency(pkg.price)}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                    {/* Preferred choice indicator + See checklist */}
-                    {preferredPackages[quote.id] && (
-                      <div className="flex items-center justify-between pt-1 border-t border-border">
-                        <p className="text-[10px] text-primary font-medium">
-                          Client&apos;s preferred choice: {
-                            { move: "Move In/Out", deep: "Deep Clean", standard: "Standard", monthly: "Monthly", biweekly: "Bi-weekly", weekly: "Weekly" }[preferredPackages[quote.id]] || preferredPackages[quote.id]
-                          }
-                        </p>
-                        {["move", "deep", "standard"].includes(preferredPackages[quote.id]) && (
-                          <button
-                            type="button"
-                            onClick={() => setChecklistModalQuote(quote)}
-                            className="text-[10px] font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 underline-offset-2 hover:underline transition-colors shrink-0 ml-2"
-                          >
-                            See checklist
-                          </button>
-                        )}
+                  {/* Selected cleaning tier */}
+                  {(() => {
+                    const selectedKey = preferredPackages[quote.id] || "standard"
+                    const selectedPackage = {
+                      move: { label: "Move In/Out", price: quote.result_move_in },
+                      deep: { label: "Deep Clean", price: quote.result_deep_clean },
+                      standard: { label: "Standard", price: quote.result_standard },
+                      monthly: { label: "Monthly", price: quote.result_monthly },
+                      biweekly: { label: "Bi-weekly", price: quote.result_biweekly },
+                      weekly: { label: "Weekly", price: quote.result_weekly },
+                    }[selectedKey as "move" | "deep" | "standard" | "monthly" | "biweekly" | "weekly"]
+                    return (
+                      <div className="rounded-md border border-border bg-muted/30 px-4 py-4" onClick={e => e.stopPropagation()}>
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">Selected cleaning</p>
+                        <div className="mt-2 flex items-center justify-between gap-4">
+                          <span className="text-base font-medium text-foreground">{selectedPackage?.label}</span>
+                          <span className="text-lg font-semibold text-primary">{formatCurrency(selectedPackage?.price)}</span>
+                        </div>
                       </div>
-                    )}
-                  </div>
+                    )
+                  })()}
 
 
 
