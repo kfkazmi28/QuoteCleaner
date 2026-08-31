@@ -1290,7 +1290,7 @@ export default function SavedQuotesPage() {
                 <span aria-hidden="true" />
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("price")}>Price <span aria-hidden="true">{sortConfig.key === "price" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
-                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>Quote date <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>{activeTab === "scheduled" ? "Cleaning Date" : "Quote date"} <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <span className="text-right">Actions</span>
               </div>
             {displayQuotes.map(quote => (
@@ -1421,7 +1421,7 @@ export default function SavedQuotesPage() {
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <CalendarIcon className="h-3 w-3 shrink-0" />
                       {activeTab === "scheduled" && scheduledEventsMap.get(quote.id)?.scheduled_date
-                        ? `Cleaning date: ${formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)}`
+                        ? formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)
                         : formatDate(quote.created_at)}
                     </p>
                     {/* Completed tab: show when the cleaning happened */}
