@@ -249,9 +249,6 @@ export function SendQuoteModal({
                 <p className="mt-3 text-sm text-muted-foreground">
                   {contact.clientName || "Client"} · {data.homeAddress}
                 </p>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  Included in quote
-                </p>
               </div>
               <Button
                 type="button"
