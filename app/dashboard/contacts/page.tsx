@@ -874,7 +874,7 @@ export default function ContactsPage() {
     <div className="min-h-screen bg-background">
       <DashboardNav />
 
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:ml-64">
         {/* Header */}
         <div className="mb-6 flex flex-col gap-1">
           <h1 className="text-2xl font-bold text-foreground">Contacts</h1>
