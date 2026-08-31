@@ -1292,6 +1292,7 @@ export default function SavedQuotesPage() {
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("price")}>Price <span aria-hidden="true">{sortConfig.key === "price" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>{activeTab === "open" ? "Quote Date" : "Cleaning Date"} <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <div className="flex items-center justify-end gap-2">
+                  <span>Actions</span>
                   {activeTab === "open" && (
                     <>
                       <input
@@ -1311,7 +1312,6 @@ export default function SavedQuotesPage() {
                       </Button>
                     </>
                   )}
-                  <span>Actions</span>
                 </div>
               </div>
             {displayQuotes.map(quote => (
