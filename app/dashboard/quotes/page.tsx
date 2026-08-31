@@ -64,7 +64,7 @@ import { PhoneInput } from "@/components/phone-input"
 import { exportQuotePdf } from "@/lib/export-quote-pdf"
 import { ChecklistModal, getDefaultChecklist, getChecklistTitle, getChecklistDescription, type ChecklistSection } from "@/components/checklist-modal"
 import { CreateInvoiceModal } from "@/components/create-invoice-modal"
-import { getInvoiceByQuoteId } from "@/app/actions/invoices"
+import { getInvoiceByQuoteId, getInvoices, type Invoice } from "@/app/actions/invoices"
 
 interface SavedQuote {
   id: string
@@ -938,6 +938,7 @@ export default function SavedQuotesPage() {
   const [checklistModalQuote, setChecklistModalQuote] = useState<SavedQuote | null>(null)
   const [invoiceQuote, setInvoiceQuote] = useState<SavedQuote | null>(null)
   const [invoicedQuoteIds, setInvoicedQuoteIds] = useState<Set<string>>(new Set())
+  const [invoices, setInvoices] = useState<Invoice[]>([])
   const [columnFilters, setColumnFilters] = useState({ client: "", cleaning: "", date: "", price: "" })
   const [sortConfig, setSortConfig] = useState<{ key: "client" | "address" | "cleaning" | "date" | "price"; direction: "asc" | "desc" }>({ key: "date", direction: "desc" })
 
@@ -955,8 +956,9 @@ export default function SavedQuotesPage() {
       setLoading(false)
     })
     getScheduledQuoteIds().then(ids => setScheduledQuoteIds(ids))
-    getScheduledEventsMap().then(map => setScheduledEventsMap(map))
-    // Check if DB has the status column
+  getScheduledEventsMap().then(map => setScheduledEventsMap(map))
+  getInvoices().then(setInvoices)
+  // Check if DB has the status column
     checkQuoteStatusColumn().then(ready => setStatusColumnReady(ready))
   }, [])
 
@@ -1144,18 +1146,18 @@ export default function SavedQuotesPage() {
           </Button>
         </div>
 
-        {/* Open quote summary */}
+        {/* Tab-aware quote summary */}
         <div className="mb-6 grid gap-3 sm:grid-cols-2">
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-muted-foreground">Open quotes</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : openQuotes.length}</p>
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Scheduled cleanings" : "Open quotes"}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? scheduledQuotes.length : openQuotes.length}</p>
             </CardContent>
           </Card>
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-muted-foreground">Total open price</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : formatCurrency(openQuotes.reduce((total, quote) => {
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Open invoices" : "Total open price"}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? formatCurrency(invoices.filter(invoice => invoice.status === "draft" || invoice.status === "sent").reduce((total, invoice) => total + (Number(invoice.amount_due) || 0), 0)) : formatCurrency(openQuotes.reduce((total, quote) => {
                 const packageKey = preferredPackages[quote.id] || "standard"
                 const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
                 return total + (Number(price) || 0)
