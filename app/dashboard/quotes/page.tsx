@@ -111,8 +111,8 @@ function formatCurrency(val: number) {
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
+    month: "2-digit",
+    day: "2-digit",
     year: "numeric",
   })
 }
@@ -950,7 +950,7 @@ export default function SavedQuotesPage() {
   const [checklistModalQuote, setChecklistModalQuote] = useState<SavedQuote | null>(null)
   const [invoiceQuote, setInvoiceQuote] = useState<SavedQuote | null>(null)
   const [invoicedQuoteIds, setInvoicedQuoteIds] = useState<Set<string>>(new Set())
-  const [columnFilters, setColumnFilters] = useState({ client: "", address: "", cleaning: "", date: "", price: "" })
+  const [columnFilters, setColumnFilters] = useState({ client: "", cleaning: "", date: "", price: "" })
   const [sortConfig, setSortConfig] = useState<{ key: "client" | "address" | "cleaning" | "date" | "price"; direction: "asc" | "desc" }>({ key: "date", direction: "desc" })
 
   useEffect(() => {
@@ -1071,7 +1071,7 @@ export default function SavedQuotesPage() {
     const rows = filteredQuotes.filter(q => {
       const price = String(selectedPrice(q))
       const cleaning = selectedCleaning(q)
-      return q.client_name?.toLowerCase().includes(columnFilters.client.toLowerCase()) && q.home_address?.toLowerCase().includes(columnFilters.address.toLowerCase()) && cleaning.toLowerCase().includes(columnFilters.cleaning.toLowerCase()) && formatDate(q.created_at).toLowerCase().includes(columnFilters.date.toLowerCase()) && price.includes(columnFilters.price)
+      return q.client_name?.toLowerCase().includes(columnFilters.client.toLowerCase()) && cleaning.toLowerCase().includes(columnFilters.cleaning.toLowerCase()) && formatDate(q.created_at).toLowerCase().includes(columnFilters.date.toLowerCase()) && price.includes(columnFilters.price)
     })
     return [...rows].sort((a, b) => {
       const value = (q: SavedQuote) => ({ client: q.client_name ?? "", address: q.home_address ?? "", cleaning: selectedCleaning(q), date: q.created_at, price: selectedPrice(q) }[sortConfig.key])
@@ -1250,14 +1250,18 @@ export default function SavedQuotesPage() {
         ) : (
           <div className="flex flex-col gap-3">
             <div className="overflow-x-auto rounded-md border border-border">
-              <div className="grid min-w-[980px] grid-cols-[1.1fr_1.7fr_1fr_1fr_0.8fr_1.5fr] items-center gap-3 bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {([['client', 'Client name'], ['address', 'Address'], ['cleaning', 'Cleaning type'], ['date', 'Quote date'], ['price', 'Price']] as const).map(([key, label]) => <div key={key} className="flex flex-col gap-2"><button type="button" className="flex items-center gap-1 text-left hover:text-foreground" onClick={() => setSort(key)}>{label}<span aria-hidden="true">{sortConfig.key === key ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button><Input value={columnFilters[key]} onChange={e => setColumnFilters(prev => ({ ...prev, [key]: e.target.value }))} placeholder="Filter" className="h-7 bg-background text-xs font-normal normal-case tracking-normal" /></div>)}
+              <div className="grid min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(100px,0.8fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("client")}>Client name <span aria-hidden="true">{sortConfig.key === "client" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <span aria-hidden="true" />
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("price")}>Price <span aria-hidden="true">{sortConfig.key === "price" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>Quote date <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <span className="text-right">Actions</span>
               </div>
             {displayQuotes.map(quote => (
               <Card
                 key={quote.id}
-                className="grid w-full min-w-[980px] grid-cols-[1.1fr_1.7fr_1fr_1fr_0.8fr_1.5fr] items-center gap-3 rounded-none border-0 border-b border-border bg-background px-4 py-3 shadow-none transition-colors hover:bg-muted/30 cursor-pointer"
+                className="grid w-full min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(100px,0.8fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 rounded-none border-0 border-b border-border bg-background px-4 py-3 shadow-none transition-colors hover:bg-muted/30 cursor-pointer"
                 onClick={() => setViewQuote(quote)}
               >
                 <CardHeader className="contents">
@@ -1400,12 +1404,9 @@ export default function SavedQuotesPage() {
                       weekly: { label: "Weekly", price: quote.result_weekly },
                     }[selectedKey as "move" | "deep" | "standard" | "monthly" | "biweekly" | "weekly"]
                     return (
-                      <div className="min-w-0" onClick={e => e.stopPropagation()}>
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">Selected cleaning</p>
-                        <div className="mt-2 flex items-center justify-between gap-4">
-                          <span className="text-base font-medium text-foreground">{selectedPackage?.label}</span>
-                          <span className="text-lg font-semibold text-primary">{formatCurrency(selectedPackage?.price)}</span>
-                        </div>
+                      <div className="contents" onClick={e => e.stopPropagation()}>
+                        <span className="min-w-0 text-base font-medium text-foreground">{selectedPackage?.label}</span>
+                        <span className="text-lg font-semibold text-primary">{formatCurrency(selectedPackage?.price)}</span>
                       </div>
                     )
                   })()}
@@ -1416,7 +1417,7 @@ export default function SavedQuotesPage() {
                   <div className="contents">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <CalendarIcon className="h-3 w-3 shrink-0" />
-                      Quoted on {formatDate(quote.created_at)}
+                      {formatDate(quote.created_at)}
                     </p>
                     {/* Completed tab: show when the cleaning happened */}
                     {activeTab === "completed" && (() => {
