@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { useEffect, Suspense } from "react"
+import { Suspense } from "react"
 
 function fmt(n: number) {
   return new Intl.NumberFormat("en-US", {
@@ -40,12 +40,6 @@ function PrintQuote() {
     ? new Date(dateRaw).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
 
-  useEffect(() => {
-    // Give the browser a tick to render before triggering print
-    const t = setTimeout(() => window.print(), 400)
-    return () => clearTimeout(t)
-  }, [])
-
   return (
     <>
       {/* Print-only global styles injected via a style tag */}
@@ -56,6 +50,8 @@ function PrintQuote() {
           .no-print { display: none !important; }
         }
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        .editable { outline: 1px dashed rgba(13,148,136,.45); outline-offset: 3px; cursor: text; }
+        @media print { .editable { outline: none; cursor: default; } }
       `}</style>
 
       {/* Print button — hidden when actually printing */}
@@ -73,7 +69,7 @@ function PrintQuote() {
             cursor: "pointer",
           }}
         >
-          Save as PDF / Print
+          Save as PDF
         </button>
         <button
           onClick={() => window.close()}
@@ -116,7 +112,7 @@ function PrintQuote() {
         >
           <div>
             <div style={{ color: "#fff", fontSize: "22px", fontWeight: 700, letterSpacing: "-0.3px" }}>
-              {generatedBy || "CleanQuote Pro"}
+              <span contentEditable suppressContentEditableWarning className="editable">{generatedBy || "CleanQuote Pro"}</span>
             </div>
             <div style={{ color: "#99f6e4", fontSize: "12px", marginTop: "2px" }}>
               Professional Cleaning Estimate
@@ -129,13 +125,13 @@ function PrintQuote() {
         </div>
 
         {/* Quote title */}
-        {(clientName || clientEmail || clientPhone || address) && <Section title="Client and Address"><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}>{clientName && <InfoRow label="Name" value={clientName} />}{clientEmail && <InfoRow label="Email" value={clientEmail} />}{clientPhone && <InfoRow label="Phone" value={clientPhone} />}{address && <InfoRow label="Address" value={address} />}</div></Section>}
+        {(clientName || clientEmail || clientPhone || address) && <Section title="Client and Address"><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}>{clientName && <InfoRow label="Name" value={clientName} editable />}{clientEmail && <InfoRow label="Email" value={clientEmail} />}{clientPhone && <InfoRow label="Phone" value={clientPhone} />}{address && <InfoRow label="Address" value={address} editable />}</div></Section>}
         {/* Selected service and home variables */}
         <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>
           Selected Service
         </div>
         <div style={{ background: "#f0fdfa", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "20px" }}><strong style={{ fontSize: "16px" }}>{name}</strong><strong style={{ fontSize: "18px" }}>{fmt(parseFloat(params.get("price") ?? "0"))}</strong></div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "20px" }}><strong contentEditable suppressContentEditableWarning className="editable" style={{ fontSize: "16px" }}>{name}</strong><strong contentEditable suppressContentEditableWarning className="editable" style={{ fontSize: "18px" }}>{fmt(parseFloat(params.get("price") ?? "0"))}</strong></div>
           <p style={{ color: "#4b5563", fontSize: "13px", margin: "8px 0 0" }}>{description}</p>
         </div>
         {Object.keys(homeVariables).length > 0 && <><div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>Home Details</div>
@@ -163,7 +159,7 @@ function PrintQuote() {
               <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "8px" }}>
                 Notes
               </div>
-              <p style={{ color: "#4b5563", fontSize: "13px", margin: 0, lineHeight: "1.6" }}>{notes}</p>
+              <p contentEditable suppressContentEditableWarning className="editable" style={{ color: "#4b5563", fontSize: "13px", margin: 0, lineHeight: "1.6" }}>{notes}</p>
             </div>
           </>
         )}
@@ -200,11 +196,11 @@ function PriceRow({ label, value, last }: { label: string; value: string; last?:
   )
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, value, editable = false }: { label: string; value: string; editable?: boolean }) {
   return (
     <div>
       <span style={{ color: "#9ca3af", fontSize: "11px" }}>{label}: </span>
-      <span style={{ color: "#374151", fontSize: "13px" }}>{value}</span>
+      <span contentEditable={editable} suppressContentEditableWarning className={editable ? "editable" : undefined} style={{ color: "#374151", fontSize: "13px" }}>{value}</span>
     </div>
   )
 }
