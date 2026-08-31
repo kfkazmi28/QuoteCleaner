@@ -1424,32 +1424,6 @@ export default function SavedQuotesPage() {
                         ? formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)
                         : formatDate(quote.created_at)}
                     </p>
-                    {/* Completed tab: show when the cleaning happened */}
-                    {activeTab === "completed" && (() => {
-                      const event = scheduledEventsMap.get(quote.id)
-                      if (event?.scheduled_date) {
-                        const d = new Date(event.scheduled_date + "T12:00:00")
-                        const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                        return (
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            Cleaned on {label}
-                          </p>
-                        )
-                      }
-                      // No scheduled event — manually marked completed
-                      const fallbackDate = (quote as any).completed_at ?? quote.updated_at
-                      if (fallbackDate) {
-                        const label = new Date(fallbackDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                        return (
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            Marked completed on {label}
-                          </p>
-                        )
-                      }
-                      return null
-                    })()}
                     <div className="col-start-6 flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
                       <Button
                         variant="ghost"
