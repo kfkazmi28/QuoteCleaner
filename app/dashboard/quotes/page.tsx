@@ -1157,7 +1157,11 @@ export default function SavedQuotesPage() {
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
               <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Total scheduled price" : "Total open price"}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? formatCurrency(scheduledQuotes.reduce((total, quote) => total + (Number(scheduledEventsMap.get(quote.id)?.package_price) || 0), 0)) : formatCurrency(openQuotes.reduce((total, quote) => {
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? formatCurrency(scheduledQuotes.reduce((total, quote) => {
+                const packageKey = preferredPackages[quote.id] || "standard"
+                const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
+                return total + (Number(price) || 0)
+              }, 0)) : formatCurrency(openQuotes.reduce((total, quote) => {
                 const packageKey = preferredPackages[quote.id] || "standard"
                 const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
                 return total + (Number(price) || 0)
