@@ -125,7 +125,6 @@ function PrintQuote() {
         </div>
 
         {/* Quote title */}
-        {(clientName || clientEmail || clientPhone || address) && <Section title="Client and Address"><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}>{clientName && <InfoRow label="Name" value={clientName} editable />}{clientEmail && <InfoRow label="Email" value={clientEmail} />}{clientPhone && <InfoRow label="Phone" value={clientPhone} />}{address && <InfoRow label="Address" value={address} editable />}</div></Section>}
         {/* Selected service and home variables */}
         <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>
           Selected Service
@@ -138,8 +137,6 @@ function PrintQuote() {
         <div style={{ background: "#f8fafc", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
           {Object.entries(homeVariables).filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => <InfoRow key={label} label={label.replace(/([A-Z])/g, " $1")} value={String(value)} />)}
         </div></>}
-
-        <Section title="Estimated Labor Hours"><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}><InfoRow label="1 cleaner" value={formatHours(laborOne)} /><InfoRow label="2 cleaners" value={formatHours(laborTwo)} /></div></Section>
 
         {checklist.length > 0 && <Section title={`${name} checklist`}><div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>{checklist.map((section, sectionIndex) => <div key={`${section.section}-${sectionIndex}`}><div contentEditable suppressContentEditableWarning className="editable" style={{ fontWeight: 700, fontSize: "13px", marginBottom: "5px", color: "#111827" }}>{section.section}</div><ul style={{ margin: 0, paddingLeft: "18px", color: "#374151", fontSize: "12px" }}>{section.items.map((item, itemIndex) => <li key={`${item}-${itemIndex}`} contentEditable suppressContentEditableWarning className="editable" style={{ marginBottom: "3px" }}>{item}</li>)}</ul></div>)}</div></Section>}
 
