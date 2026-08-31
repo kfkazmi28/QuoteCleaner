@@ -1308,8 +1308,10 @@ export default function SavedQuotesPage() {
                         )
                       })()}
                     </div>
+                    {/* Keep the row aligned with the table header's spacer column. */}
+                    <span aria-hidden="true" />
                     {/* Stop propagation so card click doesn't fire */}
-                    <div className="col-start-6 justify-self-end shrink-0" onClick={e => e.stopPropagation()}>
+                    <div className="hidden" onClick={e => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
