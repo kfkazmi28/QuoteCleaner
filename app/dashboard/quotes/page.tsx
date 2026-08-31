@@ -1307,30 +1307,8 @@ export default function SavedQuotesPage() {
                       {quote.home_address && <p className="truncate text-xs text-muted-foreground">{quote.home_address}</p>}
                       {(scheduledQuoteIds.has(quote.id) || quote.status === "completed") && (() => {
                         const event = scheduledEventsMap.get(quote.id)
-                        const pastAppointment = scheduledQuoteIds.has(quote.id) && isAppointmentPast(quote.id)
-                        const isCompleted = quote.status === "completed" || pastAppointment
-                        const isUpcoming = scheduledQuoteIds.has(quote.id) && !pastAppointment
                         return (
                           <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              {isCompleted ? (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                                  <CheckCircle2 className="h-2.5 w-2.5" /> Completed
-                                </span>
-                              ) : (
-                                <>
-                                  <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                                    style={{ background: "oklch(0.60 0.15 175 / 0.12)", color: "oklch(0.42 0.13 175)" }}>
-                                    <CalendarCheck className="h-2.5 w-2.5" /> Scheduled
-                                  </span>
-                                  {isUpcoming && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 text-blue-600 px-2 py-0.5 text-[10px] font-semibold">
-                                      Upcoming
-                                    </span>
-                                  )}
-                                </>
-                              )}
-                            </div>
                             {event && (
                               <p className="text-[11px] text-muted-foreground">
                                 {new Date(event.scheduled_date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
