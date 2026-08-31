@@ -1150,8 +1150,8 @@ export default function SavedQuotesPage() {
         <div className="mb-6 grid gap-3 sm:grid-cols-2">
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Scheduled cleanings" : "Open quotes"}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? scheduledQuotes.length : openQuotes.length}</p>
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Scheduled cleanings" : activeTab === "completed" ? "Completed quotes" : "Open quotes"}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? scheduledQuotes.length : activeTab === "completed" ? completedQuotes.length : openQuotes.length}</p>
             </CardContent>
           </Card>
           <Card className="border-primary/20 bg-primary/5">
@@ -1161,7 +1161,7 @@ export default function SavedQuotesPage() {
                 const packageKey = preferredPackages[quote.id] || "standard"
                 const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
                 return total + (Number(price) || 0)
-              }, 0)) : formatCurrency(openQuotes.reduce((total, quote) => {
+              }, 0)) : formatCurrency((activeTab === "completed" ? completedQuotes : openQuotes).reduce((total, quote) => {
                 const packageKey = preferredPackages[quote.id] || "standard"
                 const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
                 return total + (Number(price) || 0)
