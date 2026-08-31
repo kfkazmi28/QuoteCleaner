@@ -296,7 +296,7 @@ function SaveQuoteModal({
 
           <DialogFooter className="shrink-0 border-t border-border px-6 py-4 gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
-            <Button type="submit" disabled={saving || !fields.name.trim() || !isAddressComplete}>
+            <Button type="submit" disabled={saving || !selectedTier.trim() || (!initialClient?.address && !isAddressComplete)}>
               {saving ? "Saving..." : "Save Quote"}
             </Button>
           </DialogFooter>
