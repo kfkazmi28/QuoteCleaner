@@ -428,6 +428,7 @@ export default function DashboardPage() {
   const [newContactPhone, setNewContactPhone] = useState("")
   const [newContactAddress, setNewContactAddress] = useState("")
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
+  const [activeSavedCalculator, setActiveSavedCalculator] = useState<string | null>(null)
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
   const [newFolderName, setNewFolderName] = useState("")
@@ -445,6 +446,7 @@ export default function DashboardPage() {
   // inputs when the user refreshes or navigates away and returns.
   useEffect(() => {
     if (!isLoaded) return
+    setActiveSavedCalculator(null)
     updateHomeDetails(defaultHomeDetails)
     updateQuoteResults(null)
     setSqftUnit("sqft")
@@ -600,6 +602,7 @@ export default function DashboardPage() {
   }
 
   const handleLoadCalculator = (calc: SavedCalculator) => {
+    setActiveSavedCalculator(calc.name)
     updateSettings(calc.settings)
     updateQuoteResults(null) // Clear results when loading new settings
     toast.success(`Loaded "${calc.name}" settings`)
@@ -841,6 +844,7 @@ export default function DashboardPage() {
             <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/cleaning-tools-banner-v2.png')] bg-cover bg-center" />
             <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/35 to-transparent" />
             <div className="relative flex h-full max-w-xl flex-col justify-end gap-2 p-6 sm:p-8">
+              {activeSavedCalculator && <p className="w-fit rounded-md bg-orange-500 px-3 py-1 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-sm">Saved calculator</p>}
               <h1 className="text-3xl font-bold tracking-tight text-primary-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
               <p className="max-w-lg text-sm leading-6 text-primary-foreground/85 sm:text-base">Build a professional quote in seconds. Enter a few details and we&apos;ll recommend a price.</p>
             </div>
