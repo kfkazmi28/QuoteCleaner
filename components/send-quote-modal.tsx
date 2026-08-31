@@ -24,7 +24,8 @@ const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency",
 export function SendQuoteModal({ open, onClose, data, onContactSaved }: { open: boolean; onClose: () => void; data: SendQuoteData | null; onContactSaved?: (updated: Partial<SendQuoteData>) => void }) {
   const [contact, setContact] = useState<Draft>({ clientName: "", clientEmail: "", clientPhone: "" })
   const [method, setMethod] = useState<"email" | "text" | "pdf">("email")
-  const [tone, setTone] = useState("Professional")
+  const tone = "Professional"
+  const setTone = (_nextTone: string) => undefined
   const [message, setMessage] = useState("")
   const [saving, setSaving] = useState(false)
   const [contacts, setContacts] = useState<ClientContact[]>([])
