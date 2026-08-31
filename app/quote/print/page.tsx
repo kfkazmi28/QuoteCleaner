@@ -98,32 +98,6 @@ function PrintQuote() {
           lineHeight: "1.6",
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            background: "#0d9488",
-            borderRadius: "10px",
-            padding: "28px 32px",
-            marginBottom: "32px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <div style={{ color: "#fff", fontSize: "22px", fontWeight: 700, letterSpacing: "-0.3px" }}>
-              <span contentEditable suppressContentEditableWarning className="editable">{generatedBy || "CleanQuote Pro"}</span>
-            </div>
-            <div style={{ color: "#99f6e4", fontSize: "12px", marginTop: "2px" }}>
-              Professional Cleaning Estimate
-            </div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ color: "#fff", fontSize: "11px", opacity: 0.85 }}>Date</div>
-            <div style={{ color: "#fff", fontSize: "13px", fontWeight: 500 }}>{dateStr}</div>
-          </div>
-        </div>
-
         {/* Quote title */}
         {/* Selected service and home variables */}
         <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>
@@ -133,21 +107,6 @@ function PrintQuote() {
           <div style={{ display: "flex", justifyContent: "space-between", gap: "20px" }}><strong contentEditable suppressContentEditableWarning className="editable" style={{ fontSize: "16px" }}>{name}</strong><strong contentEditable suppressContentEditableWarning className="editable" style={{ fontSize: "18px" }}>{fmt(parseFloat(params.get("price") ?? "0"))}</strong></div>
           <p style={{ color: "#4b5563", fontSize: "13px", margin: "8px 0 0" }}>{description}</p>
         </div>
-        {Object.keys(homeVariables).length > 0 && <><div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>Home Details</div>
-        <div style={{ background: "#f8fafc", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
-          {Object.entries(homeVariables).filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => <InfoRow key={label} label={label.replace(/([A-Z])/g, " $1")} value={String(value)} />)}
-        </div></>}
-
-        {checklist.length > 0 && <Section title={`${name} checklist`}><div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>{checklist.map((section, sectionIndex) => <div key={`${section.section}-${sectionIndex}`}><div contentEditable suppressContentEditableWarning className="editable" style={{ fontWeight: 700, fontSize: "13px", marginBottom: "5px", color: "#111827" }}>{section.section}</div><ul style={{ margin: 0, paddingLeft: "18px", color: "#374151", fontSize: "12px" }}>{section.items.map((item, itemIndex) => <li key={`${item}-${itemIndex}`} contentEditable suppressContentEditableWarning className="editable" style={{ marginBottom: "3px" }}>{item}</li>)}</ul></div>)}</div></Section>}
-
-        {/* Selected service pricing */}
-        <div style={{ background: "#f0fdfa", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "12px" }}>
-            One-Time Services
-          </div>
-          <PriceRow label={name} value={fmt(parseFloat(params.get("price") ?? "0"))} last />
-        </div>
-
         {/* Notes */}
         {notes && (
           <>
