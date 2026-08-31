@@ -240,7 +240,7 @@ export default function CalendarPage() {
   return (
     <div className="min-h-screen bg-background">
       <DashboardNav />
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:ml-64">
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
