@@ -66,7 +66,7 @@ function SaveQuoteModal({
   defaultSenderName: string | null
   selectedTier: string
   pricingSummary: { label: string; value: string }[]
-  initialClient?: { clientFirstName: string; clientLastName: string; clientEmail: string; clientPhone: string }
+  initialClient?: { clientFirstName: string; clientLastName: string; clientEmail: string; clientPhone: string; address?: string }
 }) {
   const empty: SaveQuoteFields = { name: "", streetAddress: "", aptUnit: "", city: "", state: "", zip: "", notes: "", clientFirstName: initialClient?.clientFirstName ?? "", clientLastName: initialClient?.clientLastName ?? "", clientEmail: initialClient?.clientEmail ?? "", clientPhone: initialClient?.clientPhone ?? "", generatedBy: "" }
   const [fields, setFields] = useState<SaveQuoteFields>(empty)
@@ -109,7 +109,7 @@ function SaveQuoteModal({
   // Pre-fill generatedBy from default when modal opens, load contacts
   useEffect(() => {
     if (open) {
-      setFields(prev => ({ ...prev, ...(initialClient ?? {}) }))
+      setFields(prev => ({ ...prev, ...(initialClient ?? {}), ...(initialClient?.address ? { streetAddress: initialClient.address, city: "", state: "", zip: "" } : {}) }))
       if (defaultSenderName && !fields.generatedBy) {
         setFields(prev => ({ ...prev, generatedBy: defaultSenderName }))
       }
@@ -422,10 +422,12 @@ export default function DashboardPage() {
   const [selectedClient, setSelectedClient] = useState<ClientContact | null>(null)
   const [clientContacts, setClientContacts] = useState<ClientContact[]>([])
   const [clientSearch, setClientSearch] = useState("")
-  const selectedClientFields = selectedClient ? (() => { const [firstName, ...last] = selectedClient.name.split(" "); return { clientFirstName: firstName ?? "", clientLastName: last.join(" "), clientEmail: selectedClient.email ?? "", clientPhone: selectedClient.phone ?? "" } })() : undefined
-  const [newContactName, setNewContactName] = useState("")
+  const selectedClientFields = selectedClient ? (() => { const [firstName, ...last] = selectedClient.name.split(" "); return { clientFirstName: firstName ?? "", clientLastName: last.join(" "), clientEmail: selectedClient.email ?? "", clientPhone: selectedClient.phone ?? "", address: selectedClient.address ?? "" } })() : undefined
+  const [newContactFirstName, setNewContactFirstName] = useState("")
+  const [newContactLastName, setNewContactLastName] = useState("")
   const [newContactEmail, setNewContactEmail] = useState("")
   const [newContactPhone, setNewContactPhone] = useState("")
+  const [newContactAddress, setNewContactAddress] = useState("")
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
@@ -1186,7 +1188,7 @@ export default function DashboardPage() {
         </DialogContent>
       </Dialog>
       <Dialog open={showAddContact} onOpenChange={setShowAddContact}>
-        <DialogContent className="sm:max-w-md"><DialogHeader><DialogTitle>Add client contact</DialogTitle><DialogDescription>Save this client and continue with their details already filled in.</DialogDescription></DialogHeader><div className="flex flex-col gap-3"><Input placeholder="Full name" value={newContactName} onChange={e => setNewContactName(e.target.value)} /><Input placeholder="Email (optional)" value={newContactEmail} onChange={e => setNewContactEmail(e.target.value)} type="email" /><PhoneInput value={newContactPhone} onChange={setNewContactPhone} /></div><DialogFooter><Button type="button" onClick={async () => { if (!newContactName.trim()) return; const result = await createClientContact({ name: newContactName.trim(), email: newContactEmail.trim(), phone: newContactPhone.trim() }); if (result.data) { setClientContacts(prev => [result.data!, ...prev]); setSelectedClient(result.data); setShowAddContact(false); setShowClientPicker(false); setShowSaveModal(true); setNewContactName(""); setNewContactEmail(""); setNewContactPhone("") } else toast.error(result.error ?? "Unable to add contact") }}>Add and continue</Button></DialogFooter></DialogContent>
+        <DialogContent className="sm:max-w-md"><DialogHeader><DialogTitle>Add client contact</DialogTitle><DialogDescription>Save this client and continue with their details already filled in.</DialogDescription></DialogHeader><div className="flex flex-col gap-3"><div className="grid grid-cols-2 gap-3"><Input placeholder="First name" value={newContactFirstName} onChange={e => setNewContactFirstName(e.target.value)} required /><Input placeholder="Last name" value={newContactLastName} onChange={e => setNewContactLastName(e.target.value)} required /></div><Input placeholder="Email (optional)" value={newContactEmail} onChange={e => setNewContactEmail(e.target.value)} type="email" /><PhoneInput value={newContactPhone} onChange={setNewContactPhone} /><AddressAutocomplete id="new-contact-address" value={newContactAddress} onChange={setNewContactAddress} onSelectParts={parts => setNewContactAddress([parts.street, parts.city, parts.state, parts.zip].filter(Boolean).join(", "))} placeholder="Address" /></div><DialogFooter><Button type="button" onClick={async () => { const fullName = `${newContactFirstName.trim()} ${newContactLastName.trim()}`.trim(); if (!newContactFirstName.trim() || !newContactLastName.trim()) return; const result = await createClientContact({ name: fullName, email: newContactEmail.trim(), phone: newContactPhone.trim(), address: newContactAddress.trim() }); if (result.data) { setClientContacts(prev => [result.data!, ...prev]); setSelectedClient(result.data); setShowAddContact(false); setShowClientPicker(false); setShowSaveModal(true); setNewContactFirstName(""); setNewContactLastName(""); setNewContactEmail(""); setNewContactPhone(""); setNewContactAddress("") } else toast.error(result.error ?? "Unable to add contact") }}>Add and continue</Button></DialogFooter></DialogContent>
       </Dialog>
       <SaveQuoteModal
         open={showSaveModal}
