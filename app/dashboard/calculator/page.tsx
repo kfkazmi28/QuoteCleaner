@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils"
 import { getSubscriptionAndDayPassStatus } from "@/app/actions/subscription"
 import { createDayPassCheckoutSession } from "@/app/actions/stripe"
 import { saveQuote, getDefaultSenderName, setDefaultSenderName } from "@/app/actions/quotes"
-import { getClientContacts } from "@/app/actions/contacts"
+import { getClientContacts, createClientContact } from "@/app/actions/contacts"
 import type { ClientContact } from "@/lib/contacts-types"
 import { SendQuoteModal, type SendQuoteData } from "@/components/send-quote-modal"
 import { ChecklistModal, STANDARD_CLEAN_CHECKLIST as _STANDARD_CLEAN_CHECKLIST, DEEP_CLEAN_CHECKLIST as _DEEP_CLEAN_CHECKLIST, MOVE_IN_CHECKLIST as _MOVE_IN_CHECKLIST, type ChecklistSection } from "@/components/checklist-modal"
@@ -58,6 +58,7 @@ function SaveQuoteModal({
   defaultSenderName,
   selectedTier,
   pricingSummary,
+  initialClient,
 }: {
   open: boolean
   onClose: () => void
@@ -65,8 +66,9 @@ function SaveQuoteModal({
   defaultSenderName: string | null
   selectedTier: string
   pricingSummary: { label: string; value: string }[]
+  initialClient?: { clientFirstName: string; clientLastName: string; clientEmail: string; clientPhone: string }
 }) {
-  const empty: SaveQuoteFields = { name: "", streetAddress: "", aptUnit: "", city: "", state: "", zip: "", notes: "", clientFirstName: "", clientLastName: "", clientEmail: "", clientPhone: "", generatedBy: "" }
+  const empty: SaveQuoteFields = { name: "", streetAddress: "", aptUnit: "", city: "", state: "", zip: "", notes: "", clientFirstName: initialClient?.clientFirstName ?? "", clientLastName: initialClient?.clientLastName ?? "", clientEmail: initialClient?.clientEmail ?? "", clientPhone: initialClient?.clientPhone ?? "", generatedBy: "" }
   const [fields, setFields] = useState<SaveQuoteFields>(empty)
   const [saveAsDefault, setSaveAsDefault] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -107,6 +109,7 @@ function SaveQuoteModal({
   // Pre-fill generatedBy from default when modal opens, load contacts
   useEffect(() => {
     if (open) {
+      setFields(prev => ({ ...prev, ...(initialClient ?? {}) }))
       if (defaultSenderName && !fields.generatedBy) {
         setFields(prev => ({ ...prev, generatedBy: defaultSenderName }))
       }
@@ -414,6 +417,14 @@ export default function DashboardPage() {
   const [showQuoteActions, setShowQuoteActions] = useState(false)
   const [showSendAfterSave, setShowSendAfterSave] = useState(false)
   const [showSendPrompt, setShowSendPrompt] = useState(false)
+  const [showClientPicker, setShowClientPicker] = useState(false)
+  const [showAddContact, setShowAddContact] = useState(false)
+  const [selectedClient, setSelectedClient] = useState<ClientContact | null>(null)
+  const [clientContacts, setClientContacts] = useState<ClientContact[]>([])
+  const selectedClientFields = selectedClient ? (() => { const [firstName, ...last] = selectedClient.name.split(" "); return { clientFirstName: firstName ?? "", clientLastName: last.join(" "), clientEmail: selectedClient.email ?? "", clientPhone: selectedClient.phone ?? "" } })() : undefined
+  const [newContactName, setNewContactName] = useState("")
+  const [newContactEmail, setNewContactEmail] = useState("")
+  const [newContactPhone, setNewContactPhone] = useState("")
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
@@ -427,6 +438,10 @@ export default function DashboardPage() {
 
   const searchParams = useSearchParams()
   const maxFreeQuotes = 3
+
+  useEffect(() => {
+    getClientContacts().then(setClientContacts)
+  }, [])
 
   // Handle Day Pass success/cancel redirects
   useEffect(() => {
@@ -1113,7 +1128,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-start gap-4">
                   <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide options ↑" : "Compare Options →"}</button>
                   {preferredPackage && <button type="button" onClick={() => setShowChecklist(true)} className="text-left text-sm font-semibold text-primary hover:underline">Open Checklist →</button>}
-                  <Button type="button" onClick={() => { setPreferredPackage(preferredPackage ?? "deep"); setShowSendAfterSave(true); setShowSaveModal(true) }} className="w-full bg-primary sm:w-auto">Use this quote →</Button>
+                  <Button type="button" onClick={() => { setPreferredPackage(preferredPackage ?? "deep"); setShowClientPicker(true) }} className="w-full bg-primary sm:w-auto">Use this quote →</Button>
                 </div>
 
 
@@ -1161,12 +1176,23 @@ export default function DashboardPage() {
   ]}
   />
 
+      <Dialog open={showClientPicker} onOpenChange={setShowClientPicker}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Choose a client</DialogTitle><DialogDescription>Select a contact to prefill the quote, or add a new client.</DialogDescription></DialogHeader>
+          <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">{clientContacts.length ? clientContacts.map(contact => <Button key={contact.id} type="button" variant="outline" className="h-auto justify-start py-3 text-left" onClick={() => { setSelectedClient(contact); setShowClientPicker(false); setShowSaveModal(true) }}><span><span className="block font-medium">{contact.name}</span><span className="block text-xs text-muted-foreground">{contact.email || contact.phone || "No contact details"}</span></span></Button>) : <p className="py-4 text-sm text-muted-foreground">No saved contacts yet.</p>}</div>
+          <DialogFooter><Button type="button" variant="outline" onClick={() => setShowAddContact(true)}>Add new contact</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showAddContact} onOpenChange={setShowAddContact}>
+        <DialogContent className="sm:max-w-md"><DialogHeader><DialogTitle>Add client contact</DialogTitle><DialogDescription>Save this client and continue with their details already filled in.</DialogDescription></DialogHeader><div className="flex flex-col gap-3"><Input placeholder="Full name" value={newContactName} onChange={e => setNewContactName(e.target.value)} /><Input placeholder="Email (optional)" value={newContactEmail} onChange={e => setNewContactEmail(e.target.value)} type="email" /><PhoneInput value={newContactPhone} onChange={setNewContactPhone} /></div><DialogFooter><Button type="button" onClick={async () => { if (!newContactName.trim()) return; const result = await createClientContact({ name: newContactName.trim(), email: newContactEmail.trim(), phone: newContactPhone.trim() }); if (result.data) { setClientContacts(prev => [result.data!, ...prev]); setSelectedClient(result.data); setShowAddContact(false); setShowClientPicker(false); setShowSaveModal(true); setNewContactName(""); setNewContactEmail(""); setNewContactPhone("") } else toast.error(result.error ?? "Unable to add contact") }}>Add and continue</Button></DialogFooter></DialogContent>
+      </Dialog>
       <SaveQuoteModal
         open={showSaveModal}
         onClose={() => setShowSaveModal(false)}
         onSave={handleSaveQuoteSubmit}
         defaultSenderName={defaultSenderName}
         selectedTier={priceCards.find(card => card.key === preferredPackage)?.label ?? "Selected cleaning service"}
+        initialClient={selectedClientFields}
         pricingSummary={[
           { label: "Sq ft", value: squareFootage || "—" },
           { label: "Clean level", value: cleanLevel || "—" },
