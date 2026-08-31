@@ -128,6 +128,8 @@ function ViewQuoteModal({
   onSend,
   onExport,
   onPhotosUpdated,
+  selectedCleaning,
+  selectedPrice,
 }: {
   quote: SavedQuote | null
   onClose: () => void
@@ -136,6 +138,8 @@ function ViewQuoteModal({
   onSend: (q: SavedQuote) => void
   onExport: (q: SavedQuote) => void
   onPhotosUpdated: (quoteId: string, photos: string[]) => void
+  selectedCleaning: string
+  selectedPrice: number
 }) {
   const [photos, setPhotos] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
@@ -236,27 +240,10 @@ function ViewQuoteModal({
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">Pricing</p>
             <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1.5 text-sm">
-              {[
-                { label: "Standard (one-time)", value: quote.result_standard },
-                { label: "Deep Clean", value: quote.result_deep_clean },
-                { label: "Move In / Move Out", value: quote.result_move_in },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-medium">{formatCurrency(value)}</span>
-                </div>
-              ))}
-              <div className="my-1 h-px bg-border" />
-              {[
-                { label: "Monthly recurring", value: quote.result_monthly },
-                { label: "Bi-weekly recurring", value: quote.result_biweekly },
-                { label: "Weekly recurring", value: quote.result_weekly },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-medium">{formatCurrency(value)}</span>
-                </div>
-              ))}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{selectedCleaning}</span>
+                <span className="font-semibold">{formatCurrency(selectedPrice)}</span>
+              </div>
             </div>
           </div>
 
@@ -1514,6 +1501,8 @@ export default function SavedQuotesPage() {
         onLoad={handleLoad}
         onSend={q => { setViewQuote(null); setSendQuote(q) }}
         onExport={handleExport}
+        selectedCleaning={viewQuote ? ({ move: "Move In/Out", deep: "Deep Clean", standard: "Standard", monthly: "Monthly", biweekly: "Bi-weekly", weekly: "Weekly" } as Record<string, string>)[preferredPackages[viewQuote.id] || "standard"] : ""}
+        selectedPrice={viewQuote ? ({ move: viewQuote.result_move_in, deep: viewQuote.result_deep_clean, standard: viewQuote.result_standard, monthly: viewQuote.result_monthly, biweekly: viewQuote.result_biweekly, weekly: viewQuote.result_weekly } as Record<string, number>)[preferredPackages[viewQuote.id] || "standard"] ?? viewQuote.result_standard : 0}
         onPhotosUpdated={(quoteId, photos) => {
           setQuotes(prev => prev.map(q => q.id === quoteId ? { ...q, photos } : q))
           setViewQuote(prev => prev && prev.id === quoteId ? { ...prev, photos } : prev)
