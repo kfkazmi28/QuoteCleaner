@@ -21,6 +21,7 @@ export function exportQuotePdf(data: SendQuoteData): void {
   if (data.generatedBy)  params.set("generatedBy",  data.generatedBy)
   if (data.notes)        params.set("notes",        data.notes)
   if (data.createdAt)    params.set("date",         data.createdAt)
+  if (data.checklist?.length) params.set("checklist", JSON.stringify(data.checklist))
   if (data.estimatedHours != null) {
     params.set("laborOne", String(data.estimatedHours))
     params.set("laborTwo", String(data.estimatedHours / 2))

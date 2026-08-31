@@ -762,6 +762,7 @@ export default function DashboardPage() {
       generatedBy: defaultSenderName,
       notes: null,
       estimatedHours: priceCards.find(card => card.key === preferredPackage)?.hours ?? results.totalHours,
+      checklist: preferredPackage === "standard" ? customStandardClean : preferredPackage === "deep" ? customDeepClean : customMoveIn,
       resultStandard: results.standardSingle,
       resultDeepClean: results.deepClean,
       resultMoveIn: results.moveInMoveOut,
