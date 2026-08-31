@@ -743,10 +743,8 @@ export default function DashboardPage() {
       }
       setShowSaveModal(false)
       toast.success("Quote saved")
-      if (showSendAfterSave) {
-        setShowSendAfterSave(false)
-        setShowSendPrompt(true)
-      }
+  setShowSendAfterSave(false)
+  setShowSendPrompt(true)
     }
   }
 
@@ -1155,12 +1153,13 @@ export default function DashboardPage() {
   <Dialog open={showSendPrompt} onOpenChange={setShowSendPrompt}>
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Send this quote to the client?</DialogTitle>
-        <DialogDescription>Your quote has been saved. Would you like to continue to the client sharing screen?</DialogDescription>
+  <DialogTitle>Quote saved</DialogTitle>
+  <DialogDescription>Your quote has been saved. What would you like to do next?</DialogDescription>
       </DialogHeader>
       <DialogFooter>
-        <Button type="button" variant="outline" onClick={() => setShowSendPrompt(false)}>Not now</Button>
-        <Button type="button" onClick={() => { setShowSendPrompt(false); handleSendQuote() }}>{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Send Quote</> : <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>}</Button>
+  <Button type="button" variant="outline" onClick={() => { setShowSendPrompt(false); handleExportPdf() }}>{hasUnlimitedAccess ? "Download PDF" : "Download PDF (Pro)"}</Button>
+  <Button type="button" onClick={() => { setShowSendPrompt(false); handleSendQuote() }}>{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Email Quote</> : <><Lock className="mr-2 h-4 w-4" />Email Quote (Pro)</>}</Button>
+  <Button type="button" variant="ghost" onClick={() => setShowSendPrompt(false)}>Done</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
