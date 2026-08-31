@@ -404,6 +404,8 @@ export default function DashboardPage() {
   const [preferredPackage, setPreferredPackage] = useState<string | null>(null)
   const [showCompare, setShowCompare] = useState(false)
   const [showQuoteActions, setShowQuoteActions] = useState(false)
+  const [showSendAfterSave, setShowSendAfterSave] = useState(false)
+  const [showSendPrompt, setShowSendPrompt] = useState(false)
   const [savedCalculators, setSavedCalculators] = useState<SavedCalculator[]>([])
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
@@ -716,6 +718,10 @@ export default function DashboardPage() {
       }
       setShowSaveModal(false)
       toast.success("Quote saved")
+      if (showSendAfterSave) {
+        setShowSendAfterSave(false)
+        setShowSendPrompt(true)
+      }
     }
   }
 
@@ -1099,7 +1105,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-start gap-4">
                   <button type="button" onClick={() => setShowCompare(prev => !prev)} className="text-left text-sm font-semibold text-primary hover:underline">{showCompare ? "Hide options ↑" : "Compare Options →"}</button>
                   {preferredPackage && <button type="button" onClick={() => setShowChecklist(true)} className="text-left text-sm font-semibold text-primary hover:underline">Open Checklist →</button>}
-                  <Button type="button" onClick={() => { setPreferredPackage(preferredPackage ?? "deep"); setShowQuoteActions(true) }} className="w-full bg-primary sm:w-auto">Use this quote →</Button>
+                  <Button type="button" onClick={() => { setPreferredPackage(preferredPackage ?? "deep"); setShowSendAfterSave(true); setShowSaveModal(true) }} className="w-full bg-primary sm:w-auto">Use this quote →</Button>
                 </div>
 
 
@@ -1121,18 +1127,15 @@ export default function DashboardPage() {
         </div>
       </main>
 
-  <Dialog open={showQuoteActions} onOpenChange={setShowQuoteActions}>
+  <Dialog open={showSendPrompt} onOpenChange={setShowSendPrompt}>
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>What would you like to do?</DialogTitle>
-        <DialogDescription>Choose an option for this quote, or close this window to keep reviewing it.</DialogDescription>
+        <DialogTitle>Send this quote to the client?</DialogTitle>
+        <DialogDescription>Your quote has been saved. Would you like to continue to the client sharing screen?</DialogDescription>
       </DialogHeader>
-      <div className="flex flex-col gap-3 pt-2">
-        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleSaveQuote}><Bookmark className="mr-2 h-4 w-4" />Save Quote</Button>
-        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleSendQuote}>{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Send Quote</> : <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>}</Button>
-      </div>
       <DialogFooter>
-        <Button type="button" variant="ghost" onClick={() => setShowQuoteActions(false)}>Close</Button>
+        <Button type="button" variant="outline" onClick={() => setShowSendPrompt(false)}>Not now</Button>
+        <Button type="button" onClick={() => { setShowSendPrompt(false); handleSendQuote() }}>{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Send Quote</> : <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>}</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
