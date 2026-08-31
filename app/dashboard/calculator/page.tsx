@@ -844,9 +844,9 @@ export default function DashboardPage() {
   
   <main className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 md:ml-64">
         <div className="mb-10 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="relative h-40 overflow-hidden sm:h-48">
-                <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/cleaning-tools-banner-v2.png')] bg-cover bg-center brightness-125" />
-                <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-foreground/55 via-foreground/20 to-transparent" />
+          <div className="relative h-52 overflow-hidden sm:h-64">
+                <div aria-hidden="true" className="absolute inset-0 bg-[url('/images/cleaning-tools-banner-v2.png')] bg-cover bg-[center_72%]" />
+                <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-foreground/65 via-foreground/25 to-transparent" />
             <div className="relative flex h-full max-w-xl flex-col justify-end gap-2 p-6 sm:p-8">
               <h1 className="text-3xl font-bold tracking-tight text-primary-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
               <p className="max-w-lg text-sm leading-6 text-primary-foreground/85 sm:text-base">Build a professional quote in seconds.</p>
