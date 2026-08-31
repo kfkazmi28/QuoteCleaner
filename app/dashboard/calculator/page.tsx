@@ -58,7 +58,7 @@ function SaveQuoteModal({
   defaultSenderName,
   selectedTier,
   pricingSummary,
-  laborHours,
+  laborHours = [],
   initialClient,
 }: {
   open: boolean
@@ -129,7 +129,10 @@ function SaveQuoteModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!initialClient?.address && (!fields.streetAddress.trim() || !fields.city.trim() || !fields.state.trim() || !fields.zip.trim())) return
+    if (!initialClient?.address && (!fields.streetAddress.trim() || !fields.city.trim() || !fields.state.trim() || !fields.zip.trim())) {
+      toast.error("Please add the client address before saving")
+      return
+    }
     setSaving(true)
     await onSave({ ...fields, name: selectedTier }, saveAsDefault)
     setSaving(false)
