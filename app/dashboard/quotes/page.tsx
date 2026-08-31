@@ -1309,7 +1309,7 @@ export default function SavedQuotesPage() {
                       })()}
                     </div>
                     {/* Stop propagation so card click doesn't fire */}
-                    <div className="shrink-0" onClick={e => e.stopPropagation()}>
+                    <div className="col-start-6 justify-self-end shrink-0" onClick={e => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -1447,7 +1447,7 @@ export default function SavedQuotesPage() {
                       }
                       return null
                     })()}
-                    <div className="flex items-center justify-between gap-1 lg:justify-end" onClick={e => e.stopPropagation()}>
+                    <div className="col-start-6 flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
                       <Button
                         variant="ghost"
                         size="sm"
