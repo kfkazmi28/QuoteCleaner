@@ -9,10 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PhoneInput } from "@/components/phone-input";
 import {
   Mail,
   MessageSquare,
@@ -23,8 +20,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { updateQuote } from "@/app/actions/quotes";
-import { getClientContacts } from "@/app/actions/contacts";
-import type { ClientContact } from "@/lib/contacts-types";
 import { exportQuotePdf } from "@/lib/export-quote-pdf";
 import { COMPANY_NAME } from "@/lib/company-config";
 
@@ -89,8 +84,6 @@ export function SendQuoteModal({
   const setTone = (_nextTone: string) => undefined;
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
-  const [contacts, setContacts] = useState<ClientContact[]>([]);
-  const [suggestions, setSuggestions] = useState(false);
   useEffect(() => {
     if (data) {
       setContact({
@@ -109,22 +102,6 @@ export function SendQuoteModal({
     : data.quoteName.toLowerCase().includes("move")
       ? data.resultMoveIn
       : data.resultStandard;
-  const saveContact = async () => {
-    if (!data.quoteId)
-      return toast.error("Save the quote first to associate client details.");
-    setSaving(true);
-    const result = await updateQuote(data.quoteId, {
-      client_name: contact.clientName || undefined,
-      client_email: contact.clientEmail || undefined,
-      client_phone: contact.clientPhone || undefined,
-    });
-    setSaving(false);
-    if (result.error) toast.error("Could not save client details.");
-    else {
-      toast.success("Client details saved");
-      onContactSaved?.(contact);
-    }
-  };
   const generate = async () => {
     setSaving(true);
     try {
@@ -171,87 +148,6 @@ export function SendQuoteModal({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-7 px-6 py-6">
-          <section className="flex flex-col gap-3">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
-              Client
-            </h3>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="share-name">Client Name</Label>
-                <Input
-                  id="share-name"
-                  value={contact.clientName}
-                  onFocus={async () => {
-                    if (!contacts.length)
-                      setContacts(await getClientContacts());
-                    setSuggestions(true);
-                  }}
-                  onChange={(e) => {
-                    setContact((c) => ({ ...c, clientName: e.target.value }));
-                    setSuggestions(true);
-                  }}
-                  placeholder="Client name"
-                />
-                {suggestions &&
-                  contact.clientName &&
-                  contacts
-                    .filter((c) =>
-                      c.name
-                        .toLowerCase()
-                        .includes(contact.clientName.toLowerCase()),
-                    )
-                    .slice(0, 4)
-                    .map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        className="text-left text-sm text-muted-foreground"
-                        onClick={() => {
-                          setContact({
-                            clientName: c.name,
-                            clientEmail: c.email || "",
-                            clientPhone: c.phone || "",
-                          });
-                          setSuggestions(false);
-                        }}
-                      >
-                        {c.name}
-                      </button>
-                    ))}
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="share-email">Client Email</Label>
-                <Input
-                  id="share-email"
-                  type="email"
-                  value={contact.clientEmail}
-                  onChange={(e) =>
-                    setContact((c) => ({ ...c, clientEmail: e.target.value }))
-                  }
-                  placeholder="client@example.com"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <Label htmlFor="share-phone">Client Phone</Label>
-                <PhoneInput
-                  id="share-phone"
-                  value={contact.clientPhone}
-                  onChange={(v) =>
-                    setContact((c) => ({ ...c, clientPhone: v }))
-                  }
-                />
-              </div>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              className="self-start px-0 text-primary"
-              onClick={saveContact}
-              disabled={saving || !data.quoteId}
-            >
-              {saving ? "Saving..." : "Save client details"}
-            </Button>
-          </section>
           <section className="order-2 flex flex-col gap-3">
             <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
               Share via
