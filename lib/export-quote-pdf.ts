@@ -19,6 +19,18 @@ export function exportQuotePdf(data: SendQuoteData): void {
   params.set("monthly",   String(data.resultMonthly   ?? 0))
   params.set("biweekly",  String(data.resultBiweekly  ?? 0))
   params.set("weekly",    String(data.resultWeekly    ?? 0))
+  params.set("address", data.homeAddress ?? "")
+  params.set("homeVariables", JSON.stringify(data.homeVariables ?? {}))
+  if (data.clientName) params.set("clientName", data.clientName)
+  if (data.clientEmail) params.set("clientEmail", data.clientEmail)
+  if (data.clientPhone) params.set("clientPhone", data.clientPhone)
+  if (data.generatedBy) params.set("generatedBy", data.generatedBy)
+  if (data.notes) params.set("notes", data.notes)
+  if (data.checklist?.length) params.set("checklist", JSON.stringify(data.checklist))
+  if (data.estimatedHours != null) {
+    params.set("laborOne", String(data.estimatedHours))
+    params.set("laborTwo", String(data.estimatedHours / 2))
+  }
 
   const url = `/quote/print?${params.toString()}`
   window.open(url, "_blank", "noopener,noreferrer")

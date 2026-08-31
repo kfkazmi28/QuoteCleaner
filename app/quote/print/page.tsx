@@ -14,7 +14,18 @@ function fmt(n: number) {
 function PrintQuote() {
   const params = useSearchParams()
 
-  const name      = params.get("name")      ?? "Quote"
+  const name = params.get("name") ?? "Quote"
+  const price = parseFloat(params.get("price") ?? "0")
+  const address = params.get("address") ?? ""
+  const clientName = params.get("clientName") ?? ""
+  const clientEmail = params.get("clientEmail") ?? ""
+  const clientPhone = params.get("clientPhone") ?? ""
+  const notes = params.get("notes") ?? ""
+  const homeVariables = JSON.parse(params.get("homeVariables") ?? "{}") as Record<string, string | number | null>
+  const checklist = JSON.parse(params.get("checklist") ?? "[]") as { section: string; items: string[] }[]
+  const laborOne = parseFloat(params.get("laborOne") ?? "0")
+  const laborTwo = parseFloat(params.get("laborTwo") ?? "0")
+  const formatHours = (hours: number) => `${Math.floor(hours)} hr${Math.floor(hours) === 1 ? "" : "s"}${Math.round((hours % 1) * 60) ? ` ${Math.round((hours % 1) * 60)} min` : ""}`
   return (
     <>
       {/* Print-only global styles injected via a style tag */}
@@ -75,8 +86,13 @@ function PrintQuote() {
       >
         {/* Selected service and price */}
         <div style={{ background: "#f0fdfa", borderRadius: "8px", padding: "24px 28px", marginBottom: "24px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "20px" }}><strong contentEditable suppressContentEditableWarning className="editable" style={{ fontSize: "22px" }}>{name}</strong><strong contentEditable suppressContentEditableWarning className="editable" style={{ fontSize: "26px" }}>{fmt(parseFloat(params.get("price") ?? "0"))}</strong></div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "20px" }}><strong contentEditable suppressContentEditableWarning className="editable" style={{ fontSize: "22px" }}>{name}</strong><strong contentEditable suppressContentEditableWarning className="editable" style={{ fontSize: "26px" }}>{fmt(price)}</strong></div>
         </div>
+        {(clientName || address || clientEmail || clientPhone) && <Section title="Client"><div style={{ display: "grid", gap: "6px" }}>{clientName && <InfoRow label="Name" value={clientName} editable />}{clientEmail && <InfoRow label="Email" value={clientEmail} />}{clientPhone && <InfoRow label="Phone" value={clientPhone} />}{address && <InfoRow label="Address" value={address} editable />}</div></Section>}
+        {Object.keys(homeVariables).length > 0 && <Section title="Home Details"><div style={{ display: "grid", gap: "6px" }}>{Object.entries(homeVariables).filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => <InfoRow key={label} label={label.replace(/([A-Z])/g, " $1")} value={String(value)} />)}</div></Section>}
+        {(laborOne || laborTwo) > 0 && <Section title="Labor Hours"><div style={{ display: "grid", gap: "6px" }}><InfoRow label="1 cleaner" value={formatHours(laborOne)} /><InfoRow label="2 cleaners" value={formatHours(laborTwo)} /></div></Section>}
+        {checklist.length > 0 && <Section title={`${name} Checklist`}><div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>{checklist.map((section, sectionIndex) => <div key={`${section.section}-${sectionIndex}`}><div contentEditable suppressContentEditableWarning className="editable" style={{ fontWeight: 700, fontSize: "13px", marginBottom: "5px" }}>{section.section}</div><ul style={{ margin: 0, paddingLeft: "18px" }}>{section.items.map((item, itemIndex) => <li key={`${item}-${itemIndex}`} contentEditable suppressContentEditableWarning className="editable">{item}</li>)}</ul></div>)}</div></Section>}
+        {notes && <Section title="Notes"><p contentEditable suppressContentEditableWarning className="editable" style={{ margin: 0 }}>{notes}</p></Section>}
 
       </div>
     </>
