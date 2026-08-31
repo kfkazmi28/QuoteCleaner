@@ -301,7 +301,6 @@ export default function InvoicesPage() {
     { key: "draft", label: "Draft" },
     { key: "sent", label: "Sent" },
     { key: "paid", label: "Paid" },
-    { key: "canceled", label: "Canceled" },
   ]
 
   const filtered = activeTab === "all"
@@ -407,12 +406,11 @@ export default function InvoicesPage() {
 
         {/* Summary cards */}
         {tableReady && !loading && (
-          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {[
               { label: "Draft", count: countByStatus("draft"), color: "text-muted-foreground" },
               { label: "Sent", count: countByStatus("sent"), color: "text-blue-600 dark:text-blue-400" },
               { label: "Paid", count: countByStatus("paid"), color: "text-primary" },
-              { label: "Canceled", count: countByStatus("canceled"), color: "text-destructive" },
             ].map((s) => (
               <div key={s.label} className="rounded-lg border border-border bg-card px-4 py-3">
                 <p className="text-xs text-muted-foreground">{s.label}</p>
