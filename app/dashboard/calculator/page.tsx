@@ -849,7 +849,7 @@ export default function DashboardPage() {
                 <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-foreground/55 via-foreground/20 to-transparent" />
             <div className="relative flex h-full max-w-xl flex-col justify-end gap-2 p-6 sm:p-8">
               <h1 className="text-3xl font-bold tracking-tight text-primary-foreground sm:text-5xl">Cleaning Quote Calculator</h1>
-              <p className="max-w-lg text-sm leading-6 text-primary-foreground/85 sm:text-base">Build a professional quote in seconds. Enter a few details and we&apos;ll recommend a price.</p>
+              <p className="max-w-lg text-sm leading-6 text-primary-foreground/85 sm:text-base">Build a professional quote in seconds.</p>
             </div>
           </div>
         </div>
