@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useTransition } from "react"
+import { useEffect, useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -950,6 +950,8 @@ export default function SavedQuotesPage() {
   const [checklistModalQuote, setChecklistModalQuote] = useState<SavedQuote | null>(null)
   const [invoiceQuote, setInvoiceQuote] = useState<SavedQuote | null>(null)
   const [invoicedQuoteIds, setInvoicedQuoteIds] = useState<Set<string>>(new Set())
+  const [columnFilters, setColumnFilters] = useState({ client: "", address: "", cleaning: "", date: "", price: "" })
+  const [sortConfig, setSortConfig] = useState<{ key: "client" | "address" | "cleaning" | "date" | "price"; direction: "asc" | "desc" }>({ key: "date", direction: "desc" })
 
   useEffect(() => {
     getSavedQuotes().then(({ data, error }) => {
@@ -1059,6 +1061,27 @@ export default function SavedQuotesPage() {
     : activeTab === "scheduled" ? scheduledQuotes
     : activeTab === "completed" ? completedQuotes
     : archivedQuotes
+
+  const displayQuotes = useMemo(() => {
+    const selectedPrice = (q: SavedQuote) => {
+      const key = preferredPackages[q.id] || "standard"
+      return ({ move: q.result_move_in, deep: q.result_deep_clean, standard: q.result_standard, monthly: q.result_monthly, biweekly: q.result_biweekly, weekly: q.result_weekly } as Record<string, number>)[key] ?? q.result_standard
+    }
+    const selectedCleaning = (q: SavedQuote) => ({ move: "Move In/Out", deep: "Deep Clean", standard: "Standard", monthly: "Monthly", biweekly: "Bi-weekly", weekly: "Weekly" } as Record<string, string>)[preferredPackages[q.id] || "standard"]
+    const rows = filteredQuotes.filter(q => {
+      const price = String(selectedPrice(q))
+      const cleaning = selectedCleaning(q)
+      return q.client_name?.toLowerCase().includes(columnFilters.client.toLowerCase()) && q.home_address?.toLowerCase().includes(columnFilters.address.toLowerCase()) && cleaning.toLowerCase().includes(columnFilters.cleaning.toLowerCase()) && formatDate(q.created_at).toLowerCase().includes(columnFilters.date.toLowerCase()) && price.includes(columnFilters.price)
+    })
+    return [...rows].sort((a, b) => {
+      const value = (q: SavedQuote) => ({ client: q.client_name ?? "", address: q.home_address ?? "", cleaning: selectedCleaning(q), date: q.created_at, price: selectedPrice(q) }[sortConfig.key])
+      const av = value(a), bv = value(b)
+      const comparison = typeof av === "number" ? av - (bv as number) : String(av).localeCompare(String(bv), undefined, { numeric: true })
+      return sortConfig.direction === "asc" ? comparison : -comparison
+    })
+  }, [filteredQuotes, preferredPackages, columnFilters, sortConfig])
+
+  const setSort = (key: typeof sortConfig.key) => setSortConfig(prev => ({ key, direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc" }))
 
   const quoteToSendData = (q: SavedQuote): SendQuoteData => ({
     quoteId: q.id,
@@ -1188,7 +1211,7 @@ export default function SavedQuotesPage() {
               </Card>
             ))}
           </div>
-        ) : filteredQuotes.length === 0 ? (
+        ) : displayQuotes.length === 0 ? (
           <Card className="flex min-h-[320px] flex-col items-center justify-center border-dashed text-center">
             <CardContent className="flex flex-col items-center gap-3 pt-10">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
@@ -1226,14 +1249,19 @@ export default function SavedQuotesPage() {
           </Card>
         ) : (
           <div className="flex flex-col gap-3">
-            {filteredQuotes.map(quote => (
+            <div className="overflow-x-auto rounded-md border border-border">
+              <div className="grid min-w-[980px] grid-cols-[1.1fr_1.7fr_1fr_1fr_0.8fr_1.5fr] items-center gap-3 bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {([['client', 'Client name'], ['address', 'Address'], ['cleaning', 'Cleaning type'], ['date', 'Quote date'], ['price', 'Price']] as const).map(([key, label]) => <div key={key} className="flex flex-col gap-2"><button type="button" className="flex items-center gap-1 text-left hover:text-foreground" onClick={() => setSort(key)}>{label}<span aria-hidden="true">{sortConfig.key === key ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button><Input value={columnFilters[key]} onChange={e => setColumnFilters(prev => ({ ...prev, [key]: e.target.value }))} placeholder="Filter" className="h-7 bg-background text-xs font-normal normal-case tracking-normal" /></div>)}
+                <span className="text-right">Actions</span>
+              </div>
+            {displayQuotes.map(quote => (
               <Card
                 key={quote.id}
-                className="flex w-full flex-row items-center transition-shadow hover:shadow-md cursor-pointer"
+                className="grid w-full min-w-[980px] grid-cols-[1.1fr_1.7fr_1fr_1fr_0.8fr_1.5fr] items-center gap-3 rounded-none border-0 border-b border-border bg-background px-4 py-3 shadow-none transition-colors hover:bg-muted/30 cursor-pointer"
                 onClick={() => setViewQuote(quote)}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
+                <CardHeader className="contents">
+                  <div className="contents">
                     <div className="flex flex-col gap-1 min-w-0">
                       {quote.client_name && <CardTitle className="text-base leading-snug">{quote.client_name}</CardTitle>}
                       {quote.home_address && <p className="truncate text-xs text-muted-foreground">{quote.home_address}</p>}
@@ -1358,7 +1386,7 @@ export default function SavedQuotesPage() {
                   </div>
                 </CardHeader>
 
-                <CardContent className="flex flex-1 flex-col gap-3">
+                <CardContent className="contents">
 
                   {/* Selected cleaning tier */}
                   {(() => {
@@ -1372,7 +1400,7 @@ export default function SavedQuotesPage() {
                       weekly: { label: "Weekly", price: quote.result_weekly },
                     }[selectedKey as "move" | "deep" | "standard" | "monthly" | "biweekly" | "weekly"]
                     return (
-                      <div className="rounded-md border border-border bg-muted/30 px-4 py-4" onClick={e => e.stopPropagation()}>
+                      <div className="min-w-0" onClick={e => e.stopPropagation()}>
                         <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">Selected cleaning</p>
                         <div className="mt-2 flex items-center justify-between gap-4">
                           <span className="text-base font-medium text-foreground">{selectedPackage?.label}</span>
@@ -1385,7 +1413,7 @@ export default function SavedQuotesPage() {
 
 
                   {/* Footer */}
-                  <div className="mt-auto flex flex-col gap-1.5">
+                  <div className="contents">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <CalendarIcon className="h-3 w-3 shrink-0" />
                       Quoted on {formatDate(quote.created_at)}
@@ -1416,7 +1444,7 @@ export default function SavedQuotesPage() {
                       }
                       return null
                     })()}
-                    <div className="flex items-center justify-between" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center justify-between gap-1 lg:justify-end" onClick={e => e.stopPropagation()}>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1447,7 +1475,8 @@ export default function SavedQuotesPage() {
                 </CardContent>
               </Card>
             ))}
-          </div>
+              </div>
+            </div>
         )}
       </main>
 
