@@ -1263,6 +1263,7 @@ export default function SavedQuotesPage() {
               <Card
                 key={quote.id}
                 className="grid w-full min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(100px,0.8fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 rounded-none border-0 border-b border-border bg-background px-4 py-3 shadow-none transition-colors hover:bg-muted/30 cursor-pointer"
+                title={quote.notes?.trim() || undefined}
                 onClick={() => setViewQuote(quote)}
               >
                 <CardHeader className="contents">
