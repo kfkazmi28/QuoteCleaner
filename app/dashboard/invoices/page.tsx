@@ -33,7 +33,7 @@ import {
   LayoutGrid,
   List,
 } from "lucide-react"
-import { getInvoices, markInvoiceSent, cancelInvoice, type Invoice } from "@/app/actions/invoices"
+import { getInvoices, markInvoiceSent, deleteInvoice, type Invoice } from "@/app/actions/invoices"
 import { checkInvoicesTableExists } from "@/app/actions/invoices"
 import { getStripeConnectStatus, type StripeConnectStatus } from "@/app/actions/stripe-connect"
 import { toast } from "sonner"
@@ -88,13 +88,13 @@ function InvoiceDetailModal({
   invoice,
   onClose,
   onMarkSent,
-  onCancel,
+  onDelete,
   connectEnabled,
 }: {
   invoice: Invoice | null
   onClose: () => void
   onMarkSent: (id: string) => void
-  onCancel: (id: string) => void
+  onDelete: (id: string) => void
   connectEnabled: boolean
 }) {
   if (!invoice) return null
@@ -242,10 +242,10 @@ function InvoiceDetailModal({
                 variant="ghost"
                 size="sm"
                 className="text-destructive hover:text-destructive"
-                onClick={() => { onCancel(invoice.id); onClose() }}
+                onClick={() => { onDelete(invoice.id); onClose() }}
               >
                 <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                Cancel Invoice
+                Delete Invoice
               </Button>
             )}
           </div>
@@ -289,11 +289,11 @@ export default function InvoicesPage() {
     toast.success("Invoice marked as sent")
   }
 
-  const handleCancel = async (id: string) => {
-    const { error } = await cancelInvoice(id)
-    if (error) { toast.error("Failed to cancel invoice"); return }
-    setInvoices((prev) => prev.map((inv) => inv.id === id ? { ...inv, status: "canceled" } : inv))
-    toast.success("Invoice canceled")
+  const handleDelete = async (id: string) => {
+  const { error } = await deleteInvoice(id)
+  if (error) { toast.error("Failed to delete invoice"); return }
+  setInvoices((prev) => prev.filter((inv) => inv.id !== id))
+  toast.success("Invoice deleted")
   }
 
   const tabs: { key: TabKey; label: string }[] = [
@@ -622,7 +622,7 @@ export default function InvoicesPage() {
         invoice={viewInvoice}
         onClose={() => setViewInvoice(null)}
         onMarkSent={handleMarkSent}
-        onCancel={handleCancel}
+        onDelete={handleDelete}
         connectEnabled={connectStatus?.chargesEnabled ?? false}
       />
     </div>
