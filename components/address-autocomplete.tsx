@@ -32,10 +32,14 @@ declare global {
 
 function loadGoogleMaps(apiKey: string): Promise<void> {
   return new Promise((resolve) => {
-    if (window.__mapsLoaded) { resolve(); return }
+    if (window.__mapsLoaded || window.google?.maps?.places) { window.__mapsLoaded = true; resolve(); return }
     if (!window.__mapsLoadCallbacks) window.__mapsLoadCallbacks = []
     window.__mapsLoadCallbacks.push(resolve)
-    if (document.querySelector('script[data-gm-places]')) return
+    const existing = document.querySelector('script[data-gm-places]')
+    if (existing) {
+      existing.addEventListener("load", () => { window.__mapsLoaded = true; window.__mapsLoadCallbacks?.forEach(cb => cb()); window.__mapsLoadCallbacks = [] }, { once: true })
+      return
+    }
     window.initGoogleMaps = () => {
       window.__mapsLoaded = true
       window.__mapsLoadCallbacks?.forEach(cb => cb())
@@ -70,6 +74,7 @@ function getPlacesService(): google.maps.places.PlacesService {
 export function AddressAutocomplete({ id, value, onChange, onSelectParts, placeholder, required, className }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const serviceRef = useRef<google.maps.places.AutocompleteService | null>(null)
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [open, setOpen] = useState(false)
   const [inputVal, setInputVal] = useState(value)
@@ -117,6 +122,20 @@ export function AddressAutocomplete({ id, value, onChange, onSelectParts, placeh
     if (!apiKey) return
     loadGoogleMaps(apiKey).then(() => {
       serviceRef.current = new window.google.maps.places.AutocompleteService()
+      if (inputRef.current && !autocompleteRef.current) {
+        autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, { types: ["address"], componentRestrictions: { country: "us" }, fields: ["address_components", "formatted_address"] })
+        autocompleteRef.current.addListener("place_changed", () => {
+          const place = autocompleteRef.current?.getPlace()
+          if (!place?.address_components) return
+          const get = (type: string) => place.address_components?.find(component => component.types.includes(type))?.long_name ?? ""
+          const getShort = (type: string) => place.address_components?.find(component => component.types.includes(type))?.short_name ?? ""
+          const formatted = place.formatted_address ?? inputRef.current?.value ?? ""
+          setInputVal(formatted)
+          onChange(formatted)
+          onSelectParts?.({ street: [get("street_number"), get("route")].filter(Boolean).join(" "), city: get("locality") || get("sublocality") || get("neighborhood"), state: getShort("administrative_area_level_1"), zip: get("postal_code") })
+        })
+      }
+      if (inputVal.length >= 3) fetchSuggestions(inputVal)
     })
   }, [apiKey])
 

@@ -3,6 +3,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Keep Google Places suggestions above dialogs and popovers. */
+.pac-container { z-index: 10000 !important; }
+
 :root {
   --background: oklch(0.995 0.002 180);
   --foreground: oklch(0.20 0.02 220);
