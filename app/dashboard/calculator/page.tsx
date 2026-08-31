@@ -434,7 +434,6 @@ export default function DashboardPage() {
   const [calculatorFolders, setCalculatorFolders] = useState<CalculatorFolder[]>([])
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
   const [newFolderName, setNewFolderName] = useState("")
-  const [newFolderColor, setNewFolderColor] = useState("#0f766e")
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null)
   const [showSaveCalculatorModal, setShowSaveCalculatorModal] = useState(false)
   const [newCalculatorName, setNewCalculatorName] = useState("")
@@ -643,7 +642,7 @@ export default function DashboardPage() {
 
   const handleCreateFolder = async () => {
     if (!newFolderName.trim()) return undefined
-    const { data, error } = await createCalculatorFolder(newFolderName, newFolderColor)
+    const { data, error } = await createCalculatorFolder(newFolderName, "#0f766e")
     if (error) toast.error(error)
     else if (data) {
       setCalculatorFolders(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
@@ -1372,7 +1371,6 @@ export default function DashboardPage() {
                 </select>
                 <div className="flex gap-2">
                   <Input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} placeholder="Create new folder" className="h-9" />
-                  <input type="color" value={newFolderColor} onChange={e => setNewFolderColor(e.target.value)} className="h-9 w-10 rounded border border-input bg-background p-1" aria-label="New folder color" />
                   <Button type="button" variant="outline" size="sm" onClick={async () => { await handleCreateFolder(); }} disabled={!newFolderName.trim()}>Create</Button>
                 </div>
               </div>
@@ -1407,7 +1405,6 @@ export default function DashboardPage() {
         <aside className="w-80 max-w-[calc(100vw-2.75rem)] border border-border bg-background p-4 shadow-xl" aria-label="Saved calculators">
           <div className="mb-4 flex gap-2">
             <Input value={newFolderName} onChange={e => setNewFolderName(e.target.value)} onKeyDown={e => e.key === "Enter" && handleCreateFolder()} placeholder="New folder" className="h-9" />
-            <input type="color" value={newFolderColor} onChange={e => setNewFolderColor(e.target.value)} className="h-9 w-9 rounded border border-input bg-background p-1" aria-label="Folder color" />
             <Button size="icon" onClick={handleCreateFolder} aria-label="Create folder"><Plus className="h-4 w-4" /></Button>
           </div>
           <div className="flex items-center justify-between">
@@ -1418,10 +1415,8 @@ export default function DashboardPage() {
             {calculatorFolders.map(folder => (
               <section key={folder.id}>
   <div className="flex items-center gap-2">
-  <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: folder.color }} />
   {editingFolderId === folder.id ? <>
     <Input autoFocus defaultValue={folder.name} onBlur={async e => { const name = e.target.value.trim(); if (name && name !== folder.name) { const result = await updateCalculatorFolder(folder.id, { name }); if (result.error) toast.error(result.error); else setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, name } : item).sort((a, b) => a.name.localeCompare(b.name))) } setEditingFolderId(null) }} className="h-8 min-w-0 flex-1" aria-label={`Rename ${folder.name}`} />
-    <input type="color" value={folder.color} onChange={async e => { const color = e.target.value; setCalculatorFolders(prev => prev.map(item => item.id === folder.id ? { ...item, color } : item)); const result = await updateCalculatorFolder(folder.id, { color }); if (result.error) toast.error(result.error) }} className="h-7 w-7 shrink-0 rounded border border-input bg-background p-0.5" aria-label={`Recolor ${folder.name}`} />
   </> : <>
     <h3 className="min-w-0 flex-1 truncate text-sm font-medium">{folder.name}</h3>
     <Button type="button" variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => setEditingFolderId(folder.id)} aria-label={`Edit ${folder.name}`}><Pencil className="h-3.5 w-3.5" /></Button>
