@@ -780,7 +780,7 @@ function ScheduleModal({
               </select>
             </div>
 
-            {/* Editable package name + price — shown once a package is selected */}
+            {/* Editable package name + price �� shown once a package is selected */}
             {selectedPackage && (
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
@@ -1084,23 +1084,44 @@ export default function SavedQuotesPage() {
 
   const setSort = (key: typeof sortConfig.key) => setSortConfig(prev => ({ key, direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc" }))
 
-  const quoteToSendData = (q: SavedQuote): SendQuoteData => ({
-    quoteId: q.id,
-    quoteName: q.quote_name,
-    homeAddress: q.home_address,
-    clientName: q.client_name,
-    clientEmail: q.client_email,
-    clientPhone: q.client_phone,
-    generatedBy: q.quote_generated_by,
-    notes: q.notes,
-    resultStandard: q.result_standard,
-    resultDeepClean: q.result_deep_clean,
-    resultMoveIn: q.result_move_in,
-    resultMonthly: q.result_monthly,
-    resultBiweekly: q.result_biweekly,
-    resultWeekly: q.result_weekly,
-    createdAt: q.created_at,
-  })
+  const quoteToSendData = (q: SavedQuote): SendQuoteData => {
+    const packageKey = preferredPackages[q.id] || q.preferred_package || "standard"
+    const packageLabels: Record<string, string> = {
+      move: "Move In / Move Out",
+      deep: "Deep Clean",
+      standard: "Standard Clean",
+      monthly: "Monthly",
+      biweekly: "Bi-weekly",
+      weekly: "Weekly",
+    }
+    const checklist = q.checklist_data?.[packageKey as "standard" | "deep" | "move"]
+    return {
+      quoteId: q.id,
+      quoteName: q.quote_name,
+      selectedTier: packageLabels[packageKey] || q.quote_name,
+      homeAddress: q.home_address,
+      homeVariables: {
+        squareFootage: q.square_footage,
+        bedrooms: q.bedrooms,
+        bathrooms: q.bathrooms,
+        pets: q.pets,
+        children: q.children,
+      },
+      clientName: q.client_name,
+      clientEmail: q.client_email,
+      clientPhone: q.client_phone,
+      generatedBy: q.quote_generated_by,
+      notes: q.notes,
+      checklist: checklist?.length ? checklist : undefined,
+      resultStandard: q.result_standard,
+      resultDeepClean: q.result_deep_clean,
+      resultMoveIn: q.result_move_in,
+      resultMonthly: q.result_monthly,
+      resultBiweekly: q.result_biweekly,
+      resultWeekly: q.result_weekly,
+      createdAt: q.created_at,
+    }
+  }
 
   const handleExport = async (q: SavedQuote) => {
     await exportQuotePdf(quoteToSendData(q))
