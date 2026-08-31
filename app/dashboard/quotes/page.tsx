@@ -1252,9 +1252,9 @@ export default function SavedQuotesPage() {
             <div className="overflow-x-auto rounded-md border border-border">
               <div className="grid min-w-[980px] grid-cols-[1.1fr_1.7fr_1fr_1fr_0.8fr_1.5fr] items-center gap-3 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("client")}>Client name <span aria-hidden="true">{sortConfig.key === "client" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
-                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <span />
+                <div className="flex items-center gap-2"><button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button><span className="text-muted-foreground">/ Price</span></div>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>Quote date <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
-                <span>Price</span>
                 <span />
                 <span className="text-right">Actions</span>
               </div>
