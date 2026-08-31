@@ -58,6 +58,7 @@ function SaveQuoteModal({
   defaultSenderName,
   selectedTier,
   pricingSummary,
+  laborHours,
   initialClient,
 }: {
   open: boolean
@@ -66,6 +67,7 @@ function SaveQuoteModal({
   defaultSenderName: string | null
   selectedTier: string
   pricingSummary: { label: string; value: string }[]
+  laborHours: { label: string; value: string }[]
   initialClient?: { clientFirstName: string; clientLastName: string; clientEmail: string; clientPhone: string; address?: string }
 }) {
   const empty: SaveQuoteFields = { name: "", streetAddress: "", aptUnit: "", city: "", state: "", zip: "", notes: "", clientFirstName: initialClient?.clientFirstName ?? "", clientLastName: initialClient?.clientLastName ?? "", clientEmail: initialClient?.clientEmail ?? "", clientPhone: initialClient?.clientPhone ?? "", generatedBy: "" }
@@ -206,6 +208,10 @@ function SaveQuoteModal({
               <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Cleaning tier</p>
                 <p className="mt-1 font-semibold text-foreground">{selectedTier}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estimated labor hours</p>
+                <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">{laborHours.map(item => <div key={item.label}><span className="text-muted-foreground">{item.label}: </span><span className="font-medium text-foreground">{item.value}</span></div>)}</div>
               </div>
               <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Home details</p>
@@ -1187,8 +1193,11 @@ export default function DashboardPage() {
         defaultSenderName={defaultSenderName}
         selectedTier={priceCards.find(card => card.key === preferredPackage)?.label ?? "Selected cleaning service"}
         initialClient={selectedClientFields}
+        laborHours={[
+          { label: "1 cleaner", value: formatHours(priceCards.find(card => card.key === preferredPackage)?.hours ?? results?.totalHours ?? 0) },
+          { label: "2 cleaners", value: formatHours((priceCards.find(card => card.key === preferredPackage)?.hours ?? results?.totalHours ?? 0) / 2) },
+        ]}
         pricingSummary={[
-          { label: "Estimated labor", value: formatHours(priceCards.find(card => card.key === preferredPackage)?.hours ?? results.totalHours) },
           { label: "Sq ft", value: squareFootage || "—" },
           { label: "Clean level", value: cleanLevel || "—" },
           { label: "Beds", value: bedrooms || "—" },
