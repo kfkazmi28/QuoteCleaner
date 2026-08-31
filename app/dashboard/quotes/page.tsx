@@ -1157,9 +1157,6 @@ export default function SavedQuotesPage() {
               {loading ? "Loading..." : `${quotes.length} saved quote${quotes.length !== 1 ? "s" : ""}`}
             </p>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/dashboard">Back to Calculator</Link>
-          </Button>
         </div>
 
         {/* Tab-aware quote summary */}
