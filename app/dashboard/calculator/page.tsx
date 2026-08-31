@@ -861,7 +861,7 @@ export default function DashboardPage() {
             <div className="mb-10">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">Let&apos;s price this clean</h2>
-                {activeSavedCalculator && <div className="rounded-md bg-orange-500 px-3 py-1.5 text-sm font-bold text-white">Saved Calculator: {activeSavedCalculatorFolder ? `${activeSavedCalculatorFolder} > ` : ""}{activeSavedCalculator.replace(/\s*[/>&]+\s*/g, " > ")}</div>}
+                {activeSavedCalculator && <div className="text-sm font-semibold text-foreground">Saved Calculator: {activeSavedCalculatorFolder ? `${activeSavedCalculatorFolder} > ` : ""}{activeSavedCalculator.replace(/\s*[/>&]+\s*/g, " > ")}</div>}
               </div>
             </div>
             <div className="space-y-9">
