@@ -16,7 +16,7 @@ import { exportQuotePdf } from "@/lib/export-quote-pdf"
 import { COMPANY_NAME } from "@/lib/company-config"
 
 export interface SendQuoteData {
-  quoteId?: string | null; quoteName: string; homeAddress: string; clientName?: string | null; clientEmail?: string | null; clientPhone?: string | null; generatedBy?: string | null; notes?: string | null; resultStandard: number; resultDeepClean: number; resultMoveIn: number; resultMonthly: number; resultBiweekly: number; resultWeekly: number; createdAt?: string; estimatedHours?: number
+  quoteId?: string | null; quoteName: string; selectedTier?: string | null; tierDescription?: string | null; homeVariables?: { squareFootage?: string | number | null; bedrooms?: string | number | null; bathrooms?: string | number | null; pets?: string | number | null; children?: string | number | null }; homeAddress: string; clientName?: string | null; clientEmail?: string | null; clientPhone?: string | null; generatedBy?: string | null; notes?: string | null; resultStandard: number; resultDeepClean: number; resultMoveIn: number; resultMonthly: number; resultBiweekly: number; resultWeekly: number; createdAt?: string; estimatedHours?: number
 }
 interface Draft { clientName: string; clientEmail: string; clientPhone: string }
 const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n || 0)

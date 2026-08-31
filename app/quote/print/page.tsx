@@ -15,7 +15,9 @@ function PrintQuote() {
   const params = useSearchParams()
 
   const name      = params.get("name")      ?? "Quote"
+  const description = params.get("description") ?? "Professional cleaning service"
   const address   = params.get("address")   ?? ""
+  const homeVariables = JSON.parse(params.get("homeVariables") ?? "{}") as Record<string, string | number | null>
   const clientName   = params.get("clientName")
   const clientEmail  = params.get("clientEmail")
   const clientPhone  = params.get("clientPhone")
@@ -124,9 +126,8 @@ function PrintQuote() {
 
         {/* Quote title */}
         <h1 style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 4px" }}>{name}</h1>
-        <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 24px", display: "flex", alignItems: "center", gap: "4px" }}>
-          <span style={{ fontSize: "12px" }}>&#128205;</span> {address}
-        </p>
+        <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 6px" }}>{description}</p>
+        <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 24px" }}>{address}</p>
 
         <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "0 0 24px" }} />
 
@@ -144,9 +145,17 @@ function PrintQuote() {
           </div>
         )}
 
-        {/* Pricing */}
+        {/* Selected service and home variables */}
         <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>
-          Pricing Estimate
+          Selected Service
+        </div>
+        <div style={{ background: "#f0fdfa", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "20px" }}><strong style={{ fontSize: "16px" }}>{name}</strong><strong style={{ fontSize: "18px" }}>{fmt(parseFloat(params.get("price") ?? "0"))}</strong></div>
+          <p style={{ color: "#4b5563", fontSize: "13px", margin: "8px 0 0" }}>{description}</p>
+        </div>
+        <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>Home Details</div>
+        <div style={{ background: "#f8fafc", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
+          {Object.entries(homeVariables).filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => <InfoRow key={label} label={label.replace(/([A-Z])/g, " $1")} value={String(value)} />)}
         </div>
 
         {/* One-time */}
