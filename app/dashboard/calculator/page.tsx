@@ -1130,7 +1130,6 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-3 pt-2">
         <Button type="button" variant="outline" className="w-full justify-start" onClick={handleSaveQuote}><Bookmark className="mr-2 h-4 w-4" />Save Quote</Button>
         <Button type="button" variant="outline" className="w-full justify-start" onClick={handleSendQuote}>{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Send Quote</> : <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>}</Button>
-        <Button type="button" variant="outline" className="w-full justify-start" onClick={handleExportPdf}>{hasUnlimitedAccess ? <><FileDown className="mr-2 h-4 w-4" />Export PDF</> : <><Lock className="mr-2 h-4 w-4" />Export PDF (Pro)</>}</Button>
       </div>
       <DialogFooter>
         <Button type="button" variant="ghost" onClick={() => setShowQuoteActions(false)}>Close</Button>
