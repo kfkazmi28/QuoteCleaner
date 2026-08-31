@@ -181,7 +181,7 @@ export function SendQuoteModal({
               ))}
             </div>
           </section>
-          {method !== "pdf" ? (
+          {method !== "pdf" && (
             <section className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
@@ -237,8 +237,8 @@ export function SendQuoteModal({
                 )}
               </Button>
             </section>
-          ) : (
-            <section className="order-1 flex flex-col gap-4 rounded-xl border border-border p-4">
+          )}
+          <section className="order-1 flex flex-col gap-4 rounded-xl border border-border p-4">
               <div className="rounded-lg bg-muted/30 p-5">
                 <p className="text-sm text-muted-foreground">Create a professional quote PDF</p>
                 <p className="font-semibold text-primary">{COMPANY_NAME}</p>
@@ -265,8 +265,7 @@ export function SendQuoteModal({
                 <FileDown className="mr-2 h-4 w-4" />
                 Download PDF ↓
               </Button>
-            </section>
-          )}
+          </section>
         </div>
       </DialogContent>
     </Dialog>
