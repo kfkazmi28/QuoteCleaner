@@ -1288,9 +1288,9 @@ export default function SavedQuotesPage() {
               <div className="grid min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(100px,0.8fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("client")}>Client name <span aria-hidden="true">{sortConfig.key === "client" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <span aria-hidden="true" />
-                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning Type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("price")}>Price <span aria-hidden="true">{sortConfig.key === "price" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
-                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>{activeTab === "scheduled" ? "Cleaning Date" : "Quote date"} <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>{activeTab === "scheduled" ? "Cleaning Date" : "Quote Date"} <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <span className="text-right">Actions</span>
               </div>
             {displayQuotes.map(quote => (
