@@ -421,6 +421,7 @@ export default function DashboardPage() {
   const [showAddContact, setShowAddContact] = useState(false)
   const [selectedClient, setSelectedClient] = useState<ClientContact | null>(null)
   const [clientContacts, setClientContacts] = useState<ClientContact[]>([])
+  const [clientSearch, setClientSearch] = useState("")
   const selectedClientFields = selectedClient ? (() => { const [firstName, ...last] = selectedClient.name.split(" "); return { clientFirstName: firstName ?? "", clientLastName: last.join(" "), clientEmail: selectedClient.email ?? "", clientPhone: selectedClient.phone ?? "" } })() : undefined
   const [newContactName, setNewContactName] = useState("")
   const [newContactEmail, setNewContactEmail] = useState("")
@@ -1176,10 +1177,11 @@ export default function DashboardPage() {
   ]}
   />
 
-      <Dialog open={showClientPicker} onOpenChange={setShowClientPicker}>
+      <Dialog open={showClientPicker} onOpenChange={open => { setShowClientPicker(open); if (!open) setClientSearch("") }}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Choose a client</DialogTitle><DialogDescription>Select a contact to prefill the quote, or add a new client.</DialogDescription></DialogHeader>
-          <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">{clientContacts.length ? clientContacts.map(contact => <Button key={contact.id} type="button" variant="outline" className="h-auto justify-start py-3 text-left" onClick={() => { setSelectedClient(contact); setShowClientPicker(false); setShowSaveModal(true) }}><span><span className="block font-medium">{contact.name}</span><span className="block text-xs text-muted-foreground">{contact.email || contact.phone || "No contact details"}</span></span></Button>) : <p className="py-4 text-sm text-muted-foreground">No saved contacts yet.</p>}</div>
+          <DialogHeader><DialogTitle>Choose a client</DialogTitle><DialogDescription>Start typing a name to find a contact and prefill the quote.</DialogDescription></DialogHeader>
+          <Input autoFocus placeholder="Search clients by name..." value={clientSearch} onChange={event => setClientSearch(event.target.value)} aria-label="Search clients" />
+          <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">{clientContacts.filter(contact => contact.name.toLowerCase().includes(clientSearch.trim().toLowerCase())).length ? clientContacts.filter(contact => contact.name.toLowerCase().includes(clientSearch.trim().toLowerCase())).map(contact => <Button key={contact.id} type="button" variant="outline" className="h-auto justify-start py-3 text-left" onClick={() => { setSelectedClient(contact); setClientSearch(""); setShowClientPicker(false); setShowSaveModal(true) }}><span><span className="block font-medium">{contact.name}</span><span className="block text-xs text-muted-foreground">{contact.email || contact.phone || "No contact details"}</span></span></Button>) : <p className="py-4 text-sm text-muted-foreground">No matching contacts.</p>}</div>
           <DialogFooter><Button type="button" variant="outline" onClick={() => setShowAddContact(true)}>Add new contact</Button></DialogFooter>
         </DialogContent>
       </Dialog>
