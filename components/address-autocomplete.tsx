@@ -32,10 +32,14 @@ declare global {
 
 function loadGoogleMaps(apiKey: string): Promise<void> {
   return new Promise((resolve) => {
-    if (window.__mapsLoaded) { resolve(); return }
+    if (window.__mapsLoaded || window.google?.maps?.places) { window.__mapsLoaded = true; resolve(); return }
     if (!window.__mapsLoadCallbacks) window.__mapsLoadCallbacks = []
     window.__mapsLoadCallbacks.push(resolve)
-    if (document.querySelector('script[data-gm-places]')) return
+    const existing = document.querySelector('script[data-gm-places]')
+    if (existing) {
+      existing.addEventListener("load", () => { window.__mapsLoaded = true; window.__mapsLoadCallbacks?.forEach(cb => cb()); window.__mapsLoadCallbacks = [] }, { once: true })
+      return
+    }
     window.initGoogleMaps = () => {
       window.__mapsLoaded = true
       window.__mapsLoadCallbacks?.forEach(cb => cb())
@@ -117,6 +121,7 @@ export function AddressAutocomplete({ id, value, onChange, onSelectParts, placeh
     if (!apiKey) return
     loadGoogleMaps(apiKey).then(() => {
       serviceRef.current = new window.google.maps.places.AutocompleteService()
+      if (inputVal.length >= 3) fetchSuggestions(inputVal)
     })
   }, [apiKey])
 
