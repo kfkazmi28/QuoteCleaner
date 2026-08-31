@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { DashboardNav } from "@/components/dashboard-nav"
-import { usePricingSettings, defaultSettings } from "@/contexts/pricing-settings-context"
+import { usePricingSettings, defaultHomeDetails, defaultSettings } from "@/contexts/pricing-settings-context"
 import { Calculator, Sparkles, Lock, Info, Check, Bookmark, Send, FileDown, Pencil, Trash2, Plus, FolderOpen, ChevronDown, BookmarkPlus, MoreHorizontal } from "lucide-react"
 import { getSavedCalculators, getCalculatorFolders, createCalculatorFolder, updateCalculatorFolder, moveCalculator, saveCalculator, deleteCalculator, renameCalculator, type SavedCalculator, type CalculatorFolder } from "@/app/actions/calculators"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -440,6 +440,20 @@ export default function DashboardPage() {
 
   const searchParams = useSearchParams()
   const maxFreeQuotes = 3
+
+  // A calculator visit starts a fresh quote. This also clears persisted draft
+  // inputs when the user refreshes or navigates away and returns.
+  useEffect(() => {
+    if (!isLoaded) return
+    updateHomeDetails(defaultHomeDetails)
+    updateQuoteResults(null)
+    setSqftUnit("sqft")
+    setQuoteCity("")
+    setQuoteZip("")
+    setLocationQuery("")
+    setPreferredPackage(null)
+    setShowCompare(false)
+  }, [isLoaded])
 
   useEffect(() => {
     getClientContacts().then(setClientContacts)
