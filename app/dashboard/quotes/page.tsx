@@ -1229,11 +1229,11 @@ export default function SavedQuotesPage() {
             {filteredQuotes.map(quote => (
               <Card
                 key={quote.id}
-                className="flex w-full flex-row items-center transition-shadow hover:shadow-md cursor-pointer"
+                className="flex w-full min-w-0 flex-col overflow-hidden transition-shadow hover:shadow-md cursor-pointer"
                 onClick={() => setViewQuote(quote)}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
+                <CardHeader className="w-full min-w-0 pb-3">
+                  <div className="flex min-w-0 items-start justify-between gap-2">
                     <div className="flex flex-col gap-1 min-w-0">
                       {quote.client_name && <CardTitle className="text-base leading-snug">{quote.client_name}</CardTitle>}
                       {quote.home_address && <p className="truncate text-xs text-muted-foreground">{quote.home_address}</p>}
@@ -1358,7 +1358,7 @@ export default function SavedQuotesPage() {
                   </div>
                 </CardHeader>
 
-                <CardContent className="flex flex-1 flex-col gap-3">
+                <CardContent className="flex w-full min-w-0 flex-1 flex-col gap-3">
 
                   {/* Selected cleaning tier */}
                   {(() => {
