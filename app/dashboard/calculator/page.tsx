@@ -56,11 +56,15 @@ function SaveQuoteModal({
   onClose,
   onSave,
   defaultSenderName,
+  selectedTier,
+  pricingSummary,
 }: {
   open: boolean
   onClose: () => void
   onSave: (fields: SaveQuoteFields, saveAsDefault: boolean) => Promise<void>
   defaultSenderName: string | null
+  selectedTier: string
+  pricingSummary: { label: string; value: string }[]
 }) {
   const empty: SaveQuoteFields = { name: "", streetAddress: "", aptUnit: "", city: "", state: "", zip: "", notes: "", clientFirstName: "", clientLastName: "", clientEmail: "", clientPhone: "", generatedBy: "" }
   const [fields, setFields] = useState<SaveQuoteFields>(empty)
@@ -120,9 +124,9 @@ function SaveQuoteModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!fields.name.trim() || !fields.streetAddress.trim() || !fields.city.trim() || !fields.state.trim() || !fields.zip.trim()) return
+    if (!fields.streetAddress.trim() || !fields.city.trim() || !fields.state.trim() || !fields.zip.trim()) return
     setSaving(true)
-    await onSave({ ...fields, name: fields.name.trim() }, saveAsDefault)
+    await onSave({ ...fields, name: selectedTier }, saveAsDefault)
     setSaving(false)
   }
 
@@ -145,9 +149,13 @@ function SaveQuoteModal({
             {/* Quote Info */}
             <div className="flex flex-col gap-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary">Quote Info</p>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="sq-name">Quote Name <span className="text-destructive">*</span></Label>
-                <Input id="sq-name" placeholder="e.g. Smith House Deep Clean" value={fields.name} onChange={set("name")} required />
+              <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Cleaning tier</p>
+                <p className="mt-1 font-semibold text-foreground">{selectedTier}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Pricing details</p>
+                <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">{pricingSummary.map(item => <div key={item.label}><span className="text-muted-foreground">{item.label}: </span><span className="font-medium text-foreground">{item.value}</span></div>)}</div>
               </div>
               <div className="flex flex-col gap-3">
                 <p className="text-xs font-medium text-muted-foreground">Home Address <span className="text-destructive">*</span></p>
@@ -1158,6 +1166,15 @@ export default function DashboardPage() {
         onClose={() => setShowSaveModal(false)}
         onSave={handleSaveQuoteSubmit}
         defaultSenderName={defaultSenderName}
+        selectedTier={priceCards.find(card => card.key === preferredPackage)?.label ?? "Selected cleaning service"}
+        pricingSummary={[
+          { label: "Sq ft", value: squareFootage || "—" },
+          { label: "Clean level", value: cleanLevel || "—" },
+          { label: "Beds", value: bedrooms || "—" },
+          { label: "Baths", value: bathrooms || "—" },
+          { label: "Pets", value: pets || "0" },
+          { label: "Children", value: children || "0" },
+        ]}
       />
 
       <SendQuoteModal
