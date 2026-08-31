@@ -182,7 +182,7 @@ export function SendQuoteModal({
             </div>
           </section>
           {method !== "pdf" && (
-            <section className="flex flex-col gap-3">
+            <section className="order-3 flex flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
                   Message preview
