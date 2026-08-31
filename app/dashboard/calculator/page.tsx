@@ -1162,7 +1162,6 @@ export default function DashboardPage() {
   <DialogDescription>Your quote has been saved. What would you like to do next?</DialogDescription>
       </DialogHeader>
       <DialogFooter>
-  <Button type="button" variant="outline" onClick={() => { setShowSendPrompt(false); handleExportPdf() }}>{hasUnlimitedAccess ? "Download PDF" : "Download PDF (Pro)"}</Button>
   <Button type="button" onClick={() => { setShowSendPrompt(false); handleSendQuote() }}>{hasUnlimitedAccess ? <><Send className="mr-2 h-4 w-4" />Send Quote</> : <><Lock className="mr-2 h-4 w-4" />Send Quote (Pro)</>}</Button>
   <Button type="button" variant="ghost" onClick={() => setShowSendPrompt(false)}>Done</Button>
       </DialogFooter>
