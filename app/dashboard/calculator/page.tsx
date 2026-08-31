@@ -208,7 +208,7 @@ function SaveQuoteModal({
                 <p className="mt-1 font-semibold text-foreground">{selectedTier}</p>
               </div>
               <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Pricing details</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Home details</p>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">{pricingSummary.map(item => <div key={item.label}><span className="text-muted-foreground">{item.label}: </span><span className="font-medium text-foreground">{item.value}</span></div>)}</div>
               </div>
               <div className="flex flex-col gap-1.5">
@@ -1072,7 +1072,7 @@ export default function DashboardPage() {
                 ) : (
                   <>
                     <Calculator className="mr-2 h-4 w-4" />
-                    Generate my quote ��
+                    Generate my quote ���
                   </>
                 )}
               </Button>
