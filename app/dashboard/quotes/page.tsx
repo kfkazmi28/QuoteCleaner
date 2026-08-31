@@ -111,8 +111,8 @@ function formatCurrency(val: number) {
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
+    month: "2-digit",
+    day: "2-digit",
     year: "numeric",
   })
 }
@@ -1419,7 +1419,7 @@ export default function SavedQuotesPage() {
                   <div className="contents">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <CalendarIcon className="h-3 w-3 shrink-0" />
-                      Quoted on {formatDate(quote.created_at)}
+                      {formatDate(quote.created_at)}
                     </p>
                     {/* Completed tab: show when the cleaning happened */}
                     {activeTab === "completed" && (() => {
