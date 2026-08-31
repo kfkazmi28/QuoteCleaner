@@ -1305,20 +1305,7 @@ export default function SavedQuotesPage() {
                     <div className="flex flex-col gap-1 min-w-0">
                       {quote.client_name && <CardTitle className="text-base leading-snug">{quote.client_name}</CardTitle>}
                       {quote.home_address && <p className="truncate text-xs text-muted-foreground">{quote.home_address}</p>}
-                      {(scheduledQuoteIds.has(quote.id) || quote.status === "completed") && (() => {
-                        const event = scheduledEventsMap.get(quote.id)
-                        return (
-                          <div className="flex flex-col gap-1">
-                            {event && (
-                              <p className="text-[11px] text-muted-foreground">
-                                {new Date(event.scheduled_date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                                {event.start_time && ` at ${event.start_time.slice(0, 5)}`}
-                                {event.package_name && ` · ${event.package_name}`}
-                              </p>
-                            )}
-                          </div>
-                        )
-                      })()}
+
                     </div>
                     {/* Keep the row aligned with the table header's spacer column. */}
                     <span aria-hidden="true" />
