@@ -1250,9 +1250,12 @@ export default function SavedQuotesPage() {
         ) : (
           <div className="flex flex-col gap-3">
             <div className="overflow-x-auto rounded-md border border-border">
-              <div className="grid min-w-[980px] grid-cols-[1.1fr_1.7fr_1fr_1fr_0.8fr_1.5fr] items-center gap-3 bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {([['client', 'Client name'], ['cleaning', 'Cleaning type'], ['date', 'Quote date'], ['price', 'Price']] as const).map(([key, label]) => <div key={key} className="flex flex-col gap-2"><button type="button" className="flex items-center gap-1 text-left hover:text-foreground" onClick={() => setSort(key)}>{label}<span aria-hidden="true">{sortConfig.key === key ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button><Input value={columnFilters[key]} onChange={e => setColumnFilters(prev => ({ ...prev, [key]: e.target.value }))} placeholder="Filter" className="h-7 bg-background text-xs font-normal normal-case tracking-normal" /></div>)}
-                <div className="flex flex-col gap-2"><button type="button" className="flex items-center gap-1 text-left hover:text-foreground" onClick={() => setSort("address")}>Address<span aria-hidden="true">{sortConfig.key === "address" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button><span className="h-7 text-xs font-normal normal-case tracking-normal text-muted-foreground">No filter</span></div>
+              <div className="grid min-w-[980px] grid-cols-[1.1fr_1.7fr_1fr_1fr_0.8fr_1.5fr] items-center gap-3 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("client")}>Client name <span aria-hidden="true">{sortConfig.key === "client" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>Quote date <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <span>Price</span>
+                <span />
                 <span className="text-right">Actions</span>
               </div>
             {displayQuotes.map(quote => (
