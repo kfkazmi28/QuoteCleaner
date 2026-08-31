@@ -1330,20 +1330,6 @@ export default function SavedQuotesPage() {
                     </div>
                     {/* Keep the row aligned with the table header's spacer column. */}
                     <span aria-hidden="true" />
-                    {activeTab === "open" && (
-                      <input
-                        type="checkbox"
-                        aria-label={`Select ${quote.client_name || quote.quote_name}`}
-                        checked={selectedQuoteIds.has(quote.id)}
-                        onChange={() => setSelectedQuoteIds(prev => {
-                          const next = new Set(prev)
-                          next.has(quote.id) ? next.delete(quote.id) : next.add(quote.id)
-                          return next
-                        })}
-                        onClick={e => e.stopPropagation()}
-                        className="h-4 w-4 rounded border-input accent-primary"
-                      />
-                    )}
                     {/* Stop propagation so card click doesn't fire */}
                     <div className="hidden" onClick={e => e.stopPropagation()}>
                       <DropdownMenu>
@@ -1485,6 +1471,20 @@ export default function SavedQuotesPage() {
                       >
                         <Eye className="mr-1 h-3 w-3" />View
                       </Button>
+                      {activeTab === "open" && (
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${quote.client_name || quote.quote_name}`}
+                          checked={selectedQuoteIds.has(quote.id)}
+                          onChange={() => setSelectedQuoteIds(prev => {
+                            const next = new Set(prev)
+                            next.has(quote.id) ? next.delete(quote.id) : next.add(quote.id)
+                            return next
+                          })}
+                          onClick={e => e.stopPropagation()}
+                          className="ml-1 h-4 w-4 rounded border-input accent-primary"
+                        />
+                      )}
                     </div>
                   </div>
                 </CardContent>
