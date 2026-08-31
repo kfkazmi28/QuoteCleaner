@@ -1250,17 +1250,18 @@ export default function SavedQuotesPage() {
         ) : (
           <div className="flex flex-col gap-3">
             <div className="overflow-x-auto rounded-md border border-border">
-              <div className="grid min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <div className="grid min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(100px,0.8fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 border-b border-border bg-muted/50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("client")}>Client name <span aria-hidden="true">{sortConfig.key === "client" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <span aria-hidden="true" />
-                <div className="flex items-center gap-2"><button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button><span className="text-muted-foreground">/ Price</span></div>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("cleaning")}>Cleaning type <span aria-hidden="true">{sortConfig.key === "cleaning" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
+                <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("price")}>Price <span aria-hidden="true">{sortConfig.key === "price" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <button type="button" className="text-left hover:text-foreground" onClick={() => setSort("date")}>Quote date <span aria-hidden="true">{sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}</span></button>
                 <span className="text-right">Actions</span>
               </div>
             {displayQuotes.map(quote => (
               <Card
                 key={quote.id}
-                className="grid w-full min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 rounded-none border-0 border-b border-border bg-background px-4 py-3 shadow-none transition-colors hover:bg-muted/30 cursor-pointer"
+                className="grid w-full min-w-[980px] grid-cols-[minmax(220px,2fr)_40px_minmax(190px,1.5fr)_minmax(100px,0.8fr)_minmax(150px,1fr)_minmax(300px,2fr)] items-center gap-3 rounded-none border-0 border-b border-border bg-background px-4 py-3 shadow-none transition-colors hover:bg-muted/30 cursor-pointer"
                 onClick={() => setViewQuote(quote)}
               >
                 <CardHeader className="contents">
@@ -1403,11 +1404,9 @@ export default function SavedQuotesPage() {
                       weekly: { label: "Weekly", price: quote.result_weekly },
                     }[selectedKey as "move" | "deep" | "standard" | "monthly" | "biweekly" | "weekly"]
                     return (
-                      <div className="min-w-0" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between gap-4">
-                          <span className="text-base font-medium text-foreground">{selectedPackage?.label}</span>
-                          <span className="text-lg font-semibold text-primary">{formatCurrency(selectedPackage?.price)}</span>
-                        </div>
+                      <div className="contents" onClick={e => e.stopPropagation()}>
+                        <span className="min-w-0 text-base font-medium text-foreground">{selectedPackage?.label}</span>
+                        <span className="text-lg font-semibold text-primary">{formatCurrency(selectedPackage?.price)}</span>
                       </div>
                     )
                   })()}
