@@ -7,9 +7,11 @@ import type { SendQuoteData } from "@/components/send-quote-modal"
 export function exportQuotePdf(data: SendQuoteData): void {
   const params = new URLSearchParams()
 
-  params.set("name", data.selectedTier || data.quoteName || "Quote")
+  const selectedName = data.selectedTier || data.quoteName || "Quote"
+  const selectedKey = selectedName.toLowerCase()
+  params.set("name", selectedName)
   params.set("description", data.tierDescription || "Professional cleaning service")
-  const selectedPrice = data.quoteName.toLowerCase().includes("deep") ? data.resultDeepClean : data.quoteName.toLowerCase().includes("move") ? data.resultMoveIn : data.quoteName.toLowerCase().includes("monthly") ? data.resultMonthly : data.quoteName.toLowerCase().includes("bi") ? data.resultBiweekly : data.quoteName.toLowerCase().includes("weekly") ? data.resultWeekly : data.resultStandard
+  const selectedPrice = selectedKey.includes("deep") ? data.resultDeepClean : selectedKey.includes("move") ? data.resultMoveIn : selectedKey.includes("monthly") ? data.resultMonthly : selectedKey.includes("bi") ? data.resultBiweekly : selectedKey.includes("weekly") ? data.resultWeekly : data.resultStandard
   params.set("price", String(selectedPrice ?? 0))
   params.set("address", data.homeAddress ?? "")
   if (data.homeVariables) params.set("homeVariables", JSON.stringify(data.homeVariables))

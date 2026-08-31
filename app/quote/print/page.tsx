@@ -129,12 +129,6 @@ function PrintQuote() {
 
         {/* Quote title */}
         {(clientName || clientEmail || clientPhone || address) && <Section title="Client and Address"><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}>{clientName && <InfoRow label="Name" value={clientName} />}{clientEmail && <InfoRow label="Email" value={clientEmail} />}{clientPhone && <InfoRow label="Phone" value={clientPhone} />}{address && <InfoRow label="Address" value={address} />}</div></Section>}
-        <h1 style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 4px" }}>{name}</h1>
-        <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 6px" }}>{description}</p>
-        <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 24px" }}>{address}</p>
-
-        <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "0 0 24px" }} />
-
         {/* Selected service and home variables */}
         <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>
           Selected Service
@@ -143,32 +137,19 @@ function PrintQuote() {
           <div style={{ display: "flex", justifyContent: "space-between", gap: "20px" }}><strong style={{ fontSize: "16px" }}>{name}</strong><strong style={{ fontSize: "18px" }}>{fmt(parseFloat(params.get("price") ?? "0"))}</strong></div>
           <p style={{ color: "#4b5563", fontSize: "13px", margin: "8px 0 0" }}>{description}</p>
         </div>
-        <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>Home Details</div>
+        {Object.keys(homeVariables).length > 0 && <><div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>Home Details</div>
         <div style={{ background: "#f8fafc", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
-          {Object.entries(homeVariables)
-.filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => <InfoRow key={label} label={label.replace(/([A-Z])/g, " $1")} value={String(value)} />)}
-        </div>
+          {Object.entries(homeVariables).filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => <InfoRow key={label} label={label.replace(/([A-Z])/g, " $1")} value={String(value)} />)}
+        </div></>}
 
         <Section title="Estimated Labor Hours"><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}><InfoRow label="1 cleaner" value={formatHours(laborOne)} /><InfoRow label="2 cleaners" value={formatHours(laborTwo)} /></div></Section>
 
-        {/* One-time */}
-        <div style={{ background: "#f8fafc", borderRadius: "8px", padding: "16px 20px", marginBottom: "12px" }}>
+        {/* Selected service pricing */}
+        <div style={{ background: "#f0fdfa", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
           <div style={{ fontSize: "10px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "12px" }}>
             One-Time Services
           </div>
-          <PriceRow label="Standard Clean"      value={fmt(standard)} />
-          <PriceRow label="Deep Clean"           value={fmt(deep)} />
-          <PriceRow label="Move In / Move Out"   value={fmt(movein)} last />
-        </div>
-
-        {/* Recurring */}
-        <div style={{ background: "#f0fdfa", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, color: "#0d9488", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "12px" }}>
-            Recurring Services (per visit)
-          </div>
-          <PriceRow label="Monthly"   value={fmt(monthly)} />
-          <PriceRow label="Bi-Weekly" value={fmt(biweekly)} />
-          <PriceRow label="Weekly"    value={fmt(weekly)} last />
+          <PriceRow label={name} value={fmt(parseFloat(params.get("price") ?? "0"))} last />
         </div>
 
         {/* Notes */}

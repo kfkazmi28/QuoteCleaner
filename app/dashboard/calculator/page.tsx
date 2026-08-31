@@ -751,13 +751,17 @@ export default function DashboardPage() {
   const getSendQuoteData = (): SendQuoteData | null => {
     if (!results) return null
     return {
-      quoteName: "Quick Quote",
-      homeAddress: squareFootage ? `${squareFootage} ${sqftUnit === "sqft" ? "sq ft" : "m²"} home` : "Your Home",
-      clientName: null,
-      clientEmail: null,
-      clientPhone: null,
+      quoteName: priceCards.find(card => card.key === preferredPackage)?.label || "Quote",
+      selectedTier: priceCards.find(card => card.key === preferredPackage)?.label || "Quote",
+      tierDescription: priceCards.find(card => card.key === preferredPackage)?.subtitle || "Professional cleaning service",
+      homeAddress: selectedClient?.address || "",
+      homeVariables: { squareFootage, bedrooms, bathrooms, pets, children },
+      clientName: selectedClient?.name || null,
+      clientEmail: selectedClient?.email || null,
+      clientPhone: selectedClient?.phone || null,
       generatedBy: defaultSenderName,
       notes: null,
+      estimatedHours: priceCards.find(card => card.key === preferredPackage)?.hours ?? results.totalHours,
       resultStandard: results.standardSingle,
       resultDeepClean: results.deepClean,
       resultMoveIn: results.moveInMoveOut,
