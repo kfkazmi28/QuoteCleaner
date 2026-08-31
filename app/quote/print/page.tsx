@@ -31,6 +31,9 @@ function PrintQuote() {
   const monthly   = parseFloat(params.get("monthly")   ?? "0")
   const biweekly  = parseFloat(params.get("biweekly")  ?? "0")
   const weekly    = parseFloat(params.get("weekly")    ?? "0")
+  const laborOne  = parseFloat(params.get("laborOne") ?? "0")
+  const laborTwo  = parseFloat(params.get("laborTwo") ?? "0")
+  const formatHours = (hours: number) => `${Math.floor(hours)} hr${Math.floor(hours) === 1 ? "" : "s"}${Math.round((hours % 1) * 60) ? ` ${Math.round((hours % 1) * 60)} min` : ""}`
 
   const dateStr = dateRaw
     ? new Date(dateRaw).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
@@ -125,25 +128,12 @@ function PrintQuote() {
         </div>
 
         {/* Quote title */}
+        {(clientName || clientEmail || clientPhone || address) && <Section title="Client and Address"><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}>{clientName && <InfoRow label="Name" value={clientName} />}{clientEmail && <InfoRow label="Email" value={clientEmail} />}{clientPhone && <InfoRow label="Phone" value={clientPhone} />}{address && <InfoRow label="Address" value={address} />}</div></Section>}
         <h1 style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 4px" }}>{name}</h1>
         <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 6px" }}>{description}</p>
         <p style={{ color: "#6b7280", fontSize: "13px", margin: "0 0 24px" }}>{address}</p>
 
         <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "0 0 24px" }} />
-
-        {/* Client info */}
-        {(clientName || clientEmail || clientPhone) && (
-          <div style={{ marginBottom: "24px" }}>
-            <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "10px" }}>
-              Client Info
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}>
-              {clientName  && <InfoRow label="Name"  value={clientName} />}
-              {clientEmail && <InfoRow label="Email" value={clientEmail} />}
-              {clientPhone && <InfoRow label="Phone" value={clientPhone} />}
-            </div>
-          </div>
-        )}
 
         {/* Selected service and home variables */}
         <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>
@@ -155,8 +145,11 @@ function PrintQuote() {
         </div>
         <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "12px" }}>Home Details</div>
         <div style={{ background: "#f8fafc", borderRadius: "8px", padding: "16px 20px", marginBottom: "24px" }}>
-          {Object.entries(homeVariables).filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => <InfoRow key={label} label={label.replace(/([A-Z])/g, " $1")} value={String(value)} />)}
+          {Object.entries(homeVariables)
+.filter(([, value]) => value !== null && value !== undefined && value !== "").map(([label, value]) => <InfoRow key={label} label={label.replace(/([A-Z])/g, " $1")} value={String(value)} />)}
         </div>
+
+        <Section title="Estimated Labor Hours"><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 24px" }}><InfoRow label="1 cleaner" value={formatHours(laborOne)} /><InfoRow label="2 cleaners" value={formatHours(laborTwo)} /></div></Section>
 
         {/* One-time */}
         <div style={{ background: "#f8fafc", borderRadius: "8px", padding: "16px 20px", marginBottom: "12px" }}>
@@ -199,6 +192,10 @@ function PrintQuote() {
       </div>
     </>
   )
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return <div style={{ marginBottom: "24px" }}><div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: "#0d9488", textTransform: "uppercase", marginBottom: "10px" }}>{title}</div><div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "16px 20px" }}>{children}</div></div>
 }
 
 function PriceRow({ label, value, last }: { label: string; value: string; last?: boolean }) {
