@@ -932,7 +932,7 @@ export default function SavedQuotesPage() {
   const [scheduleQuote, setScheduleQuote] = useState<SavedQuote | null>(null)
   const [scheduledQuoteIds, setScheduledQuoteIds] = useState<Set<string>>(new Set())
   const [scheduledEventsMap, setScheduledEventsMap] = useState<Map<string, ScheduledEventInfo>>(new Map())
-  const [activeTab, setActiveTab] = useState<"open" | "scheduled" | "completed" | "archived">("open")
+  const [activeTab, setActiveTab] = useState<"open" | "scheduled" | "completed">("open")
   const [isPending, startTransition] = useTransition()
   const [statusColumnReady, setStatusColumnReady] = useState<boolean | null>(null)
   const [checklistModalQuote, setChecklistModalQuote] = useState<SavedQuote | null>(null)
@@ -1045,12 +1045,9 @@ export default function SavedQuotesPage() {
   const completedQuotes = quotes.filter(q =>
     !q.archived && (q.status === "completed" || (scheduledQuoteIds.has(q.id) && isAppointmentPast(q.id)))
   )
-  const archivedQuotes = quotes.filter(q => q.archived)
-
   const filteredQuotes = activeTab === "open" ? openQuotes
-    : activeTab === "scheduled" ? scheduledQuotes
-    : activeTab === "completed" ? completedQuotes
-    : archivedQuotes
+  : activeTab === "scheduled" ? scheduledQuotes
+  : completedQuotes
 
   const displayQuotes = useMemo(() => {
     const selectedPrice = (q: SavedQuote) => {
@@ -1217,17 +1214,6 @@ export default function SavedQuotesPage() {
             Completed
             {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({completedQuotes.length})</span>}
           </button>
-          <button
-            onClick={() => setActiveTab("archived")}
-            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === "archived"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Archived
-            {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({archivedQuotes.length})</span>}
-          </button>
         </div>
 
         {/* Content */}
@@ -1250,9 +1236,7 @@ export default function SavedQuotesPage() {
           <Card className="flex min-h-[320px] flex-col items-center justify-center border-dashed text-center">
             <CardContent className="flex flex-col items-center gap-3 pt-10">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-                {activeTab === "archived" ? (
-                  <Archive className="h-7 w-7 text-muted-foreground" />
-                ) : activeTab === "scheduled" ? (
+                {activeTab === "scheduled" ? (
                   <CalendarCheck className="h-7 w-7 text-muted-foreground" />
                 ) : activeTab === "completed" ? (
                   <CheckCircle2 className="h-7 w-7 text-muted-foreground" />
@@ -1261,15 +1245,12 @@ export default function SavedQuotesPage() {
                 )}
               </div>
               <p className="text-base font-medium text-foreground">
-                {activeTab === "archived" ? "No archived quotes"
-                  : activeTab === "scheduled" ? "No scheduled quotes"
+{activeTab === "scheduled" ? "No scheduled quotes"
                   : activeTab === "completed" ? "No completed quotes"
                   : "No open quotes"}
               </p>
               <p className="max-w-xs text-sm text-muted-foreground">
-                {activeTab === "archived"
-                  ? "Archived quotes will appear here."
-                  : activeTab === "scheduled"
+{activeTab === "scheduled"
                   ? "Schedule a job from an open quote to see it here."
                   : activeTab === "completed"
                   ? "Quotes are moved here automatically once their appointment date has passed, or when marked as completed."
