@@ -1070,11 +1070,12 @@ export default function DashboardPage() {
                     return (
                       <button
                         type="button"
-                        onClick={() => {
-                          resetToDefaults()
-                          updateQuoteResults(null)
-                          toast.success("Pricing settings reset")
-                        }}
+              onClick={() => {
+                resetToDefaults()
+                setActiveSavedCalculator(null)
+                updateQuoteResults(null)
+                toast.success("Pricing settings reset")
+              }}
                         className="text-xs text-destructive/80 hover:text-destructive hover:underline"
                       >
                         Clear Active Pricing Settings
