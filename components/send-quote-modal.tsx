@@ -141,9 +141,6 @@ export function SendQuoteModal({
         <DialogHeader className="border-b border-border px-6 py-6">
           <DialogTitle className="text-2xl">Share Quote</DialogTitle>
           <DialogDescription>
-            <span className="font-medium text-foreground">
-              {data.quoteName} · {money(selectedPrice)}
-            </span>
             <span className="sr-only">Quote sharing options</span>
           </DialogDescription>
         </DialogHeader>
