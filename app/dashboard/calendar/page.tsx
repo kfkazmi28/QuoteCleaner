@@ -326,17 +326,6 @@ export default function CalendarPage() {
                 <Button key={mode} variant="ghost" size="sm" onClick={() => setCalendarView(mode)} className={cn("h-7 px-2.5 text-xs capitalize", calendarView === mode && "bg-background shadow-sm text-foreground")}>{mode}</Button>
               ))}
             </div>
-            <div className="flex items-center gap-1">
-              <Button variant="outline" size="icon" onClick={prevMonth} aria-label="Previous month">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="min-w-[140px] text-center text-sm font-semibold text-foreground">
-                {MONTHS[month - 1]} {year}
-              </span>
-              <Button variant="outline" size="icon" onClick={nextMonth} aria-label="Next month">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
             <Button onClick={() => openNewAppt()} className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Plus className="mr-1.5 h-4 w-4" />
               Add Appointment
@@ -464,8 +453,20 @@ export default function CalendarPage() {
 
       {/* Calendar grid */}
       {view === "calendar" && <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm">
-        <div className="border-b border-border bg-muted/20 px-4 py-3 text-sm font-semibold text-foreground">
-          {calendarView === "month" ? `${MONTHS[month - 1]} ${year}` : calendarView === "week" ? "Week schedule" : "Day schedule"}
+        <div className="flex items-center border-b border-border bg-muted/20 px-4 py-2.5">
+          {calendarView === "month" ? (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={prevMonth} aria-label="Previous month">
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[140px] text-center text-sm font-semibold text-foreground">{MONTHS[month - 1]} {year}</span>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={nextMonth} aria-label="Next month">
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <span className="text-sm font-semibold text-foreground">{calendarView === "week" ? "Week schedule" : "Day schedule"}</span>
+          )}
         </div>
         {/* Day headers */}
         <div className={cn("grid border-b border-border bg-muted/30", calendarView === "day" ? "grid-cols-1" : "grid-cols-7")}>
