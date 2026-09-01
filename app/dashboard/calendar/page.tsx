@@ -512,9 +512,9 @@ export default function CalendarPage() {
                         }}
                         className={cn(
                           "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                          "mt-3 whitespace-normal break-words rounded-xl border px-2.5 py-2 text-xs font-medium leading-tight shadow-sm",
+                          "mt-3 whitespace-normal break-words rounded-xl border px-2.5 py-2 text-xs font-medium leading-tight shadow-sm transition-colors hover:border-primary hover:bg-primary/20",
                           ev.event_type === "manual"
-                            ? "border-border bg-muted/70 text-muted-foreground"
+                            ? "border-border bg-muted/70 text-muted-foreground hover:text-foreground"
                             : "border-primary/20 bg-primary/10 text-primary"
                         )}
                       >
