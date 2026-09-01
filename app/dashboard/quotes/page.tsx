@@ -781,8 +781,8 @@ function ScheduleModal({
                   <div className="rounded-xl border border-border bg-muted/35 p-4">
               <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
               <div className="flex flex-col gap-2">
-                <div className="w-full rounded-xl border border-border bg-background p-2">
-                  <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
+                <div className="w-full rounded-xl border border-brand-pink/40 bg-brand-pink/10 p-2">
+                  <div className="w-full overflow-hidden rounded-xl border border-brand-pink/40 bg-brand-pink/10">
                     <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
                       <Button type="button" variant="ghost" size="icon" onClick={() => setPickerMonth(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() - 1, 1))} aria-label="Previous month">‹</Button>
                       <p className="font-semibold">{pickerMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p>
