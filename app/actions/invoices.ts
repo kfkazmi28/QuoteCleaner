@@ -23,6 +23,9 @@ export interface Invoice {
   paid_at: string | null
   created_at: string
   updated_at: string
+  payment_method: string | null
+  payment_recorded_at: string | null
+  payment_reference: string | null
 }
 
 export interface CreateInvoiceInput {
@@ -233,8 +236,55 @@ export async function markInvoiceSent(invoiceId: string): Promise<{ error?: stri
   return updateInvoice(invoiceId, { status: "sent" })
 }
 
-export async function cancelInvoice(invoiceId: string): Promise<{ error?: string }> {
-  return updateInvoice(invoiceId, { status: "canceled" })
+export async function recordManualPayment(invoiceId: string, paymentMethod: string, amountPaid: number, paymentReference?: string): Promise<{ data?: Invoice; error?: string }> {
+  if (!paymentMethod.trim() || !Number.isFinite(amountPaid) || amountPaid <= 0) return { error: "Enter a valid payment method and amount" }
+  if (paymentMethod === "Check" && !paymentReference?.trim()) return { error: "Enter the check reference number" }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+  const { data, error } = await supabase
+    .from("invoices")
+    .update({ status: "paid", amount_due: 0, paid_at: new Date().toISOString(), payment_method: paymentMethod.trim(), payment_reference: paymentReference?.trim() || null, payment_recorded_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq("id", invoiceId)
+    .eq("user_id", user.id)
+    .neq("status", "paid")
+    .select()
+    .single()
+  if (error) return { error: error.message }
+  return { data: data as Invoice }
+}
+
+export async function updatePaymentMethod(invoiceId: string, paymentMethod: string, paymentReference?: string): Promise<{ data?: Invoice; error?: string }> {
+  if (!paymentMethod.trim()) return { error: "Enter a payment method" }
+  if (paymentMethod === "Check" && !paymentReference?.trim()) return { error: "Enter the check reference number" }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+  const { data, error } = await supabase
+    .from("invoices")
+    .update({ payment_method: paymentMethod.trim(), payment_reference: paymentReference?.trim() || null, updated_at: new Date().toISOString() })
+    .eq("id", invoiceId)
+    .eq("user_id", user.id)
+    .eq("status", "paid")
+    .select()
+    .single()
+  if (error) return { error: error.message }
+  return { data: data as Invoice }
+}
+
+export async function deleteInvoice(invoiceId: string): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+
+  const { error } = await supabase
+    .from("invoices")
+    .delete()
+    .eq("id", invoiceId)
+    .eq("user_id", user.id)
+
+  if (error) return { error: error.message }
+  return {}
 }
 
 export async function checkInvoicesTableExists(): Promise<boolean> {

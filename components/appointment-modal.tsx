@@ -28,6 +28,7 @@ interface AppointmentModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   defaultDate?: string // YYYY-MM-DD
+  initialQuote?: SavedQuoteSearchResult | null
   onCreated: () => void
 }
 
@@ -76,7 +77,7 @@ function addMinutes(time: string, minutes: number): string {
   return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`
 }
 
-export function AppointmentModal({ open, onOpenChange, defaultDate, onCreated }: AppointmentModalProps) {
+export function AppointmentModal({ open, onOpenChange, defaultDate, initialQuote, onCreated }: AppointmentModalProps) {
   // Client info
   const [clientName, setClientName] = useState("")
   const [clientEmail, setClientEmail] = useState("")
@@ -114,8 +115,16 @@ export function AppointmentModal({ open, onOpenChange, defaultDate, onCreated }:
       setClientPhone("")
       setQuoteSearch("")
       setQuoteResults([])
-      setSelectedQuote(null)
+      setSelectedQuote(initialQuote ?? null)
       setSkipQuote(false)
+      if (initialQuote) {
+        setQuoteSearch(initialQuote.quote_name ?? initialQuote.client_name ?? "")
+        setClientName(initialQuote.client_name ?? "")
+        setClientEmail(initialQuote.client_email ?? "")
+        setClientPhone(initialQuote.client_phone ?? "")
+        setServiceType(initialQuote.preferred_package ?? "")
+        setNotes(initialQuote.notes ?? "")
+      }
       setDate(defaultDate ?? "")
       setStartTime("09:00")
       setDuration("120")
@@ -127,7 +136,7 @@ export function AppointmentModal({ open, onOpenChange, defaultDate, onCreated }:
       setRecurrenceOccurrences("")
       setRecurrenceEndMode("occurrences")
     }
-  }, [open, defaultDate])
+  }, [open, defaultDate, initialQuote])
 
   // Live quote search
   useEffect(() => {

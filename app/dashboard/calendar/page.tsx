@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useSearchParams } from "next/navigation"
 import { ChevronLeft, ChevronRight, CalendarDays, Clock, Trash2, MapPin, User, Plus, LinkIcon, Filter, X, RefreshCcw, Sparkles, Home, Check, DollarSign, TrendingUp, Users, BarChart3, ClipboardList, ExternalLink, FileText, Pencil, Receipt, List, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { getCalendarEvents, deleteCalendarEvent, updateCalendarEvent, type CalendarEvent } from "@/app/actions/calendar"
+import { getSavedQuoteById, getCalendarEvents, deleteCalendarEvent, updateCalendarEvent, type CalendarEvent, type SavedQuoteSearchResult } from "@/app/actions/calendar"
 import { upsertInvoiceForEvent, getInvoicesByQuoteIds, type Invoice } from "@/app/actions/invoices"
 import { getEmployeeContacts } from "@/app/actions/contacts"
 import { getClientContacts } from "@/app/actions/contacts"
@@ -46,6 +47,7 @@ function fmtDate(date: string) {
 }
 
 export default function CalendarPage() {
+  const searchParams = useSearchParams()
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth() + 1) // 1-based
@@ -55,12 +57,16 @@ export default function CalendarPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [apptModalOpen, setApptModalOpen] = useState(false)
   const [apptDefaultDate, setApptDefaultDate] = useState<string | undefined>(undefined)
+  const [preloadedQuote, setPreloadedQuote] = useState<SavedQuoteSearchResult | null>(null)
+  const [quoteLoadError, setQuoteLoadError] = useState<string | null>(null)
   const [viewingEvent, setViewingEvent] = useState<CalendarEvent | null>(null)
   const [editingPackage, setEditingPackage] = useState(false)
   const [editPackageName, setEditPackageName] = useState("")
   const [editPackagePrice, setEditPackagePrice] = useState("")
   const [savingPackage, setSavingPackage] = useState(false)
+  const [savingCleaner, setSavingCleaner] = useState(false)
   const [view, setView] = useState<"calendar" | "invoice-list">("calendar")
+  const [calendarView, setCalendarView] = useState<"month" | "week" | "day">("month")
   const [invoicesByEventId, setInvoicesByEventId] = useState<Record<string, Invoice>>({})
 
   // Filters
@@ -101,6 +107,22 @@ export default function CalendarPage() {
   }, [year, month])
 
   useEffect(() => { load() }, [load])
+
+  useEffect(() => {
+    const quoteId = searchParams.get("quoteId")
+    if (!quoteId) return
+    let cancelled = false
+    getSavedQuoteById(quoteId).then((quote) => {
+      if (cancelled) return
+      if (!quote) {
+        setQuoteLoadError("Saved quote could not be found. No appointment was opened.")
+        return
+      }
+      setPreloadedQuote(quote)
+      setApptModalOpen(true)
+    })
+    return () => { cancelled = true }
+  }, [searchParams])
 
   // Filter events
   const filteredEvents = events.filter(ev => {
@@ -154,12 +176,22 @@ export default function CalendarPage() {
   // Build grid
   const firstDay = new Date(year, month - 1, 1).getDay()
   const daysInMonth = new Date(year, month, 0).getDate()
-  const cells: (number | null)[] = [
+  let cells: (number | null)[] = [
     ...Array(firstDay).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ]
-  // Pad to full weeks
-  while (cells.length % 7 !== 0) cells.push(null)
+  // Month shows the full month; week and day focus the current date range.
+  if (calendarView === "day") {
+    const focusedDay = today.getFullYear() === year && today.getMonth() + 1 === month ? today.getDate() : 1
+    cells = [focusedDay]
+  } else if (calendarView === "week") {
+    const focusedDay = today.getFullYear() === year && today.getMonth() + 1 === month ? today.getDate() : 1
+    const weekStart = Math.max(1, focusedDay - new Date(year, month - 1, focusedDay).getDay())
+    cells = Array.from({ length: 7 }, (_, index) => weekStart + index <= daysInMonth ? weekStart + index : null)
+  } else {
+    // Pad the month to complete calendar rows.
+    while (cells.length % 7 !== 0) cells.push(null)
+  }
 
   const eventsByDay = new Map<number, CalendarEvent[]>()
   for (const ev of filteredEvents) {
@@ -218,6 +250,19 @@ export default function CalendarPage() {
     setSavingPackage(false)
   }
 
+  async function handleAssignCleaner(eventId: string, cleanerId: string) {
+    setSavingCleaner(true)
+    const { error } = await updateCalendarEvent(eventId, { cleaner_id: cleanerId || undefined, cleaner_ids: cleanerId ? [cleanerId] : [] })
+    if (error) toast.error("Failed to assign cleaner")
+    else {
+      const cleaner = employees.find((employee) => employee.id === cleanerId)
+      if (viewingEvent?.id === eventId) setViewingEvent({ ...viewingEvent, cleaner_id: cleanerId || null, cleaner_ids: cleanerId ? [cleanerId] : [], })
+      toast.success(cleaner ? `${cleaner.name} assigned to this job` : "Cleaner assignment removed")
+      await load()
+    }
+    setSavingCleaner(false)
+  }
+
   function startEditingPackage(ev: CalendarEvent) {
     setEditPackageName(ev.package_name ?? "")
     setEditPackagePrice(ev.package_price?.toString() ?? "")
@@ -240,7 +285,7 @@ export default function CalendarPage() {
   return (
     <div className="min-h-screen bg-background">
       <DashboardNav />
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:ml-64">
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-4">
@@ -276,16 +321,10 @@ export default function CalendarPage() {
                 Invoice List
               </Button>
             </div>
-            <div className="flex items-center gap-1">
-              <Button variant="outline" size="icon" onClick={prevMonth} aria-label="Previous month">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="min-w-[140px] text-center text-sm font-semibold text-foreground">
-                {MONTHS[month - 1]} {year}
-              </span>
-              <Button variant="outline" size="icon" onClick={nextMonth} aria-label="Next month">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center rounded-lg border border-border bg-muted/50 p-0.5" aria-label="Calendar view">
+              {(["month", "week", "day"] as const).map((mode) => (
+                <Button key={mode} variant="ghost" size="sm" onClick={() => setCalendarView(mode)} className={cn("h-7 px-2.5 text-xs capitalize", calendarView === mode && "bg-background shadow-sm text-foreground")}>{mode}</Button>
+              ))}
             </div>
             <Button onClick={() => openNewAppt()} className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Plus className="mr-1.5 h-4 w-4" />
@@ -414,17 +453,33 @@ export default function CalendarPage() {
 
       {/* Calendar grid */}
       {view === "calendar" && <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm">
+        <div className="flex items-center border-b border-border bg-muted/20 px-4 py-2.5">
+          {calendarView === "month" ? (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={prevMonth} aria-label="Previous month">
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[140px] text-center text-sm font-semibold text-foreground">{MONTHS[month - 1]} {year}</span>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={nextMonth} aria-label="Next month">
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <span className="text-sm font-semibold text-foreground">{calendarView === "week" ? "Week schedule" : "Day schedule"}</span>
+          )}
+        </div>
         {/* Day headers */}
-        <div className="grid grid-cols-7 border-b border-border">
+        <div className={cn("grid border-b border-border bg-muted/30", calendarView === "day" ? "grid-cols-1" : "grid-cols-7")}>
           {DAYS.map(d => (
-            <div key={d} className="py-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <div key={d} className="py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {d}
             </div>
           ))}
         </div>
 
-        {/* Day cells */}
-        <div className="grid grid-cols-7">
+        {/* Day cells — scrollable so month boundaries stay visible */}
+        <div className="max-h-[min(68vh,680px)] overflow-y-auto">
+        <div className={cn("grid", calendarView === "day" ? "grid-cols-1" : "grid-cols-7")}>
           {cells.map((day, i) => {
             const dayEvents = day ? (eventsByDay.get(day) ?? []) : []
             return (
@@ -432,18 +487,21 @@ export default function CalendarPage() {
                 key={i}
                 onClick={() => {
                   if (!day) return
-                  const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-                  if (dayEvents.length > 0) openDay(day)
-                  else openNewAppt(dateStr)
-                }}
+  openDay(day)
+  }}
                 className={cn(
-                  "relative min-h-[90px] border-b border-r border-border p-1.5 sm:p-2",
+                  "relative min-h-[150px] border-b border-r border-border bg-background p-3 transition-colors sm:min-h-[170px] sm:p-4",
                   i % 7 === 6 && "border-r-0",
                   Math.floor(i / 7) === Math.floor((cells.length - 1) / 7) && "border-b-0",
                   day && "cursor-pointer transition-colors hover:bg-muted/40",
                   !day && "bg-muted/20",
                 )}
               >
+                {!day && calendarView === "month" && i < firstDay && (
+                  <span className="flex h-6 w-6 items-center justify-center text-xs font-medium text-muted-foreground/50">
+                    {new Date(year, month - 1, i - firstDay + 1).getDate()}
+                  </span>
+                )}
                 {day && (
                   <>
                     <span
@@ -457,19 +515,32 @@ export default function CalendarPage() {
                       {day}
                     </span>
 
-                    {loading ? null : dayEvents.slice(0, 3).map(ev => (
+                    {loading ? null : dayEvents.map(ev => (
                       <div
                         key={ev.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setViewingEvent(ev)
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault()
+                            event.stopPropagation()
+                            setViewingEvent(ev)
+                          }
+                        }}
                         className={cn(
-                          "mt-1 truncate rounded px-1 py-0.5 text-[10px] font-medium leading-tight",
+                          "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                          "mt-3 whitespace-normal break-words rounded-xl border px-2.5 py-2 text-xs font-medium leading-tight shadow-sm transition-colors hover:border-primary hover:bg-primary/20",
                           ev.event_type === "manual"
-                            ? "bg-muted/60 text-muted-foreground"
-                            : ""
+                            ? "border-border bg-muted/70 text-muted-foreground hover:text-foreground"
+                            : "border-primary/20 bg-primary/10 text-primary"
                         )}
-                        style={ev.event_type !== "manual" ? { background: "oklch(0.60 0.15 175 / 0.15)", color: "oklch(0.42 0.13 175)" } : {}}
                       >
                         {fmt12(ev.start_time) && <span className="mr-1">{fmt12(ev.start_time)}</span>}
-                        {ev.event_type === "manual" ? (ev.client_name ?? "Appointment") : (ev.quote?.quote_name ?? "Job")}
+                        <span>{ev.event_type === "manual" ? (ev.client_name ?? "Appointment") : (ev.quote?.quote_name ?? "Job")}</span>
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
@@ -480,6 +551,7 @@ export default function CalendarPage() {
               </div>
             )
           })}
+        </div>
         </div>
       </div>}
 
@@ -640,28 +712,25 @@ export default function CalendarPage() {
       })()}
 
       {/* New appointment modal */}
-      <AppointmentModal
-        open={apptModalOpen}
-        onOpenChange={setApptModalOpen}
-        defaultDate={apptDefaultDate}
+  {quoteLoadError && <div role="alert" className="mx-auto mb-4 max-w-7xl rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">{quoteLoadError}</div>}
+  <AppointmentModal
+  open={apptModalOpen}
+  onOpenChange={setApptModalOpen}
+  defaultDate={apptDefaultDate}
+  initialQuote={preloadedQuote}
         onCreated={load}
       />
 
-      {/* Day detail dialog */}
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
-          <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
-            <DialogTitle className="flex items-center gap-2 text-base">
-              <CalendarDays className="h-4 w-4 text-primary" />
-              {selected && fmtDate(selected.date)}
-            </DialogTitle>
-            <DialogDescription>
-              {selected?.events.length
-                ? `${selected.events.length} job${selected.events.length > 1 ? "s" : ""} scheduled`
-                : "No jobs scheduled"}
-            </DialogDescription>
-          </DialogHeader>
-
+      {/* In-page scheduling sidebar */}
+      {selected && <aside className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l border-border bg-background shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-5">
+          <div>
+            <h2 className="flex items-center gap-2 text-base font-semibold"><CalendarDays className="h-4 w-4 text-primary" />{fmtDate(selected.date)}</h2>
+            <p className="text-sm text-muted-foreground">{selected.events.length ? `${selected.events.length} scheduled` : "No jobs scheduled"}</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => setSelected(null)} aria-label="Close scheduling sidebar"><X className="h-4 w-4" /></Button>
+        </div> 
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {selected?.events.length === 0 && (
               <div className="flex flex-col items-center gap-3 py-8">
@@ -689,7 +758,12 @@ export default function CalendarPage() {
                 return (
                   <div
                     key={ev.id}
-                    className="rounded-lg border border-border bg-muted/30 p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                    className={cn(
+                      "cursor-pointer rounded-lg border p-4 transition-colors",
+                      isManual
+                        ? "border-border bg-muted/60 hover:bg-muted/80"
+                        : "border-primary/20 bg-primary/5 hover:bg-primary/10",
+                    )}
                     onClick={() => setViewingEvent(ev)}
                   >
                     <div className="flex items-center gap-2 min-w-0">
@@ -744,8 +818,8 @@ export default function CalendarPage() {
               </Button>
             )}
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </aside>}
 
       {/* Appointment Details Modal */}
       <Dialog open={!!viewingEvent} onOpenChange={(open) => {
@@ -831,6 +905,14 @@ export default function CalendarPage() {
                       </div>
                     </div>
                   )}
+
+                  <div className="rounded-lg border border-border bg-muted/30 p-4">
+                    <p className="mb-2 text-sm font-medium text-foreground">Cleaner</p>
+                    <select className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm" value={ev.cleaner_id ?? ev.cleaner_ids?.[0] ?? ""} disabled={savingCleaner} onChange={(event) => handleAssignCleaner(ev.id, event.target.value)}>
+                      <option value="">Unassigned</option>
+                      {employees.map((employee) => <option key={employee.id} value={employee.id}>{employee.name}</option>)}
+                    </select>
+                  </div>
 
                   {/* Package / Service with Price - Always show for editing */}
                   <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">

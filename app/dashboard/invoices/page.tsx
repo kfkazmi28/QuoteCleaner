@@ -14,7 +14,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import {
-  FileText,
   Copy,
   Check,
   ExternalLink,
@@ -33,10 +32,11 @@ import {
   LayoutGrid,
   List,
 } from "lucide-react"
-import { getInvoices, markInvoiceSent, cancelInvoice, type Invoice } from "@/app/actions/invoices"
+import { getInvoices, markInvoiceSent, deleteInvoice, recordManualPayment, updatePaymentMethod, type Invoice } from "@/app/actions/invoices"
 import { checkInvoicesTableExists } from "@/app/actions/invoices"
 import { getStripeConnectStatus, type StripeConnectStatus } from "@/app/actions/stripe-connect"
 import { toast } from "sonner"
+import { SendInvoiceModal } from "@/components/send-invoice-modal"
 
 const STATUS_LABELS: Record<Invoice["status"], string> = {
   draft: "Draft",
@@ -88,16 +88,27 @@ function InvoiceDetailModal({
   invoice,
   onClose,
   onMarkSent,
-  onCancel,
+  onDelete,
+  onPaymentRecorded,
+  onSendInvoice,
   connectEnabled,
 }: {
   invoice: Invoice | null
   onClose: () => void
   onMarkSent: (id: string) => void
-  onCancel: (id: string) => void
+  onDelete: (id: string) => void
+  onPaymentRecorded: (invoice: Invoice) => void
+  onSendInvoice: (invoice: Invoice) => void
   connectEnabled: boolean
 }) {
   if (!invoice) return null
+
+  const [paymentMethod, setPaymentMethod] = useState("Cash")
+  const [paymentReference, setPaymentReference] = useState("")
+  const [paymentAmount, setPaymentAmount] = useState(String(invoice.amount_due))
+  const [isRecordingPayment, setIsRecordingPayment] = useState(false)
+  const [isEditingPayment, setIsEditingPayment] = useState(false)
+  const [isSavingPayment, setIsSavingPayment] = useState(false)
 
   const emailSubject = `Your Cleaning Invoice from CleanQuote`
   const emailBody = [
@@ -126,12 +137,9 @@ function InvoiceDetailModal({
         <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-semibold">{invoice.invoice_title}</DialogTitle>
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[invoice.status]}`}>
-              {STATUS_LABELS[invoice.status]}
-            </span>
           </div>
           <DialogDescription className="text-sm text-muted-foreground">
-            Created {formatDate(invoice.created_at)}
+            Cleaned {formatDate(invoice.created_at)}
             {invoice.due_date && ` · Due ${formatDate(invoice.due_date)}`}
           </DialogDescription>
         </DialogHeader>
@@ -208,25 +216,79 @@ function InvoiceDetailModal({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                No payment link available.{" "}
-                <Link href="/account" className="text-primary underline">Connect Stripe</Link>{" "}
-                then re-create this invoice to generate a valid payment link.
+                Stripe is not connected, so this invoice does not have an online payment link. You can still send it using the Send button and accept payment manually by cash, check, Venmo, Zelle, or another method.
               </p>
             )}
           </div>
 
+          {invoice.status !== "paid" && invoice.status !== "canceled" && (
+            <div className="space-y-3 rounded-lg border border-border p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Record Manual Payment</p>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="space-y-1 text-sm">
+                  <span className="text-xs text-muted-foreground">Payment Method</span>
+                  <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm">
+                    <option>Cash</option><option>Check</option><option>Venmo</option><option>Zelle</option><option>Other</option>
+                  </select>
+                </label>
+                <label className="space-y-1 text-sm">
+                  <span className="text-xs text-muted-foreground">Amount Paid</span>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground">$</span>
+                    <input type="number" min="0.01" step="0.01" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="h-9 w-full rounded-md border border-input bg-background pl-7 pr-2 text-sm" />
+                  </div>
+                </label>
+                {paymentMethod === "Check" && (
+                  <label className="space-y-1 text-sm">
+                    <span className="text-xs text-muted-foreground">Ref #</span>
+                    <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Check number" className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" />
+                  </label>
+                )}
+              </div>
+              <Button type="button" size="sm" disabled={isRecordingPayment} onClick={async () => {
+                setIsRecordingPayment(true)
+                const result = await recordManualPayment(invoice.id, paymentMethod, Number(paymentAmount), paymentReference)
+                setIsRecordingPayment(false)
+                if (result.error) { toast.error(result.error); return }
+                if (result.data) onPaymentRecorded(result.data)
+                toast.success("Payment recorded")
+                onClose()
+              }}>
+                {isRecordingPayment ? "Recording…" : "Record Payment"}
+              </Button>
+            </div>
+          )}
+
           {/* Paid info */}
           {invoice.status === "paid" && invoice.paid_at && (
             <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-              <p className="text-sm font-medium text-primary">
-                Paid on {formatDate(invoice.paid_at)}
-              </p>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium text-primary">Paid on {formatDate(invoice.paid_at)}</p>
+                  <p className="text-sm text-muted-foreground">Payment method: {invoice.payment_method || "Stripe"}{invoice.payment_method === "Check" && invoice.payment_reference ? ` · Ref #${invoice.payment_reference}` : ""}</p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={() => { setPaymentMethod(invoice.payment_method || "Cash"); setPaymentReference(invoice.payment_reference || ""); setIsEditingPayment((value) => !value) }}>
+                  {isEditingPayment ? "Cancel" : "Edit"}
+                </Button>
+              </div>
+              {isEditingPayment && (
+                <div className="mt-3 flex flex-wrap items-end gap-2">
+                  <label className="space-y-1 text-sm"><span className="block text-xs text-muted-foreground">Payment Method</span><select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="h-9 rounded-md border border-input bg-background px-2 text-sm"><option>Cash</option><option>Check</option><option>Venmo</option><option>Zelle</option><option>Other</option></select></label>
+                  {paymentMethod === "Check" && <label className="space-y-1 text-sm"><span className="block text-xs text-muted-foreground">Ref #</span><input value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} className="h-9 rounded-md border border-input bg-background px-2 text-sm" placeholder="Check number" /></label>}
+                  <Button type="button" size="sm" disabled={isSavingPayment} onClick={async () => { setIsSavingPayment(true); const result = await updatePaymentMethod(invoice.id, paymentMethod, paymentReference); setIsSavingPayment(false); if (result.error) { toast.error(result.error); return } if (result.data) onPaymentRecorded(result.data); setIsEditingPayment(false); toast.success("Payment method updated") }}>{isSavingPayment ? "Saving…" : "Save"}</Button>
+                </div>
+              )}
             </div>
           )}
         </div>
 
         <div className="shrink-0 border-t border-border px-6 py-4 flex items-center justify-between gap-3">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {invoice.status !== "paid" && invoice.status !== "canceled" && (
+              <Button variant="default" size="sm" onClick={() => { onClose(); onSendInvoice(invoice) }}>
+                <Send className="mr-1.5 h-3.5 w-3.5" /> Send
+              </Button>
+            )}
             {invoice.status === "draft" && (
               <Button
                 variant="outline"
@@ -237,33 +299,33 @@ function InvoiceDetailModal({
                 Mark as Sent
               </Button>
             )}
-            {invoice.status !== "canceled" && invoice.status !== "paid" && (
+            {invoice.status !== "paid" && (
               <Button
                 variant="ghost"
                 size="sm"
                 className="text-destructive hover:text-destructive"
-                onClick={() => { onCancel(invoice.id); onClose() }}
+                onClick={() => { onDelete(invoice.id); onClose() }}
               >
                 <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                Cancel Invoice
+                Delete Invoice
               </Button>
             )}
           </div>
-          <Button variant="outline" size="sm" onClick={onClose}>Close</Button>
         </div>
       </DialogContent>
     </Dialog>
   )
 }
 
-type TabKey = Invoice["status"] | "all"
+type TabKey = "paid" | "unpaid"
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [tableReady, setTableReady] = useState<boolean | null>(null)
-  const [activeTab, setActiveTab] = useState<TabKey>("all")
+  const [activeTab, setActiveTab] = useState<TabKey>("unpaid")
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null)
+  const [sendInvoice, setSendInvoice] = useState<Invoice | null>(null)
   const [connectStatus, setConnectStatus] = useState<StripeConnectStatus | null>(null)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
 
@@ -289,24 +351,19 @@ export default function InvoicesPage() {
     toast.success("Invoice marked as sent")
   }
 
-  const handleCancel = async (id: string) => {
-    const { error } = await cancelInvoice(id)
-    if (error) { toast.error("Failed to cancel invoice"); return }
-    setInvoices((prev) => prev.map((inv) => inv.id === id ? { ...inv, status: "canceled" } : inv))
-    toast.success("Invoice canceled")
+  const handleDelete = async (id: string) => {
+  const { error } = await deleteInvoice(id)
+  if (error) { toast.error("Failed to delete invoice"); return }
+  setInvoices((prev) => prev.filter((inv) => inv.id !== id))
+  toast.success("Invoice deleted")
   }
 
   const tabs: { key: TabKey; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "draft", label: "Draft" },
-    { key: "sent", label: "Sent" },
     { key: "paid", label: "Paid" },
-    { key: "canceled", label: "Canceled" },
+    { key: "unpaid", label: "Unpaid" },
   ]
 
-  const filtered = activeTab === "all"
-    ? invoices
-    : invoices.filter((inv) => inv.status === activeTab)
+  const filtered = invoices.filter((inv) => activeTab === "paid" ? inv.status === "paid" : inv.status !== "paid")
 
   const countByStatus = (s: Invoice["status"]) => invoices.filter((i) => i.status === s).length
 
@@ -407,16 +464,14 @@ export default function InvoicesPage() {
 
         {/* Summary cards */}
         {tableReady && !loading && (
-          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="mb-6 grid grid-cols-2 gap-3">
             {[
-              { label: "Draft", count: countByStatus("draft"), color: "text-muted-foreground" },
-              { label: "Sent", count: countByStatus("sent"), color: "text-blue-600 dark:text-blue-400" },
-              { label: "Paid", count: countByStatus("paid"), color: "text-primary" },
-              { label: "Canceled", count: countByStatus("canceled"), color: "text-destructive" },
+              { label: "Open Invoices", value: invoices.filter((invoice) => invoice.status !== "paid").length, color: "text-blue-600 dark:text-blue-400" },
+              { label: "Total Amount Due", value: formatCurrency(invoices.filter((invoice) => invoice.status !== "paid").reduce((total, invoice) => total + (Number(invoice.amount_due) || 0), 0)), color: "text-primary" },
             ].map((s) => (
               <div key={s.label} className="rounded-lg border border-border bg-card px-4 py-3">
                 <p className="text-xs text-muted-foreground">{s.label}</p>
-                <p className={`text-2xl font-bold ${s.color}`}>{s.count}</p>
+                <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
               </div>
             ))}
           </div>
@@ -435,9 +490,9 @@ export default function InvoicesPage() {
               }`}
             >
               {tab.label}
-              {tab.key !== "all" && !loading && (
+              {!loading && (
                 <span className="ml-1.5 text-xs text-muted-foreground">
-                  ({countByStatus(tab.key as Invoice["status"])})
+                  ({tab.key === "paid" ? countByStatus("paid") : invoices.filter((invoice) => invoice.status !== "paid").length})
                 </span>
               )}
             </button>
@@ -618,12 +673,17 @@ export default function InvoicesPage() {
         )}
       </main>
 
-      <InvoiceDetailModal
-        invoice={viewInvoice}
+  <SendInvoiceModal open={!!sendInvoice} invoice={sendInvoice} onClose={() => setSendInvoice(null)} />
+  <InvoiceDetailModal
+  invoice={viewInvoice}
         onClose={() => setViewInvoice(null)}
         onMarkSent={handleMarkSent}
-        onCancel={handleCancel}
-        connectEnabled={connectStatus?.chargesEnabled ?? false}
+  onDelete={handleDelete}
+  onPaymentRecorded={(updated) => {
+    setInvoices((prev) => prev.map((invoice) => invoice.id === updated.id ? updated : invoice))
+  }}
+  onSendInvoice={setSendInvoice}
+  connectEnabled={connectStatus?.chargesEnabled ?? false}
       />
     </div>
   )

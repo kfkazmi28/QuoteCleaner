@@ -16,7 +16,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
   DialogContent,
@@ -64,7 +63,7 @@ import { PhoneInput } from "@/components/phone-input"
 import { exportQuotePdf } from "@/lib/export-quote-pdf"
 import { ChecklistModal, getDefaultChecklist, getChecklistTitle, getChecklistDescription, type ChecklistSection } from "@/components/checklist-modal"
 import { CreateInvoiceModal } from "@/components/create-invoice-modal"
-import { getInvoiceByQuoteId, getInvoices, type Invoice } from "@/app/actions/invoices"
+import { getInvoiceByQuoteId, getInvoices, getInvoicesByQuoteIds, type Invoice } from "@/app/actions/invoices"
 
 interface SavedQuote {
   id: string
@@ -108,6 +107,14 @@ function formatCurrency(val: number) {
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(val)
+}
+
+function formatTime12(value?: string | null) {
+  if (!value) return ""
+  const [hours, minutes] = value.slice(0, 5).split(":").map(Number)
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return value
+  const period = hours >= 12 ? "PM" : "AM"
+  return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${period}`
 }
 
 function formatDate(iso: string) {
@@ -437,13 +444,15 @@ function EditQuoteModal({
 
 function CleanerSelector({
   employees,
-  cleanerIds,
-  setCleanerIds,
-  isAvailable,
+    cleanerIds,
+    setCleanerIds,
+    cleanerCount,
+    isAvailable,
 }: {
   employees: EmployeeContact[]
   cleanerIds: string[]
   setCleanerIds: (ids: string[]) => void
+  cleanerCount: 1 | 2
   isAvailable: (emp: EmployeeContact) => boolean
 }) {
   const [search, setSearch] = useState("")
@@ -514,7 +523,7 @@ function CleanerSelector({
                 key={emp.id}
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { toggle(emp.id); setSearch("") }}
+                onClick={() => { if (!selected && cleanerIds.length >= cleanerCount) return; toggle(emp.id); setSearch("") }}
                 className={`flex items-center justify-between px-3 py-2 text-sm transition-colors text-left ${
                   selected
                     ? "bg-primary text-primary-foreground"
@@ -566,9 +575,12 @@ function ScheduleModal({
   const [packageName, setPackageName] = useState("")
   const [packagePrice, setPackagePrice] = useState("")
   const [cleanerIds, setCleanerIds] = useState<string[]>([])
+  const [cleanerCount, setCleanerCount] = useState<1 | 2>(1)
   const [employees, setEmployees] = useState<EmployeeContact[]>([])
   const [scheduledDates, setScheduledDates] = useState<Record<string, ScheduledDateEvent[]>>({})
   const [saving, setSaving] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(false)
+  const [pickerMonth, setPickerMonth] = useState(() => new Date())
 
   // Fetch employees and scheduled dates on mount
   useEffect(() => {
@@ -642,6 +654,15 @@ function ScheduleModal({
     return Math.round(raw * 4) / 4 // round to nearest quarter hour
   })()
 
+  // Fill the end time from the start time and selected cleaner count.
+  useEffect(() => {
+    if (!startTime || !estimatedHours) return
+    const [hours, minutes] = startTime.split(":").map(Number)
+    const durationMinutes = Math.round((estimatedHours / cleanerCount) * 60)
+    const end = new Date(2000, 0, 1, hours, minutes + durationMinutes)
+    setEndTime(`${String(end.getHours()).padStart(2, "0")}:${String(end.getMinutes()).padStart(2, "0")}`)
+  }, [startTime, estimatedHours, cleanerCount])
+
   // Build package options from quote prices
   const packages = quote ? [
     { key: "move",      label: "Move In / Out",  price: quote.result_move_in },
@@ -658,22 +679,17 @@ function ScheduleModal({
       setDate("")
       setStartTime("")
       setEndTime("")
-      setNotes("")
-      setSelectedPackage("")
-      setPackageName("")
-      setPackagePrice("")
+      setNotes(quote.notes ?? "")
+      setCalendarOpen(true)
+      const quotedPackage = quote.preferred_package || "standard"
+      const quotedPackageData = packages.find((pkg) => pkg.key === quotedPackage) || packages[0]
+      setSelectedPackage(quotedPackageData?.key || "")
+      setPackageName(quotedPackageData?.label || "Quoted cleaning package")
+      setPackagePrice(quotedPackageData ? quotedPackageData.price.toFixed(2) : "0.00")
       setCleanerIds([])
+      getScheduledDatesWithEvents().then(setScheduledDates)
     }
   }, [quote])
-
-  const handlePackageSelect = (key: string) => {
-    setSelectedPackage(key)
-    const pkg = packages.find(p => p.key === key)
-    if (pkg) {
-      setPackageName(pkg.label)
-      setPackagePrice(pkg.price.toFixed(2))
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -719,7 +735,7 @@ function ScheduleModal({
 
   return (
     <Dialog open={!!quote} onOpenChange={onClose}>
-      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
+      <DialogContent className="flex h-[calc(100dvh-2rem)] max-h-[calc(100dvh-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-5xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
           <DialogTitle className="flex items-center gap-2">
             <CalendarCheck className="h-5 w-5 text-primary" />
@@ -729,119 +745,103 @@ function ScheduleModal({
             {quote?.quote_name} — pick a date and optional time.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
 
-            {/* Package selector */}
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="sched-pkg-select">Cleaning Package <span className="text-xs text-muted-foreground">(optional)</span></Label>
-              {quote?.preferred_package && (() => {
-                const label: Record<string, string> = {
-                  "move":     "Move In / Move Out",
-                  "deep":     "Deep Clean",
-                  "standard": "Standard Clean",
-                  "monthly":  "Monthly",
-                  "biweekly": "Bi-weekly",
-                  "weekly":   "Weekly",
-                }
-                const display = label[quote.preferred_package]
-                if (!display) return null
-                return (
-                  <p className="text-xs text-primary font-medium">
-                    Client&apos;s preferred package: {display}
-                  </p>
-                )
-              })()}
-              <select
-                id="sched-pkg-select"
-                value={selectedPackage}
-                onChange={e => handlePackageSelect(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="">Select a package...</option>
-                {packages.map(pkg => (
-                  <option key={pkg.key} value={pkg.key}>
-                    {pkg.label} — ${pkg.price.toFixed(2)}
-                  </option>
-                ))}
-              </select>
+            {/* Pre-filled quote information */}
+            <div className="grid gap-2 rounded-xl border border-border bg-muted/25 p-4 text-sm sm:grid-cols-2">
+              <div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Customer</p><p className="font-medium">{quote?.client_name || "Not provided"}</p><p className="text-muted-foreground">{quote?.client_email || quote?.client_phone || "No contact details"}</p></div>
+              <div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Property</p><p className="font-medium">{quote?.home_address || "Address not provided"}</p></div>
             </div>
 
-            {/* Editable package name + price �� shown once a package is selected */}
-            {selectedPackage && (
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="sched-pkg-name">Package Name</Label>
-                  <Input
-                    id="sched-pkg-name"
-                    value={packageName}
-                    onChange={e => setPackageName(e.target.value)}
-                    placeholder="e.g. Deep Clean"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="sched-pkg-price">Price ($)</Label>
-                  <Input
-                    id="sched-pkg-price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={packagePrice}
-                    onChange={e => setPackagePrice(e.target.value)}
-                    placeholder="0.00"
-                  />
-                </div>
+            {/* Package and quoted price from the selected quote */}
+            <div className="grid grid-cols-2 gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 shadow-sm">
+              <div>
+                <Label>Cleaning Package</Label>
+                <p className="mt-1 text-sm font-medium">{packageName || "Quoted cleaning package"}</p>
               </div>
-            )}
+              <div>
+                <Label>Quoted Price</Label>
+                <p className="mt-1 text-sm font-medium">${packagePrice || "0.00"}</p>
+              </div>
+            </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label>Date <span className="text-destructive">*</span></Label>
+<Button type="button" variant="outline" className="h-auto justify-between rounded-xl border-primary/25 bg-primary/5 p-4 text-left hover:bg-primary/10" onClick={() => setCalendarOpen(true)}>
+  <span>
+    <span className="block text-xs font-semibold uppercase tracking-wider text-primary">Schedule date & time</span>
+    <span className="mt-1 block text-sm font-medium text-foreground">
+      {date ? `${new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}${startTime ? ` · ${formatTime12(startTime)}` : ""}${endTime ? `–${formatTime12(endTime)}` : ""}` : "Choose a date and time"}
+    </span>
+  </span>
+  <CalendarIcon className="h-5 w-5 text-primary" />
+</Button>
+            {calendarOpen && (
+              <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-foreground/40 p-3 sm:p-5" onPointerDown={(event) => event.stopPropagation()} onClick={() => setCalendarOpen(false)}>
+                <div className="flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col rounded-xl border border-border bg-background p-4 shadow-2xl sm:p-5" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div><h2 className="text-lg font-semibold">Choose date and time</h2><p className="text-sm text-muted-foreground">See existing jobs while selecting this quote&apos;s schedule.</p></div>
+                    <Button type="button" variant="ghost" size="icon" aria-label="Close calendar" onClick={() => setCalendarOpen(false)}>×</Button>
+                  </div>
+                <div className="flex flex-col gap-4">
+                  <div className="rounded-xl border border-border bg-muted/35 p-4">
               <div className="flex flex-col gap-2">
-                <div className="flex justify-center rounded-md border border-input bg-background">
-                  <Calendar
-                    mode="single"
-                    selected={date ? new Date(date + "T12:00:00") : undefined}
-                    onSelect={(d) => setDate(d ? d.toISOString().split("T")[0] : "")}
-                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                    modifiers={{
-                      booked: (d) => {
-                        const dateStr = d.toISOString().split("T")[0]
-                        return !!scheduledDates[dateStr]
-                      }
-                    }}
-                    modifiersStyles={{
-                      booked: {
-                        fontWeight: 600,
-                        textDecoration: "underline",
-                        textDecorationColor: "oklch(0.6 0.15 175)",
-                        textUnderlineOffset: "3px",
-                      }
-                    }}
-                    initialFocus
-                  />
+                <div className="w-full rounded-xl border border-brand-pink/40 bg-brand-pink/10 p-2">
+                  <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
+                    <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setPickerMonth(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() - 1, 1))} aria-label="Previous month">‹</Button>
+                      <p className="font-semibold">{pickerMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setPickerMonth(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() + 1, 1))} aria-label="Next month">›</Button>
+                    </div>
+                    <div className="grid grid-cols-7 border-b border-border bg-muted/20">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <div key={day} className="py-2 text-center text-xs font-semibold uppercase text-muted-foreground">{day}</div>)}</div>
+                    <div className="grid grid-cols-7">
+                      {Array.from({ length: new Date(pickerMonth.getFullYear(), pickerMonth.getMonth(), 1).getDay() }).map((_, index) => <div key={`empty-${index}`} className="min-h-14 border-b border-r border-border bg-muted/10" />)}
+                      {Array.from({ length: new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() + 1, 0).getDate() }).map((_, index) => {
+                        const day = index + 1
+                        const dateStr = `${pickerMonth.getFullYear()}-${String(pickerMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                        const dayEvents = scheduledDates[dateStr] || []
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        const past = new Date(dateStr + "T00:00:00") < today
+                        return <button key={dateStr} type="button" disabled={past} onPointerDown={(event) => event.stopPropagation()} onClick={() => { setDate(dateStr) }} className={`min-h-14 border-b border-r border-border p-1.5 text-left transition-colors ${past ? "cursor-not-allowed bg-muted/10 text-muted-foreground/40" : "cursor-pointer text-foreground hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
+                          <span className="text-sm font-medium">{day}</span>
+                          <span className="mt-2 flex max-h-20 flex-col gap-1 overflow-y-auto">{dayEvents.map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${formatTime12(event.start_time)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
+                        </button>
+                      })}
+                    </div>
+                  </div>
                 </div>
-                {/* Show selected day's schedule or legend */}
-                {date && scheduledDates[date] && scheduledDates[date].length > 0 ? (
+                {/* Show only the selected day's appointments */}
+                {date ? (
                   <div className="rounded-md border border-input bg-muted/30 p-2">
                     <p className="text-xs font-medium text-foreground mb-1.5">
-                      {new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} — {scheduledDates[date].length} job{scheduledDates[date].length > 1 ? "s" : ""}
+                      {new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} — {(scheduledDates[date] || []).length === 0 ? "No jobs yet" : `${(scheduledDates[date] || []).length} job${(scheduledDates[date] || []).length > 1 ? "s" : ""}`}
                     </p>
                     <div className="flex flex-col gap-1 max-h-24 overflow-y-auto">
-                      {scheduledDates[date].map((evt) => (
+                      {(scheduledDates[date] || []).map((evt) => (
                         <div key={evt.id} className="flex items-center justify-between text-xs text-muted-foreground">
                           <span className="truncate flex-1">{evt.quote_name || "Unnamed"}</span>
                           <span className="shrink-0 ml-2">
-                            {evt.start_time ? evt.start_time.slice(0, 5) : "No time"}
-                            {evt.end_time && ` - ${evt.end_time.slice(0, 5)}`}
+                            {evt.start_time ? formatTime12(evt.start_time) : "No time"}
+                            {evt.end_time && ` - ${formatTime12(evt.end_time)}`}
                           </span>
                         </div>
                       ))}
                     </div>
                   </div>
-                ) : null}
+                ) : (
+                  <div className="rounded-md border border-border bg-muted/25 p-3 text-sm text-muted-foreground">No appointments on this day.</div>
+                )}
               </div>
             </div>
-            <div className="flex flex-col gap-2">
+            {date && <div className="flex flex-col gap-3 rounded-xl border border-border bg-primary/[0.04] p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Job timing</p>
+              <div className="flex gap-2">
+                {([1, 2] as const).map((count) => (
+                  <Button key={count} type="button" size="sm" variant={cleanerCount === count ? "default" : "outline"} className="h-8 px-3 text-xs" onClick={() => { setCleanerCount(count); if (count === 1) setCleanerIds((ids) => ids.slice(0, 1)) }}>
+                    {count} cleaner{count === 1 ? "" : "s"}
+                  </Button>
+                ))}
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="sched-start" className="flex items-center gap-1.5">
@@ -884,9 +884,23 @@ function ScheduleModal({
                   Estimated labor hours: <span className="italic">(choose cleaning package)</span>
                 </p>
               )}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="sched-notes">Notes <span className="text-xs text-muted-foreground">(optional)</span></Label>
+              {employees.length > 0 && <div className="border-t border-border/70 pt-3">
+                <CleanerSelector
+                  employees={employees}
+                  cleanerIds={cleanerIds}
+                  setCleanerIds={setCleanerIds}
+                  cleanerCount={cleanerCount}
+                  isAvailable={isAvailable}
+                />
+              </div>}
+            </div>}
+            <Button type="button" onClick={() => { if (date) setCalendarOpen(false) }} disabled={!date}>Use this schedule</Button>
+                    </div>
+                </div>
+              </div>
+            )}
+            <div className="flex flex-col gap-2 rounded-xl border border-border bg-muted/25 p-4">
+              <Label htmlFor="sched-notes" className="text-base font-semibold">Notes <span className="text-xs font-normal text-muted-foreground">(optional)</span></Label>
               <textarea
                 id="sched-notes"
                 rows={2}
@@ -897,15 +911,6 @@ function ScheduleModal({
               />
             </div>
 
-            {/* Cleaner selector — search-driven, shown last */}
-            {employees.length > 0 && (
-              <CleanerSelector
-                employees={employees}
-                cleanerIds={cleanerIds}
-                setCleanerIds={setCleanerIds}
-                isAvailable={isAvailable}
-              />
-            )}
           </div>
           <DialogFooter className="shrink-0 border-t border-border px-6 py-4 gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
@@ -932,13 +937,14 @@ export default function SavedQuotesPage() {
   const [scheduleQuote, setScheduleQuote] = useState<SavedQuote | null>(null)
   const [scheduledQuoteIds, setScheduledQuoteIds] = useState<Set<string>>(new Set())
   const [scheduledEventsMap, setScheduledEventsMap] = useState<Map<string, ScheduledEventInfo>>(new Map())
-  const [activeTab, setActiveTab] = useState<"open" | "scheduled" | "completed">("open")
+  const [activeTab, setActiveTab] = useState<"open" | "scheduled">("open")
   const [isPending, startTransition] = useTransition()
   const [statusColumnReady, setStatusColumnReady] = useState<boolean | null>(null)
   const [checklistModalQuote, setChecklistModalQuote] = useState<SavedQuote | null>(null)
   const [invoiceQuote, setInvoiceQuote] = useState<SavedQuote | null>(null)
   const [invoicedQuoteIds, setInvoicedQuoteIds] = useState<Set<string>>(new Set())
   const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [invoiceByQuoteId, setInvoiceByQuoteId] = useState<Record<string, Invoice>>({})
   const [selectedQuoteIds, setSelectedQuoteIds] = useState<Set<string>>(new Set())
   const [columnFilters, setColumnFilters] = useState({ client: "", cleaning: "", date: "", price: "" })
   const [sortConfig, setSortConfig] = useState<{ key: "client" | "address" | "cleaning" | "date" | "price"; direction: "asc" | "desc" }>({ key: "date", direction: "desc" })
@@ -958,9 +964,20 @@ export default function SavedQuotesPage() {
     })
     getScheduledQuoteIds().then(ids => setScheduledQuoteIds(ids))
   getScheduledEventsMap().then(map => setScheduledEventsMap(map))
-  getInvoices().then(setInvoices)
+  const refreshInvoiceStatuses = () => getInvoices().then((loadedInvoices) => {
+    setInvoices(loadedInvoices)
+    setInvoiceByQuoteId(Object.fromEntries(loadedInvoices.filter((invoice) => invoice.quote_id).map((invoice) => [invoice.quote_id as string, invoice])))
+  })
+  refreshInvoiceStatuses()
+  const handleVisibility = () => { if (document.visibilityState === "visible") refreshInvoiceStatuses() }
+  document.addEventListener("visibilitychange", handleVisibility)
+  const invoiceRefresh = window.setInterval(refreshInvoiceStatuses, 30000)
   // Check if DB has the status column
     checkQuoteStatusColumn().then(ready => setStatusColumnReady(ready))
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility)
+      window.clearInterval(invoiceRefresh)
+    }
   }, [])
 
   const handlePreferredPackageChange = (quoteId: string, pkgKey: string) => {
@@ -1061,12 +1078,7 @@ export default function SavedQuotesPage() {
   const scheduledQuotes = quotes.filter(q =>
     !q.archived && q.status !== "completed" && scheduledQuoteIds.has(q.id) && !isAppointmentPast(q.id)
   )
-  const completedQuotes = quotes.filter(q =>
-    !q.archived && (q.status === "completed" || (scheduledQuoteIds.has(q.id) && isAppointmentPast(q.id)))
-  )
-  const filteredQuotes = activeTab === "open" ? openQuotes
-  : activeTab === "scheduled" ? scheduledQuotes
-  : completedQuotes
+  const filteredQuotes = activeTab === "scheduled" ? scheduledQuotes : openQuotes
 
   const displayQuotes = useMemo(() => {
     const selectedPrice = (q: SavedQuote) => {
@@ -1153,9 +1165,7 @@ export default function SavedQuotesPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Saved Quotes</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {loading ? "Loading..." : `${quotes.length} saved quote${quotes.length !== 1 ? "s" : ""}`}
-            </p>
+
           </div>
         </div>
 
@@ -1163,18 +1173,18 @@ export default function SavedQuotesPage() {
         <div className="mb-6 grid gap-3 sm:grid-cols-2">
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Scheduled cleanings" : activeTab === "completed" ? "Completed quotes" : "Open quotes"}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? scheduledQuotes.length : activeTab === "completed" ? completedQuotes.filter(quote => quote.client_name).length : openQuotes.length}</p>
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Scheduled cleanings" : "Open quotes"}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? scheduledQuotes.length : openQuotes.length}</p>
             </CardContent>
           </Card>
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Total scheduled price" : activeTab === "completed" ? "Total completed price" : "Total open price"}</p>
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Total scheduled price" : "Total open price"}</p>
               <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? formatCurrency(scheduledQuotes.reduce((total, quote) => {
                 const packageKey = preferredPackages[quote.id] || "standard"
                 const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
                 return total + (Number(price) || 0)
-              }, 0)) : formatCurrency((activeTab === "completed" ? completedQuotes.filter(quote => quote.client_name) : openQuotes).reduce((total, quote) => {
+              }, 0)) : formatCurrency(openQuotes.reduce((total, quote) => {
                 const packageKey = preferredPackages[quote.id] || "standard"
                 const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
                 return total + (Number(price) || 0)
@@ -1219,17 +1229,6 @@ export default function SavedQuotesPage() {
             Scheduled
             {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({scheduledQuotes.length})</span>}
           </button>
-          <button
-            onClick={() => setActiveTab("completed")}
-            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === "completed"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Completed
-            {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({completedQuotes.length})</span>}
-          </button>
         </div>
 
         {/* Content */}
@@ -1254,22 +1253,17 @@ export default function SavedQuotesPage() {
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                 {activeTab === "scheduled" ? (
                   <CalendarCheck className="h-7 w-7 text-muted-foreground" />
-                ) : activeTab === "completed" ? (
-                  <CheckCircle2 className="h-7 w-7 text-muted-foreground" />
                 ) : (
                   <Bookmark className="h-7 w-7 text-muted-foreground" />
                 )}
               </div>
               <p className="text-base font-medium text-foreground">
 {activeTab === "scheduled" ? "No scheduled quotes"
-                  : activeTab === "completed" ? "No completed quotes"
                   : "No open quotes"}
               </p>
               <p className="max-w-xs text-sm text-muted-foreground">
 {activeTab === "scheduled"
                   ? "Schedule a job from an open quote to see it here."
-                  : activeTab === "completed"
-                  ? "Quotes are moved here automatically once their appointment date has passed, or when marked as completed."
                   : "Generate a quote in the calculator and click \"Save Quote\" to store it here."}
               </p>
               {activeTab === "open" && (
@@ -1344,7 +1338,7 @@ export default function SavedQuotesPage() {
                             <Pencil className="mr-2 h-3.5 w-3.5" />
                             Edit
                           </DropdownMenuItem>
-                          {/* Mark as Completed — show for scheduled/upcoming quotes not yet completed */}
+                          {/* Mark as Completed ��� show for scheduled/upcoming quotes not yet completed */}
                           {!quote.archived && quote.status !== "completed" && (
                             <DropdownMenuItem
                               onClick={() => handleMarkCompleted(quote.id)}
@@ -1427,7 +1421,14 @@ export default function SavedQuotesPage() {
                     return (
                       <div className="contents" onClick={e => e.stopPropagation()}>
                         <span className="min-w-0 text-base font-medium text-foreground">{selectedPackage?.label}</span>
-                        <span className="text-lg font-semibold text-primary">{formatCurrency(selectedPackage?.price)}</span>
+                        <span className="flex items-center gap-2 text-lg font-semibold text-primary">
+                          {formatCurrency(selectedPackage?.price)}
+                          {activeTab === "scheduled" && invoiceByQuoteId[quote.id]?.status === "paid" && (
+                            <Badge variant="secondary" className="h-5 whitespace-nowrap border border-emerald-200 bg-emerald-50 px-1.5 text-[10px] font-medium text-emerald-700">
+                              Invoice Paid
+                            </Badge>
+                          )}
+                        </span>
                       </div>
                     )
                   })()}
@@ -1436,8 +1437,8 @@ export default function SavedQuotesPage() {
 
                   {/* Footer */}
                   <div className="contents">
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <CalendarIcon className="h-3 w-3 shrink-0" />
+  <p className="mt-1 ml-4 flex items-center gap-1 text-xs text-muted-foreground">
+  <CalendarIcon className="h-3 w-3 shrink-0" />
                       {activeTab === "scheduled" && scheduledEventsMap.get(quote.id)?.scheduled_date
                         ? formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)
                         : formatDate(quote.created_at)}
@@ -1491,6 +1492,18 @@ export default function SavedQuotesPage() {
             </div>
         )}
       </main>
+
+      <ScheduleModal
+        quote={scheduleQuote}
+        onClose={() => setScheduleQuote(null)}
+        onScheduled={(quoteId) => {
+          setScheduledQuoteIds(prev => new Set([...prev, quoteId]))
+          setQuotes(prev => prev.map(q => q.id === quoteId ? { ...q, status: "scheduled" } : q))
+          updateQuote(quoteId, { status: "scheduled" })
+          getScheduledEventsMap().then(map => setScheduledEventsMap(map))
+          toast.success("Quote scheduled successfully")
+        }}
+      />
 
       {/* View Modal */}
       <ViewQuoteModal
@@ -1581,15 +1594,7 @@ export default function SavedQuotesPage() {
         )
       })()}
 
-      {/* Schedule Modal */}
-      <ScheduleModal
-        quote={scheduleQuote}
-        onClose={() => setScheduleQuote(null)}
-        onScheduled={(id) => {
-          setScheduledQuoteIds(prev => new Set([...prev, id]))
-          getScheduledEventsMap().then(map => setScheduledEventsMap(map))
-        }}
-      />
+
     </div>
   )
 }

@@ -26,6 +26,8 @@ export interface CalendarEvent {
   recurrence_rule: "weekly" | "biweekly" | "monthly" | null
   recurrence_end_date: string | null
   recurrence_occurrences: number | null
+  cleaner_id: string | null
+  cleaner_ids: string[] | null
   // joined from saved_quotes
   quote?: {
     id: string
@@ -203,6 +205,20 @@ export interface SavedQuoteSearchResult {
   result_deep_clean: number | null
   result_move_in: number | null
   preferred_package: string | null
+  notes?: string | null
+}
+
+export async function getSavedQuoteById(id: string): Promise<SavedQuoteSearchResult | null> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data } = await supabase
+    .from("saved_quotes")
+    .select("id, quote_name, client_name, client_email, client_phone, home_address, notes, result_standard, result_deep_clean, result_move_in, preferred_package")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .maybeSingle()
+  return data as SavedQuoteSearchResult | null
 }
 
 export async function searchSavedQuotes(query: string): Promise<SavedQuoteSearchResult[]> {
@@ -212,7 +228,7 @@ export async function searchSavedQuotes(query: string): Promise<SavedQuoteSearch
 
   const { data } = await supabase
     .from("saved_quotes")
-    .select("id, quote_name, client_name, client_email, client_phone, home_address, result_standard, result_deep_clean, result_move_in, preferred_package")
+    .select("id, quote_name, client_name, client_email, client_phone, home_address, notes, result_standard, result_deep_clean, result_move_in, preferred_package")
     .eq("user_id", user.id)
     .or(`quote_name.ilike.%${query}%,client_name.ilike.%${query}%,home_address.ilike.%${query}%`)
     .order("created_at", { ascending: false })
