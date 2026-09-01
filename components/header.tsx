@@ -47,7 +47,6 @@ export function Header() {
 
   const publicLinks = [
     { href: "/", label: "Home" },
-    { href: "/quote", label: "Calculator" },
     { href: "/pricing", label: "Pricing" },
     { href: "/resources", label: "Resources" },
   ]
