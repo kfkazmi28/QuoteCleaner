@@ -687,6 +687,7 @@ function ScheduleModal({
       setPackageName(quotedPackageData?.label || "Quoted cleaning package")
       setPackagePrice(quotedPackageData ? quotedPackageData.price.toFixed(2) : "0.00")
       setCleanerIds([])
+      getScheduledDatesWithEvents().then(setScheduledDates)
     }
   }, [quote])
 
@@ -799,7 +800,7 @@ function ScheduleModal({
                         const past = new Date(dateStr + "T00:00:00") < today
                         return <button key={dateStr} type="button" disabled={past} onPointerDown={(event) => event.stopPropagation()} onClick={() => { setDate(dateStr) }} className={`min-h-14 border-b border-r border-border p-1.5 text-left transition-colors ${past ? "cursor-not-allowed bg-muted/10 text-muted-foreground/40" : "cursor-pointer text-foreground hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
                           <span className="text-sm font-medium">{day}</span>
-                          <span className="mt-2 flex flex-col gap-1">{dayEvents.slice(0, 3).map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${formatTime12(event.start_time)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
+                          <span className="mt-2 flex max-h-20 flex-col gap-1 overflow-y-auto">{dayEvents.map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${formatTime12(event.start_time)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
                         </button>
                       })}
                     </div>
