@@ -135,9 +135,6 @@ function InvoiceDetailModal({
         <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-semibold">{invoice.invoice_title}</DialogTitle>
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[invoice.status]}`}>
-              {STATUS_LABELS[invoice.status]}
-            </span>
           </div>
           <DialogDescription className="text-sm text-muted-foreground">
             Cleaned {formatDate(invoice.created_at)}
