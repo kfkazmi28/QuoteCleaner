@@ -11,7 +11,7 @@ export default function PublicQuotePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
+      <main className="flex-1 px-4 pb-8 pt-24 sm:px-6 sm:pb-12 sm:pt-28">
         <div className="mx-auto max-w-5xl">
           <div className="mb-8 text-center">
             <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
