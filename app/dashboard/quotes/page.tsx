@@ -766,10 +766,10 @@ function ScheduleModal({
               </div>
             </div>
 
-            <Button type="button" variant="outline" className="h-auto justify-between rounded-xl border-primary/25 bg-primary/5 p-4 text-left hover:bg-primary/10" onClick={() => setCalendarOpen(true)}>
-              <span><span className="block text-xs font-semibold uppercase tracking-wider text-primary">Schedule date & time</span><span className="mt-1 block text-sm font-medium">{date ? `${new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}${startTime ? ` · ${formatTime12(startTime)}` : ""}${endTime ? `–${formatTime12(endTime)}` : ""}` : "Choose a date and time"}</span></span>
-              <CalendarIcon className="h-5 w-5 text-primary" />
-            </Button>
+<Button type="button" variant="outline" className="h-auto justify-between rounded-xl border-primary/25 bg-primary/5 p-4 text-left hover:bg-primary/10" onClick={() => setCalendarOpen(true)}>
+  <span className="block text-xs font-semibold uppercase tracking-wider text-primary">Schedule date & time</span>
+  <CalendarIcon className="h-5 w-5 text-primary" />
+</Button>
             {calendarOpen && (
               <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-foreground/40 p-3 sm:p-5" onPointerDown={(event) => event.stopPropagation()} onClick={() => setCalendarOpen(false)}>
                 <div className="flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col rounded-xl border border-border bg-background p-4 shadow-2xl sm:p-5" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
