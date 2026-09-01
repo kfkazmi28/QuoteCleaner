@@ -753,7 +753,7 @@ function ScheduleModal({
                   <div className="rounded-xl border border-border bg-muted/35 p-4">
               <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
               <div className="flex flex-col gap-2">
-                <div className="flex min-h-[330px] justify-center overflow-hidden rounded-xl border border-border bg-background p-2">
+                <div className="flex min-h-[520px] w-full justify-center overflow-auto rounded-xl border border-border bg-background p-2">
                   <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
                     <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
                       <Button type="button" variant="ghost" size="icon" onClick={() => setPickerMonth(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() - 1, 1))} aria-label="Previous month">‹</Button>
@@ -767,8 +767,10 @@ function ScheduleModal({
                         const day = index + 1
                         const dateStr = `${pickerMonth.getFullYear()}-${String(pickerMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
                         const dayEvents = scheduledDates[dateStr] || []
-                        const past = new Date(dateStr + "T23:59:59") < new Date()
-                        return <button key={dateStr} type="button" disabled={past} onPointerDown={(event) => event.stopPropagation()} onClick={() => { setDate(dateStr) }} className={`min-h-24 border-b border-r border-border p-2 text-left transition-colors ${past ? "bg-muted/10 text-muted-foreground/40" : "hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        const past = new Date(dateStr + "T00:00:00") < today
+                        return <button key={dateStr} type="button" disabled={past} onPointerDown={(event) => event.stopPropagation()} onClick={() => { setDate(dateStr) }} className={`min-h-24 border-b border-r border-border p-2 text-left transition-colors ${past ? "cursor-not-allowed bg-muted/10 text-muted-foreground/40" : "cursor-pointer text-foreground hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
                           <span className="text-sm font-medium">{day}</span>
                           <span className="mt-2 flex flex-col gap-1">{dayEvents.slice(0, 3).map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${event.start_time.slice(0, 5)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
                         </button>
