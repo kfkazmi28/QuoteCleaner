@@ -182,8 +182,8 @@ export default function CalendarPage() {
   ]
   // Month shows the full month; week and day focus the current date range.
   if (calendarView === "day") {
-    const focusedDay = today.getFullYear() === year && today.getMonth() + 1 === month ? today.getDate() : 1
-    cells = [focusedDay]
+    // "Today" view always shows the current date only.
+    cells = [today.getDate()]
   } else if (calendarView === "week") {
     const focusedDay = today.getFullYear() === year && today.getMonth() + 1 === month ? today.getDate() : 1
     const weekStart = Math.max(1, focusedDay - new Date(year, month - 1, focusedDay).getDay())
@@ -322,9 +322,24 @@ export default function CalendarPage() {
               </Button>
             </div>
             <div className="flex items-center rounded-lg border border-border bg-muted/50 p-0.5" aria-label="Calendar view">
-              {(["month", "week", "day"] as const).map((mode) => (
-                <Button key={mode} variant="ghost" size="sm" onClick={() => setCalendarView(mode)} className={cn("h-7 px-2.5 text-xs capitalize", calendarView === mode && "bg-background shadow-sm text-foreground")}>{mode}</Button>
-              ))}
+                {(["month", "week", "day"] as const).map((mode) => (
+                  <Button
+                    key={mode}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (mode === "day") {
+                        // Today view always jumps back to the current month.
+                        setYear(today.getFullYear())
+                        setMonth(today.getMonth() + 1)
+                      }
+                      setCalendarView(mode)
+                    }}
+                    className={cn("h-7 px-2.5 text-xs capitalize", calendarView === mode && "bg-background shadow-sm text-foreground")}
+                  >
+                    {mode === "day" ? "Today" : mode}
+                  </Button>
+                ))}
             </div>
             <Button onClick={() => openNewAppt()} className="bg-primary text-primary-foreground hover:bg-primary/90">
               <Plus className="mr-1.5 h-4 w-4" />
@@ -465,7 +480,7 @@ export default function CalendarPage() {
               </Button>
             </div>
           ) : (
-            <span className="text-sm font-semibold text-foreground">{calendarView === "week" ? "Week schedule" : "Day schedule"}</span>
+            <span className="text-sm font-semibold text-foreground">{calendarView === "week" ? "Week schedule" : `Today · ${fmtDate(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`)}`}</span>
           )}
         </div>
         {/* Day headers */}
