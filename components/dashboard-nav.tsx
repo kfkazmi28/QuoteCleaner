@@ -47,7 +47,10 @@ export function DashboardNav() {
     { href: "/dashboard/calendar", label: "Calendar" },
     { href: "/dashboard/contacts", label: "Contacts" },
     { href: "/dashboard/invoices", label: "Invoices" },
+    { href: "/dashboard/communications/templates", label: "Communications", match: "/dashboard/communications" },
   ]
+  const isActive = (l: { href: string; match?: string }) =>
+    l.match ? pathname.startsWith(l.match) : pathname === l.href
 
   const menuLinks = [
     { href: "/dashboard/team", label: "Team", icon: Users },
@@ -94,7 +97,7 @@ export function DashboardNav() {
                 href={l.href}
                 className={cn(
                   "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-primary",
-                  pathname === l.href ? "text-primary" : "text-muted-foreground",
+                  isActive(l) ? "text-primary" : "text-muted-foreground",
                 )}
               >
                 {l.label}
@@ -185,7 +188,7 @@ export function DashboardNav() {
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                      pathname === l.href ? "text-primary bg-accent/50" : "text-muted-foreground",
+                      isActive(l) ? "text-primary bg-accent/50" : "text-muted-foreground",
                     )}
                   >
                     {l.label}
