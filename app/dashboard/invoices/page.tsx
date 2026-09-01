@@ -272,7 +272,7 @@ function InvoiceDetailModal({
                 Mark as Sent
               </Button>
             )}
-            {invoice.status !== "canceled" && invoice.status !== "paid" && (
+            {invoice.status !== "paid" && (
               <Button
                 variant="ghost"
                 size="sm"
