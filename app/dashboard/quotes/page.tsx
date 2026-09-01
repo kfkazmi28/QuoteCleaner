@@ -109,6 +109,14 @@ function formatCurrency(val: number) {
   }).format(val)
 }
 
+function formatTime12(value?: string | null) {
+  if (!value) return ""
+  const [hours, minutes] = value.slice(0, 5).split(":").map(Number)
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return value
+  const period = hours >= 12 ? "PM" : "AM"
+  return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${period}`
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
     month: "2-digit",
@@ -779,7 +787,7 @@ function ScheduleModal({
                         const past = new Date(dateStr + "T00:00:00") < today
                         return <button key={dateStr} type="button" disabled={past} onPointerDown={(event) => event.stopPropagation()} onClick={() => { setDate(dateStr) }} className={`min-h-14 border-b border-r border-border p-1.5 text-left transition-colors ${past ? "cursor-not-allowed bg-muted/10 text-muted-foreground/40" : "cursor-pointer text-foreground hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
                           <span className="text-sm font-medium">{day}</span>
-                          <span className="mt-2 flex flex-col gap-1">{dayEvents.slice(0, 3).map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${event.start_time.slice(0, 5)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
+                          <span className="mt-2 flex flex-col gap-1">{dayEvents.slice(0, 3).map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${formatTime12(event.start_time)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
                         </button>
                       })}
                     </div>
@@ -796,8 +804,8 @@ function ScheduleModal({
                         <div key={evt.id} className="flex items-center justify-between text-xs text-muted-foreground">
                           <span className="truncate flex-1">{evt.quote_name || "Unnamed"}</span>
                           <span className="shrink-0 ml-2">
-                            {evt.start_time ? evt.start_time.slice(0, 5) : "No time"}
-                            {evt.end_time && ` - ${evt.end_time.slice(0, 5)}`}
+                            {evt.start_time ? formatTime12(evt.start_time) : "No time"}
+                            {evt.end_time && ` - ${formatTime12(evt.end_time)}`}
                           </span>
                         </div>
                       ))}
