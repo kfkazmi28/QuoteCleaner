@@ -498,7 +498,21 @@ export default function CalendarPage() {
                     {loading ? null : dayEvents.map(ev => (
                       <div
                         key={ev.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setViewingEvent(ev)
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault()
+                            event.stopPropagation()
+                            setViewingEvent(ev)
+                          }
+                        }}
                         className={cn(
+                          "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                           "mt-3 whitespace-normal break-words rounded-xl border px-2.5 py-2 text-xs font-medium leading-tight shadow-sm",
                           ev.event_type === "manual"
                             ? "border-border bg-muted/70 text-muted-foreground"
