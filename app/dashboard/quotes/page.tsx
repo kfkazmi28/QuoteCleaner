@@ -937,7 +937,7 @@ export default function SavedQuotesPage() {
   const [scheduleQuote, setScheduleQuote] = useState<SavedQuote | null>(null)
   const [scheduledQuoteIds, setScheduledQuoteIds] = useState<Set<string>>(new Set())
   const [scheduledEventsMap, setScheduledEventsMap] = useState<Map<string, ScheduledEventInfo>>(new Map())
-  const [activeTab, setActiveTab] = useState<"open" | "scheduled" | "completed">("open")
+  const [activeTab, setActiveTab] = useState<"open" | "scheduled">("open")
   const [isPending, startTransition] = useTransition()
   const [statusColumnReady, setStatusColumnReady] = useState<boolean | null>(null)
   const [checklistModalQuote, setChecklistModalQuote] = useState<SavedQuote | null>(null)
@@ -1078,12 +1078,7 @@ export default function SavedQuotesPage() {
   const scheduledQuotes = quotes.filter(q =>
     !q.archived && q.status !== "completed" && scheduledQuoteIds.has(q.id) && !isAppointmentPast(q.id)
   )
-  const completedQuotes = quotes.filter(q =>
-    !q.archived && (q.status === "completed" || (scheduledQuoteIds.has(q.id) && isAppointmentPast(q.id)))
-  )
-  const filteredQuotes = activeTab === "open" ? openQuotes
-  : activeTab === "scheduled" ? scheduledQuotes
-  : completedQuotes
+  const filteredQuotes = activeTab === "scheduled" ? scheduledQuotes : openQuotes
 
   const displayQuotes = useMemo(() => {
     const selectedPrice = (q: SavedQuote) => {
@@ -1180,18 +1175,18 @@ export default function SavedQuotesPage() {
         <div className="mb-6 grid gap-3 sm:grid-cols-2">
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Scheduled cleanings" : activeTab === "completed" ? "Completed quotes" : "Open quotes"}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? scheduledQuotes.length : activeTab === "completed" ? completedQuotes.filter(quote => quote.client_name).length : openQuotes.length}</p>
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Scheduled cleanings" : "Open quotes"}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? scheduledQuotes.length : openQuotes.length}</p>
             </CardContent>
           </Card>
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
-              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Total scheduled price" : activeTab === "completed" ? "Total completed price" : "Total open price"}</p>
+              <p className="text-sm font-medium text-muted-foreground">{activeTab === "scheduled" ? "Total scheduled price" : "Total open price"}</p>
               <p className="mt-1 text-2xl font-bold text-foreground">{loading ? "—" : activeTab === "scheduled" ? formatCurrency(scheduledQuotes.reduce((total, quote) => {
                 const packageKey = preferredPackages[quote.id] || "standard"
                 const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
                 return total + (Number(price) || 0)
-              }, 0)) : formatCurrency((activeTab === "completed" ? completedQuotes.filter(quote => quote.client_name) : openQuotes).reduce((total, quote) => {
+              }, 0)) : formatCurrency(openQuotes.reduce((total, quote) => {
                 const packageKey = preferredPackages[quote.id] || "standard"
                 const price = ({ move: quote.result_move_in, deep: quote.result_deep_clean, standard: quote.result_standard, monthly: quote.result_monthly, biweekly: quote.result_biweekly, weekly: quote.result_weekly } as Record<string, number>)[packageKey] ?? quote.result_standard
                 return total + (Number(price) || 0)
@@ -1236,17 +1231,6 @@ export default function SavedQuotesPage() {
             Scheduled
             {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({scheduledQuotes.length})</span>}
           </button>
-          <button
-            onClick={() => setActiveTab("completed")}
-            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === "completed"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Completed
-            {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({completedQuotes.length})</span>}
-          </button>
         </div>
 
         {/* Content */}
@@ -1271,22 +1255,17 @@ export default function SavedQuotesPage() {
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                 {activeTab === "scheduled" ? (
                   <CalendarCheck className="h-7 w-7 text-muted-foreground" />
-                ) : activeTab === "completed" ? (
-                  <CheckCircle2 className="h-7 w-7 text-muted-foreground" />
                 ) : (
                   <Bookmark className="h-7 w-7 text-muted-foreground" />
                 )}
               </div>
               <p className="text-base font-medium text-foreground">
 {activeTab === "scheduled" ? "No scheduled quotes"
-                  : activeTab === "completed" ? "No completed quotes"
                   : "No open quotes"}
               </p>
               <p className="max-w-xs text-sm text-muted-foreground">
 {activeTab === "scheduled"
                   ? "Schedule a job from an open quote to see it here."
-                  : activeTab === "completed"
-                  ? "Quotes are moved here automatically once their appointment date has passed, or when marked as completed."
                   : "Generate a quote in the calculator and click \"Save Quote\" to store it here."}
               </p>
               {activeTab === "open" && (
