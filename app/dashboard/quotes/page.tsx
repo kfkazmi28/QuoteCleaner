@@ -828,6 +828,16 @@ function ScheduleModal({
                 )}
               </div>
             </div>
+            <div className="rounded-xl border border-border bg-muted/25 p-4">
+              <Label className="text-base font-semibold">Cleaners</Label>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {([1, 2] as const).map((count) => (
+                  <Button key={count} type="button" variant={cleanerCount === count ? "default" : "outline"} onClick={() => { setCleanerCount(count); if (count === 1) setCleanerIds((ids) => ids.slice(0, 1)) }}>
+                    {count} cleaner{count === 1 ? "" : "s"}
+                  </Button>
+                ))}
+              </div>
+            </div>
             {date && <div className="flex flex-col gap-3 rounded-xl border border-border bg-primary/[0.04] p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary">Job timing</p>
               <div className="grid grid-cols-2 gap-3">
@@ -888,17 +898,6 @@ function ScheduleModal({
                 onChange={e => setNotes(e.target.value)}
                 className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
               />
-            </div>
-
-            <div className="rounded-xl border border-border bg-muted/25 p-4">
-              <Label>Number of cleaners</Label>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {([1, 2] as const).map((count) => (
-                  <Button key={count} type="button" variant={cleanerCount === count ? "default" : "outline"} onClick={() => { setCleanerCount(count); if (count === 1) setCleanerIds((ids) => ids.slice(0, 1)) }}>
-                    {count} cleaner{count === 1 ? "" : "s"}
-                  </Button>
-                ))}
-              </div>
             </div>
 
             {/* Cleaner selector — search-driven, shown last */}
@@ -1351,7 +1350,7 @@ export default function SavedQuotesPage() {
                             <Pencil className="mr-2 h-3.5 w-3.5" />
                             Edit
                           </DropdownMenuItem>
-                          {/* Mark as Completed — show for scheduled/upcoming quotes not yet completed */}
+                          {/* Mark as Completed ��� show for scheduled/upcoming quotes not yet completed */}
                           {!quote.archived && quote.status !== "completed" && (
                             <DropdownMenuItem
                               onClick={() => handleMarkCompleted(quote.id)}
