@@ -659,21 +659,14 @@ function ScheduleModal({
       setStartTime("")
       setEndTime("")
       setNotes("")
-      setSelectedPackage("")
-      setPackageName("")
-      setPackagePrice("")
+      const quotedPackage = quote.preferred_package || "standard"
+      const quotedPackageData = packages.find((pkg) => pkg.key === quotedPackage) || packages[0]
+      setSelectedPackage(quotedPackageData?.key || "")
+      setPackageName(quotedPackageData?.label || "Quoted cleaning package")
+      setPackagePrice(quotedPackageData ? quotedPackageData.price.toFixed(2) : "0.00")
       setCleanerIds([])
     }
   }, [quote])
-
-  const handlePackageSelect = (key: string) => {
-    setSelectedPackage(key)
-    const pkg = packages.find(p => p.key === key)
-    if (pkg) {
-      setPackageName(pkg.label)
-      setPackagePrice(pkg.price.toFixed(2))
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -732,67 +725,17 @@ function ScheduleModal({
         <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
 
-            {/* Package selector */}
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="sched-pkg-select">Cleaning Package <span className="text-xs text-muted-foreground">(optional)</span></Label>
-              {quote?.preferred_package && (() => {
-                const label: Record<string, string> = {
-                  "move":     "Move In / Move Out",
-                  "deep":     "Deep Clean",
-                  "standard": "Standard Clean",
-                  "monthly":  "Monthly",
-                  "biweekly": "Bi-weekly",
-                  "weekly":   "Weekly",
-                }
-                const display = label[quote.preferred_package]
-                if (!display) return null
-                return (
-                  <p className="text-xs text-primary font-medium">
-                    Client&apos;s preferred package: {display}
-                  </p>
-                )
-              })()}
-              <select
-                id="sched-pkg-select"
-                value={selectedPackage}
-                onChange={e => handlePackageSelect(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="">Select a package...</option>
-                {packages.map(pkg => (
-                  <option key={pkg.key} value={pkg.key}>
-                    {pkg.label} — ${pkg.price.toFixed(2)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Editable package name + price �� shown once a package is selected */}
-            {selectedPackage && (
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="sched-pkg-name">Package Name</Label>
-                  <Input
-                    id="sched-pkg-name"
-                    value={packageName}
-                    onChange={e => setPackageName(e.target.value)}
-                    placeholder="e.g. Deep Clean"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="sched-pkg-price">Price ($)</Label>
-                  <Input
-                    id="sched-pkg-price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={packagePrice}
-                    onChange={e => setPackagePrice(e.target.value)}
-                    placeholder="0.00"
-                  />
-                </div>
+            {/* Package and quoted price from the selected quote */}
+            <div className="grid grid-cols-2 gap-3 rounded-md border border-border bg-muted/30 p-3">
+              <div>
+                <Label>Cleaning Package</Label>
+                <p className="mt-1 text-sm font-medium">{packageName || "Quoted cleaning package"}</p>
               </div>
-            )}
+              <div>
+                <Label>Quoted Price</Label>
+                <p className="mt-1 text-sm font-medium">${packagePrice || "0.00"}</p>
+              </div>
+            </div>
 
             <div className="flex flex-col gap-1.5">
               <Label>Date <span className="text-destructive">*</span></Label>
