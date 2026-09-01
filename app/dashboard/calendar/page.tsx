@@ -471,9 +471,8 @@ export default function CalendarPage() {
                 key={i}
                 onClick={() => {
                   if (!day) return
-                  const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-                  openNewAppt(dateStr)
-                }}
+  openDay(day)
+  }}
                 className={cn(
                   "relative min-h-[150px] border-b border-r border-border bg-background p-3 transition-colors sm:min-h-[170px] sm:p-4",
                   i % 7 === 6 && "border-r-0",
