@@ -495,11 +495,11 @@ export default function CalendarPage() {
                       {day}
                     </span>
 
-                    {loading ? null : dayEvents.slice(0, 3).map(ev => (
+                    {loading ? null : dayEvents.map(ev => (
                       <div
                         key={ev.id}
                         className={cn(
-                          "mt-3 truncate rounded-full border px-2.5 py-2 text-xs font-medium leading-tight shadow-sm",
+                          "mt-3 whitespace-normal break-words rounded-xl border px-2.5 py-2 text-xs font-medium leading-tight shadow-sm",
                           ev.event_type === "manual"
                             ? "border-border bg-muted/70 text-muted-foreground"
                             : "border-primary/20 bg-primary/10 text-primary"
