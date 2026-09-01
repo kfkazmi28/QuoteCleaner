@@ -511,6 +511,18 @@ export default function InvoicesPage() {
                   </div>
                   <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
+                      {invoice.status !== "paid" && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-destructive hover:text-destructive"
+                          aria-label="Delete unpaid invoice"
+                          onClick={(e) => { e.stopPropagation(); handleDelete(invoice.id) }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
                       <Calendar className="h-3 w-3" />
                       {formatDate(invoice.created_at)}
                     </div>
@@ -588,6 +600,18 @@ export default function InvoicesPage() {
 
                   {/* Status + pay link */}
                   <div className="flex flex-col items-end gap-1">
+                    {invoice.status !== "paid" && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-destructive hover:text-destructive"
+                        aria-label="Delete unpaid invoice"
+                        onClick={(e) => { e.stopPropagation(); handleDelete(invoice.id) }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${STATUS_STYLES[invoice.status]}`}>
                       {STATUS_LABELS[invoice.status]}
                     </span>
