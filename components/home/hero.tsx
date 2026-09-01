@@ -1,7 +1,7 @@
 import Image from "next/image"
+import Link from "next/link"
 import { CalendarDays, Check, CircleDollarSign, FileText, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { CalculatorDialog } from "@/components/home/calculator-dialog"
 
 export function Hero() {
   return (
@@ -23,11 +23,9 @@ export function Hero() {
             The easiest way to run a cleaning business. Create professional quotes, book more jobs, and grow with confidence.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <CalculatorDialog>
-              <Button size="lg" className="bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90">
-                Try the Calculator
-              </Button>
-            </CalculatorDialog>
+            <Button size="lg" className="bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90" asChild>
+              <Link href="/dashboard/calculator">Try the Calculator</Link>
+            </Button>
           </div>
           <div className="mt-6 flex flex-col gap-2 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> No credit card required</span>

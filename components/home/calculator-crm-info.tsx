@@ -1,6 +1,6 @@
 import Image from "next/image"
+import Link from "next/link"
 import { Calculator, UsersRound, ArrowRight } from "lucide-react"
-import { CalculatorDialog } from "@/components/home/calculator-dialog"
 
 const highlights = [
   {
@@ -38,14 +38,12 @@ export function CalculatorCrmInfo() {
             <p className="mt-4 max-w-lg text-pretty leading-relaxed text-muted-foreground">
               QuoteCleaner brings your pricing and customer follow-up together, so you can spend less time switching tools and more time winning profitable jobs.
             </p>
-            <CalculatorDialog>
-              <button
-                type="button"
-                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-              >
-                Try the free calculator <ArrowRight className="h-4 w-4" />
-              </button>
-            </CalculatorDialog>
+            <Link
+              href="/dashboard/calculator"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+            >
+              Try the free calculator <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
 
           <div className="divide-y divide-border">
