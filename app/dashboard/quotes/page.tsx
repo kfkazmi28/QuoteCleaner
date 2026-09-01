@@ -1421,7 +1421,14 @@ export default function SavedQuotesPage() {
                     return (
                       <div className="contents" onClick={e => e.stopPropagation()}>
                         <span className="min-w-0 text-base font-medium text-foreground">{selectedPackage?.label}</span>
-                        <span className="text-lg font-semibold text-primary">{formatCurrency(selectedPackage?.price)}</span>
+                        <span className="flex items-center gap-2 text-lg font-semibold text-primary">
+                          {formatCurrency(selectedPackage?.price)}
+                          {activeTab === "scheduled" && invoiceByQuoteId[quote.id]?.status === "paid" && (
+                            <Badge variant="secondary" className="h-5 whitespace-nowrap border border-emerald-200 bg-emerald-50 px-1.5 text-[10px] font-medium text-emerald-700">
+                              Invoice Paid
+                            </Badge>
+                          )}
+                        </span>
                       </div>
                     )
                   })()}
@@ -1436,11 +1443,6 @@ export default function SavedQuotesPage() {
                         ? formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)
                         : formatDate(quote.created_at)}
                     </p>
-                    {activeTab === "scheduled" && invoiceByQuoteId[quote.id]?.status === "paid" && (
-                      <Badge variant="secondary" className="w-fit border border-emerald-200 bg-emerald-50 text-xs text-emerald-700">
-                        Invoice Paid
-                      </Badge>
-                    )}
                     <div className="col-start-6 flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
                       <Button
                         variant="ghost"
