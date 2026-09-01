@@ -444,13 +444,15 @@ function EditQuoteModal({
 
 function CleanerSelector({
   employees,
-  cleanerIds,
-  setCleanerIds,
-  isAvailable,
+    cleanerIds,
+    setCleanerIds,
+    cleanerCount,
+    isAvailable,
 }: {
   employees: EmployeeContact[]
   cleanerIds: string[]
   setCleanerIds: (ids: string[]) => void
+  cleanerCount: 1 | 2
   isAvailable: (emp: EmployeeContact) => boolean
 }) {
   const [search, setSearch] = useState("")
@@ -521,7 +523,7 @@ function CleanerSelector({
                 key={emp.id}
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { toggle(emp.id); setSearch("") }}
+                onClick={() => { if (!selected && cleanerIds.length >= cleanerCount) return; toggle(emp.id); setSearch("") }}
                 className={`flex items-center justify-between px-3 py-2 text-sm transition-colors text-left ${
                   selected
                     ? "bg-primary text-primary-foreground"
@@ -573,6 +575,7 @@ function ScheduleModal({
   const [packageName, setPackageName] = useState("")
   const [packagePrice, setPackagePrice] = useState("")
   const [cleanerIds, setCleanerIds] = useState<string[]>([])
+  const [cleanerCount, setCleanerCount] = useState<1 | 2>(1)
   const [employees, setEmployees] = useState<EmployeeContact[]>([])
   const [scheduledDates, setScheduledDates] = useState<Record<string, ScheduledDateEvent[]>>({})
   const [saving, setSaving] = useState(false)
@@ -650,6 +653,15 @@ function ScheduleModal({
       : baseLaborHours * mult
     return Math.round(raw * 4) / 4 // round to nearest quarter hour
   })()
+
+  // Fill the end time from the start time and selected cleaner count.
+  useEffect(() => {
+    if (!startTime || !estimatedHours) return
+    const [hours, minutes] = startTime.split(":").map(Number)
+    const durationMinutes = Math.round((estimatedHours / cleanerCount) * 60)
+    const end = new Date(2000, 0, 1, hours, minutes + durationMinutes)
+    setEndTime(`${String(end.getHours()).padStart(2, "0")}:${String(end.getMinutes()).padStart(2, "0")}`)
+  }, [startTime, estimatedHours, cleanerCount])
 
   // Build package options from quote prices
   const packages = quote ? [
@@ -878,6 +890,17 @@ function ScheduleModal({
               />
             </div>
 
+            <div className="rounded-xl border border-border bg-muted/25 p-4">
+              <Label>Number of cleaners</Label>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {([1, 2] as const).map((count) => (
+                  <Button key={count} type="button" variant={cleanerCount === count ? "default" : "outline"} onClick={() => { setCleanerCount(count); if (count === 1) setCleanerIds((ids) => ids.slice(0, 1)) }}>
+                    {count} cleaner{count === 1 ? "" : "s"}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
             {/* Cleaner selector — search-driven, shown last */}
             {employees.length > 0 && (
               <div className="rounded-xl border border-border bg-muted/25 p-4">
@@ -885,6 +908,7 @@ function ScheduleModal({
                 employees={employees}
                 cleanerIds={cleanerIds}
                 setCleanerIds={setCleanerIds}
+                cleanerCount={cleanerCount}
                 isAvailable={isAvailable}
               />
               </div>
