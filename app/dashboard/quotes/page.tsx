@@ -63,7 +63,7 @@ import { PhoneInput } from "@/components/phone-input"
 import { exportQuotePdf } from "@/lib/export-quote-pdf"
 import { ChecklistModal, getDefaultChecklist, getChecklistTitle, getChecklistDescription, type ChecklistSection } from "@/components/checklist-modal"
 import { CreateInvoiceModal } from "@/components/create-invoice-modal"
-import { getInvoiceByQuoteId, getInvoices, type Invoice } from "@/app/actions/invoices"
+import { getInvoiceByQuoteId, getInvoices, getInvoicesByQuoteIds, type Invoice } from "@/app/actions/invoices"
 
 interface SavedQuote {
   id: string
@@ -944,6 +944,7 @@ export default function SavedQuotesPage() {
   const [invoiceQuote, setInvoiceQuote] = useState<SavedQuote | null>(null)
   const [invoicedQuoteIds, setInvoicedQuoteIds] = useState<Set<string>>(new Set())
   const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [invoiceByQuoteId, setInvoiceByQuoteId] = useState<Record<string, Invoice>>({})
   const [selectedQuoteIds, setSelectedQuoteIds] = useState<Set<string>>(new Set())
   const [columnFilters, setColumnFilters] = useState({ client: "", cleaning: "", date: "", price: "" })
   const [sortConfig, setSortConfig] = useState<{ key: "client" | "address" | "cleaning" | "date" | "price"; direction: "asc" | "desc" }>({ key: "date", direction: "desc" })
@@ -963,9 +964,20 @@ export default function SavedQuotesPage() {
     })
     getScheduledQuoteIds().then(ids => setScheduledQuoteIds(ids))
   getScheduledEventsMap().then(map => setScheduledEventsMap(map))
-  getInvoices().then(setInvoices)
+  const refreshInvoiceStatuses = () => getInvoices().then((loadedInvoices) => {
+    setInvoices(loadedInvoices)
+    setInvoiceByQuoteId(Object.fromEntries(loadedInvoices.filter((invoice) => invoice.quote_id).map((invoice) => [invoice.quote_id as string, invoice])))
+  })
+  refreshInvoiceStatuses()
+  const handleVisibility = () => { if (document.visibilityState === "visible") refreshInvoiceStatuses() }
+  document.addEventListener("visibilitychange", handleVisibility)
+  const invoiceRefresh = window.setInterval(refreshInvoiceStatuses, 30000)
   // Check if DB has the status column
     checkQuoteStatusColumn().then(ready => setStatusColumnReady(ready))
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility)
+      window.clearInterval(invoiceRefresh)
+    }
   }, [])
 
   const handlePreferredPackageChange = (quoteId: string, pkgKey: string) => {
@@ -1447,6 +1459,11 @@ export default function SavedQuotesPage() {
                         ? formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)
                         : formatDate(quote.created_at)}
                     </p>
+                    {activeTab === "scheduled" && invoiceByQuoteId[quote.id]?.status === "paid" && (
+                      <Badge variant="secondary" className="w-fit border border-emerald-200 bg-emerald-50 text-xs text-emerald-700">
+                        Invoice Paid
+                      </Badge>
+                    )}
                     <div className="col-start-6 flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
                       <Button
                         variant="ghost"
