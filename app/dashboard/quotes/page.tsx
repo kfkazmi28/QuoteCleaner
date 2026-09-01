@@ -744,8 +744,8 @@ function ScheduleModal({
               <CalendarIcon className="h-5 w-5 text-primary" />
             </Button>
             {calendarOpen && typeof document !== "undefined" && createPortal(
-              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/40 p-4" onClick={() => setCalendarOpen(false)}>
-                <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl border border-border bg-background p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/40 p-4" onPointerDown={(event) => event.stopPropagation()} onClick={() => setCalendarOpen(false)}>
+                <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl border border-border bg-background p-6 shadow-2xl" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
                   <div className="mb-4 flex items-start justify-between gap-4">
                     <div><h2 className="text-lg font-semibold">Choose date and time</h2><p className="text-sm text-muted-foreground">See existing jobs while selecting this quote&apos;s schedule.</p></div>
                     <Button type="button" variant="ghost" size="icon" aria-label="Close calendar" onClick={() => setCalendarOpen(false)}>×</Button>
@@ -769,7 +769,7 @@ function ScheduleModal({
                         const dateStr = `${pickerMonth.getFullYear()}-${String(pickerMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
                         const dayEvents = scheduledDates[dateStr] || []
                         const past = new Date(dateStr + "T23:59:59") < new Date()
-                        return <button key={dateStr} type="button" disabled={past} onClick={() => { setDate(dateStr) }} className={`min-h-24 border-b border-r border-border p-2 text-left transition-colors ${past ? "bg-muted/10 text-muted-foreground/40" : "hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
+                        return <button key={dateStr} type="button" disabled={past} onPointerDown={(event) => event.stopPropagation()} onClick={() => { setDate(dateStr) }} className={`min-h-24 border-b border-r border-border p-2 text-left transition-colors ${past ? "bg-muted/10 text-muted-foreground/40" : "hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
                           <span className="text-sm font-medium">{day}</span>
                           <span className="mt-2 flex flex-col gap-1">{dayEvents.slice(0, 3).map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${event.start_time.slice(0, 5)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
                         </button>
