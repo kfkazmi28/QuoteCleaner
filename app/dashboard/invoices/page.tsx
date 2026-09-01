@@ -14,7 +14,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import {
-  FileText,
   Copy,
   Check,
   ExternalLink,
@@ -38,7 +37,6 @@ import { checkInvoicesTableExists } from "@/app/actions/invoices"
 import { getStripeConnectStatus, type StripeConnectStatus } from "@/app/actions/stripe-connect"
 import { toast } from "sonner"
 import { SendInvoiceModal } from "@/components/send-invoice-modal"
-import { exportInvoicePdf } from "@/lib/export-invoice-pdf"
 
 const STATUS_LABELS: Record<Invoice["status"], string> = {
   draft: "Draft",
@@ -218,9 +216,7 @@ function InvoiceDetailModal({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                No payment link available.{" "}
-                <Link href="/account" className="text-primary underline">Connect Stripe</Link>{" "}
-                then re-create this invoice to generate a valid payment link.
+                Stripe is not connected, so this invoice does not have an online payment link. You can still send it using the Send button and accept payment manually by cash, check, Venmo, Zelle, or another method.
               </p>
             )}
           </div>
@@ -271,9 +267,6 @@ function InvoiceDetailModal({
                 <Send className="mr-1.5 h-3.5 w-3.5" /> Send
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={() => exportInvoicePdf(invoice)}>
-              <FileText className="mr-1.5 h-3.5 w-3.5" /> Download PDF
-            </Button>
             {invoice.status === "draft" && (
               <Button
                 variant="outline"
@@ -296,7 +289,6 @@ function InvoiceDetailModal({
               </Button>
             )}
           </div>
-          <Button variant="outline" size="sm" onClick={onClose}>Close</Button>
         </div>
       </DialogContent>
     </Dialog>
