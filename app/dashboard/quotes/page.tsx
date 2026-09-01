@@ -742,9 +742,13 @@ function ScheduleModal({
               <span><span className="block text-xs font-semibold uppercase tracking-wider text-primary">Schedule date & time</span><span className="mt-1 block text-sm font-medium">{date ? `${new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}${startTime ? ` · ${startTime}` : ""}${endTime ? `–${endTime}` : ""}` : "Choose a date and time"}</span></span>
               <Calendar className="h-5 w-5 text-primary" />
             </Button>
-            <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
-              <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-                <DialogHeader><DialogTitle>Choose date and time</DialogTitle><DialogDescription>See existing jobs while selecting this quote&apos;s schedule.</DialogDescription></DialogHeader>
+            {calendarOpen && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/40 p-4" onClick={() => setCalendarOpen(false)}>
+                <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-border bg-background p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div><h2 className="text-lg font-semibold">Choose date and time</h2><p className="text-sm text-muted-foreground">See existing jobs while selecting this quote&apos;s schedule.</p></div>
+                    <Button type="button" variant="ghost" size="icon" aria-label="Close calendar" onClick={() => setCalendarOpen(false)}>×</Button>
+                  </div>
                 <div className="flex flex-col gap-4">
                   <div className="rounded-xl border border-border bg-muted/35 p-4">
               <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
@@ -839,9 +843,10 @@ function ScheduleModal({
               )}
             </div>
             <Button type="button" onClick={() => setCalendarOpen(false)} disabled={!date}>Use this schedule</Button>
+                    </div>
                 </div>
-            </DialogContent>
-            </Dialog>
+              </div>
+            )}
             <div className="flex flex-col gap-2 rounded-xl border border-border bg-muted/25 p-4">
               <Label htmlFor="sched-notes" className="text-base font-semibold">Notes <span className="text-xs font-normal text-muted-foreground">(optional)</span></Label>
               <textarea
