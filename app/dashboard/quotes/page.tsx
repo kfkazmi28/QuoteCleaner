@@ -828,16 +828,6 @@ function ScheduleModal({
                 )}
               </div>
             </div>
-            <div className="rounded-xl border border-border bg-muted/25 p-4">
-              <Label className="text-base font-semibold">Cleaners</Label>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {([1, 2] as const).map((count) => (
-                  <Button key={count} type="button" variant={cleanerCount === count ? "default" : "outline"} onClick={() => { setCleanerCount(count); if (count === 1) setCleanerIds((ids) => ids.slice(0, 1)) }}>
-                    {count} cleaner{count === 1 ? "" : "s"}
-                  </Button>
-                ))}
-              </div>
-            </div>
             {date && <div className="flex flex-col gap-3 rounded-xl border border-border bg-primary/[0.04] p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary">Job timing</p>
               <div className="grid grid-cols-2 gap-3">
@@ -882,6 +872,25 @@ function ScheduleModal({
                   Estimated labor hours: <span className="italic">(choose cleaning package)</span>
                 </p>
               )}
+              <div className="border-t border-border/70 pt-3">
+                <Label className="text-sm font-semibold">Cleaners</Label>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {([1, 2] as const).map((count) => (
+                    <Button key={count} type="button" variant={cleanerCount === count ? "default" : "outline"} onClick={() => { setCleanerCount(count); if (count === 1) setCleanerIds((ids) => ids.slice(0, 1)) }}>
+                      {count} cleaner{count === 1 ? "" : "s"}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              {employees.length > 0 && <div className="border-t border-border/70 pt-3">
+                <CleanerSelector
+                  employees={employees}
+                  cleanerIds={cleanerIds}
+                  setCleanerIds={setCleanerIds}
+                  cleanerCount={cleanerCount}
+                  isAvailable={isAvailable}
+                />
+              </div>}
             </div>}
             <Button type="button" onClick={() => setCalendarOpen(false)} disabled={!date}>Use this schedule</Button>
                     </div>
@@ -900,18 +909,6 @@ function ScheduleModal({
               />
             </div>
 
-            {/* Cleaner selector — search-driven, shown last */}
-            {employees.length > 0 && (
-              <div className="rounded-xl border border-border bg-muted/25 p-4">
-              <CleanerSelector
-                employees={employees}
-                cleanerIds={cleanerIds}
-                setCleanerIds={setCleanerIds}
-                cleanerCount={cleanerCount}
-                isAvailable={isAvailable}
-              />
-              </div>
-            )}
           </div>
           <DialogFooter className="shrink-0 border-t border-border px-6 py-4 gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
