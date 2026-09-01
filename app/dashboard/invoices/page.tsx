@@ -37,6 +37,8 @@ import { getInvoices, markInvoiceSent, deleteInvoice, recordManualPayment, type 
 import { checkInvoicesTableExists } from "@/app/actions/invoices"
 import { getStripeConnectStatus, type StripeConnectStatus } from "@/app/actions/stripe-connect"
 import { toast } from "sonner"
+import { SendInvoiceModal } from "@/components/send-invoice-modal"
+import { exportInvoicePdf } from "@/lib/export-invoice-pdf"
 
 const STATUS_LABELS: Record<Invoice["status"], string> = {
   draft: "Draft",
@@ -90,6 +92,7 @@ function InvoiceDetailModal({
   onMarkSent,
   onDelete,
   onPaymentRecorded,
+  onSendInvoice,
   connectEnabled,
 }: {
   invoice: Invoice | null
@@ -97,6 +100,7 @@ function InvoiceDetailModal({
   onMarkSent: (id: string) => void
   onDelete: (id: string) => void
   onPaymentRecorded: (invoice: Invoice) => void
+  onSendInvoice: (invoice: Invoice) => void
   connectEnabled: boolean
 }) {
   if (!invoice) return null
@@ -261,7 +265,15 @@ function InvoiceDetailModal({
         </div>
 
         <div className="shrink-0 border-t border-border px-6 py-4 flex items-center justify-between gap-3">
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {invoice.status !== "paid" && invoice.status !== "canceled" && (
+              <Button variant="default" size="sm" onClick={() => { onClose(); onSendInvoice(invoice) }}>
+                <Send className="mr-1.5 h-3.5 w-3.5" /> Send with AI
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={() => exportInvoicePdf(invoice)}>
+              <FileText className="mr-1.5 h-3.5 w-3.5" /> Download PDF
+            </Button>
             {invoice.status === "draft" && (
               <Button
                 variant="outline"
@@ -299,6 +311,7 @@ export default function InvoicesPage() {
   const [tableReady, setTableReady] = useState<boolean | null>(null)
   const [activeTab, setActiveTab] = useState<TabKey>("unpaid")
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null)
+  const [sendInvoice, setSendInvoice] = useState<Invoice | null>(null)
   const [connectStatus, setConnectStatus] = useState<StripeConnectStatus | null>(null)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
 
@@ -646,14 +659,16 @@ export default function InvoicesPage() {
         )}
       </main>
 
-      <InvoiceDetailModal
-        invoice={viewInvoice}
+  <SendInvoiceModal open={!!sendInvoice} invoice={sendInvoice} onClose={() => setSendInvoice(null)} />
+  <InvoiceDetailModal
+  invoice={viewInvoice}
         onClose={() => setViewInvoice(null)}
         onMarkSent={handleMarkSent}
   onDelete={handleDelete}
   onPaymentRecorded={(updated) => {
     setInvoices((prev) => prev.map((invoice) => invoice.id === updated.id ? updated : invoice))
   }}
+  onSendInvoice={setSendInvoice}
   connectEnabled={connectStatus?.chargesEnabled ?? false}
       />
     </div>
