@@ -462,7 +462,8 @@ export default function CalendarPage() {
           ))}
         </div>
 
-        {/* Day cells */}
+        {/* Day cells — scrollable so month boundaries stay visible */}
+        <div className="max-h-[min(68vh,680px)] overflow-y-auto">
         <div className={cn("grid", calendarView === "day" ? "grid-cols-1" : "grid-cols-7")}>
           {cells.map((day, i) => {
             const dayEvents = day ? (eventsByDay.get(day) ?? []) : []
@@ -481,6 +482,11 @@ export default function CalendarPage() {
                   !day && "bg-muted/20",
                 )}
               >
+                {!day && calendarView === "month" && i < firstDay && (
+                  <span className="flex h-6 w-6 items-center justify-center text-xs font-medium text-muted-foreground/50">
+                    {new Date(year, month - 1, i - firstDay + 1).getDate()}
+                  </span>
+                )}
                 {day && (
                   <>
                     <span
@@ -530,6 +536,7 @@ export default function CalendarPage() {
               </div>
             )
           })}
+        </div>
         </div>
       </div>}
 
