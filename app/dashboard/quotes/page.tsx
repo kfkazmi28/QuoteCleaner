@@ -780,10 +780,10 @@ function ScheduleModal({
                 {date ? (
                   <div className="rounded-md border border-input bg-muted/30 p-2">
                     <p className="text-xs font-medium text-foreground mb-1.5">
-                      {new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} — {scheduledDates[date].length} job{scheduledDates[date].length > 1 ? "s" : ""}
+                      {new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} — {(scheduledDates[date] || []).length} job{(scheduledDates[date] || []).length > 1 ? "s" : ""}
                     </p>
                     <div className="flex flex-col gap-1 max-h-24 overflow-y-auto">
-                      {scheduledDates[date].map((evt) => (
+                      {(scheduledDates[date] || []).map((evt) => (
                         <div key={evt.id} className="flex items-center justify-between text-xs text-muted-foreground">
                           <span className="truncate flex-1">{evt.quote_name || "Unnamed"}</span>
                           <span className="shrink-0 ml-2">
