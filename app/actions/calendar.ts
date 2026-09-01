@@ -26,6 +26,8 @@ export interface CalendarEvent {
   recurrence_rule: "weekly" | "biweekly" | "monthly" | null
   recurrence_end_date: string | null
   recurrence_occurrences: number | null
+  cleaner_id: string | null
+  cleaner_ids: string[] | null
   // joined from saved_quotes
   quote?: {
     id: string

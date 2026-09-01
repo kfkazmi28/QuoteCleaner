@@ -64,6 +64,7 @@ export default function CalendarPage() {
   const [editPackageName, setEditPackageName] = useState("")
   const [editPackagePrice, setEditPackagePrice] = useState("")
   const [savingPackage, setSavingPackage] = useState(false)
+  const [savingCleaner, setSavingCleaner] = useState(false)
   const [view, setView] = useState<"calendar" | "invoice-list">("calendar")
   const [calendarView, setCalendarView] = useState<"month" | "week" | "day">("month")
   const [invoicesByEventId, setInvoicesByEventId] = useState<Record<string, Invoice>>({})
@@ -247,6 +248,19 @@ export default function CalendarPage() {
       load()
     }
     setSavingPackage(false)
+  }
+
+  async function handleAssignCleaner(eventId: string, cleanerId: string) {
+    setSavingCleaner(true)
+    const { error } = await updateCalendarEvent(eventId, { cleaner_id: cleanerId || undefined, cleaner_ids: cleanerId ? [cleanerId] : [] })
+    if (error) toast.error("Failed to assign cleaner")
+    else {
+      const cleaner = employees.find((employee) => employee.id === cleanerId)
+      if (viewingEvent?.id === eventId) setViewingEvent({ ...viewingEvent, cleaner_id: cleanerId || null, cleaner_ids: cleanerId ? [cleanerId] : [], })
+      toast.success(cleaner ? `${cleaner.name} assigned to this job` : "Cleaner assignment removed")
+      await load()
+    }
+    setSavingCleaner(false)
   }
 
   function startEditingPackage(ev: CalendarEvent) {
@@ -890,6 +904,14 @@ export default function CalendarPage() {
                       </div>
                     </div>
                   )}
+
+                  <div className="rounded-lg border border-border bg-muted/30 p-4">
+                    <p className="mb-2 text-sm font-medium text-foreground">Cleaner</p>
+                    <select className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm" value={ev.cleaner_id ?? ev.cleaner_ids?.[0] ?? ""} disabled={savingCleaner} onChange={(event) => handleAssignCleaner(ev.id, event.target.value)}>
+                      <option value="">Unassigned</option>
+                      {employees.map((employee) => <option key={employee.id} value={employee.id}>{employee.name}</option>)}
+                    </select>
+                  </div>
 
                   {/* Package / Service with Price - Always show for editing */}
                   <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
