@@ -268,7 +268,7 @@ function InvoiceDetailModal({
           <div className="flex flex-wrap gap-2">
             {invoice.status !== "paid" && invoice.status !== "canceled" && (
               <Button variant="default" size="sm" onClick={() => { onClose(); onSendInvoice(invoice) }}>
-                <Send className="mr-1.5 h-3.5 w-3.5" /> Send with AI
+                <Send className="mr-1.5 h-3.5 w-3.5" /> Send
               </Button>
             )}
             <Button variant="outline" size="sm" onClick={() => exportInvoicePdf(invoice)}>
