@@ -770,8 +770,8 @@ function ScheduleModal({
               <CalendarIcon className="h-5 w-5 text-primary" />
             </Button>
             {calendarOpen && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-foreground/40 p-3 sm:p-5" onPointerDown={(event) => event.stopPropagation()} onClick={() => setCalendarOpen(false)}>
-                <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border bg-background p-4 shadow-2xl sm:max-h-[calc(100dvh-2.5rem)] sm:p-5" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
+              <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-foreground/40 p-3 sm:p-5" onPointerDown={(event) => event.stopPropagation()} onClick={() => setCalendarOpen(false)}>
+                <div className="flex min-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col rounded-xl border border-border bg-background p-4 shadow-2xl sm:p-5" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
                   <div className="mb-4 flex items-start justify-between gap-4">
                     <div><h2 className="text-lg font-semibold">Choose date and time</h2><p className="text-sm text-muted-foreground">See existing jobs while selecting this quote&apos;s schedule.</p></div>
                     <Button type="button" variant="ghost" size="icon" aria-label="Close calendar" onClick={() => setCalendarOpen(false)}>×</Button>
@@ -780,7 +780,7 @@ function ScheduleModal({
                   <div className="rounded-xl border border-border bg-muted/35 p-4">
               <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
               <div className="flex flex-col gap-2">
-                <div className="max-h-[40dvh] min-h-[280px] w-full overflow-auto rounded-xl border border-border bg-background p-2">
+                <div className="w-full rounded-xl border border-border bg-background p-2">
                   <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
                     <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
                       <Button type="button" variant="ghost" size="icon" onClick={() => setPickerMonth(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() - 1, 1))} aria-label="Previous month">‹</Button>
