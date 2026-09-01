@@ -6,8 +6,6 @@ import { Sparkles, Menu, X, Moon, Sun } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { QuoteCalculator } from "@/components/quote-calculator"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
@@ -67,24 +65,7 @@ export function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          {publicLinks.map((l) => l.label === "Calculator" ? (
-            <Popover key={l.href}>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary",
-                    pathname === l.href ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {l.label}
-                </button>
-              </PopoverTrigger>
-              <PopoverContent align="center" className="w-[min(92vw,520px)] max-h-[calc(100vh-5rem)] overflow-y-auto p-0">
-                <QuoteCalculator />
-              </PopoverContent>
-            </Popover>
-          ) : (
+          {publicLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -151,24 +132,7 @@ export function Header() {
       {open && (
         <div className="border-t border-border bg-background px-4 py-4 md:hidden">
           <nav className="flex flex-col gap-3">
-            {publicLinks.map((l) => l.label === "Calculator" ? (
-              <Popover key={l.href}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "text-left text-sm font-medium transition-colors hover:text-primary",
-                      pathname === l.href ? "text-primary" : "text-muted-foreground",
-                    )}
-                  >
-                    {l.label}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-[min(92vw,520px)] max-h-[calc(100vh-7rem)] overflow-y-auto p-0">
-                  <QuoteCalculator />
-                </PopoverContent>
-              </Popover>
-            ) : (
+            {publicLinks.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
