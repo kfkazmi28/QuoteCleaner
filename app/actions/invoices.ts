@@ -23,6 +23,8 @@ export interface Invoice {
   paid_at: string | null
   created_at: string
   updated_at: string
+  payment_method: string | null
+  payment_recorded_at: string | null
 }
 
 export interface CreateInvoiceInput {
@@ -231,6 +233,23 @@ export async function updateInvoice(
 
 export async function markInvoiceSent(invoiceId: string): Promise<{ error?: string }> {
   return updateInvoice(invoiceId, { status: "sent" })
+}
+
+export async function recordManualPayment(invoiceId: string, paymentMethod: string, amountPaid: number): Promise<{ data?: Invoice; error?: string }> {
+  if (!paymentMethod.trim() || !Number.isFinite(amountPaid) || amountPaid <= 0) return { error: "Enter a valid payment method and amount" }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+  const { data, error } = await supabase
+    .from("invoices")
+    .update({ status: "paid", amount_due: 0, paid_at: new Date().toISOString(), payment_method: paymentMethod.trim(), payment_recorded_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq("id", invoiceId)
+    .eq("user_id", user.id)
+    .neq("status", "paid")
+    .select()
+    .single()
+  if (error) return { error: error.message }
+  return { data: data as Invoice }
 }
 
 export async function deleteInvoice(invoiceId: string): Promise<{ error?: string }> {

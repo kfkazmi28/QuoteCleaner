@@ -33,7 +33,7 @@ import {
   LayoutGrid,
   List,
 } from "lucide-react"
-import { getInvoices, markInvoiceSent, deleteInvoice, type Invoice } from "@/app/actions/invoices"
+import { getInvoices, markInvoiceSent, deleteInvoice, recordManualPayment, type Invoice } from "@/app/actions/invoices"
 import { checkInvoicesTableExists } from "@/app/actions/invoices"
 import { getStripeConnectStatus, type StripeConnectStatus } from "@/app/actions/stripe-connect"
 import { toast } from "sonner"
@@ -89,15 +89,21 @@ function InvoiceDetailModal({
   onClose,
   onMarkSent,
   onDelete,
+  onPaymentRecorded,
   connectEnabled,
 }: {
   invoice: Invoice | null
   onClose: () => void
   onMarkSent: (id: string) => void
   onDelete: (id: string) => void
+  onPaymentRecorded: (invoice: Invoice) => void
   connectEnabled: boolean
 }) {
   if (!invoice) return null
+
+  const [paymentMethod, setPaymentMethod] = useState("Cash")
+  const [paymentAmount, setPaymentAmount] = useState(String(invoice.amount_due))
+  const [isRecordingPayment, setIsRecordingPayment] = useState(false)
 
   const emailSubject = `Your Cleaning Invoice from CleanQuote`
   const emailBody = [
@@ -214,6 +220,35 @@ function InvoiceDetailModal({
               </p>
             )}
           </div>
+
+          {invoice.status !== "paid" && invoice.status !== "canceled" && (
+            <div className="space-y-3 rounded-lg border border-border p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Record Manual Payment</p>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="space-y-1 text-sm">
+                  <span className="text-xs text-muted-foreground">Payment Method</span>
+                  <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm">
+                    <option>Cash</option><option>Check</option><option>Venmo</option><option>Zelle</option><option>Other</option>
+                  </select>
+                </label>
+                <label className="space-y-1 text-sm">
+                  <span className="text-xs text-muted-foreground">Amount Paid</span>
+                  <input type="number" min="0.01" step="0.01" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" />
+                </label>
+              </div>
+              <Button type="button" size="sm" disabled={isRecordingPayment} onClick={async () => {
+                setIsRecordingPayment(true)
+                const result = await recordManualPayment(invoice.id, paymentMethod, Number(paymentAmount))
+                setIsRecordingPayment(false)
+                if (result.error) { toast.error(result.error); return }
+                if (result.data) onPaymentRecorded(result.data)
+                toast.success("Payment recorded")
+                onClose()
+              }}>
+                {isRecordingPayment ? "Recording…" : "Record Payment"}
+              </Button>
+            </div>
+          )}
 
           {/* Paid info */}
           {invoice.status === "paid" && invoice.paid_at && (
@@ -615,8 +650,11 @@ export default function InvoicesPage() {
         invoice={viewInvoice}
         onClose={() => setViewInvoice(null)}
         onMarkSent={handleMarkSent}
-        onDelete={handleDelete}
-        connectEnabled={connectStatus?.chargesEnabled ?? false}
+  onDelete={handleDelete}
+  onPaymentRecorded={(updated) => {
+    setInvoices((prev) => prev.map((invoice) => invoice.id === updated.id ? updated : invoice))
+  }}
+  connectEnabled={connectStatus?.chargesEnabled ?? false}
       />
     </div>
   )
