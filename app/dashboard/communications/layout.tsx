@@ -12,7 +12,7 @@ export default function CommunicationsLayout({ children }: { children: ReactNode
   return (
     <div className="min-h-screen bg-background">
       <DashboardNav />
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:ml-64 lg:px-8">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
