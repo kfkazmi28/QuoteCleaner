@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useSearchParams } from "next/navigation"
 import { ChevronLeft, ChevronRight, CalendarDays, Clock, Trash2, MapPin, User, Plus, LinkIcon, Filter, X, RefreshCcw, Sparkles, Home, Check, DollarSign, TrendingUp, Users, BarChart3, ClipboardList, ExternalLink, FileText, Pencil, Receipt, List, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -46,6 +47,7 @@ function fmtDate(date: string) {
 }
 
 export default function CalendarPage() {
+  const searchParams = useSearchParams()
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth() + 1) // 1-based
@@ -61,6 +63,7 @@ export default function CalendarPage() {
   const [editPackagePrice, setEditPackagePrice] = useState("")
   const [savingPackage, setSavingPackage] = useState(false)
   const [view, setView] = useState<"calendar" | "invoice-list">("calendar")
+  const [calendarView, setCalendarView] = useState<"month" | "week" | "day">("month")
   const [invoicesByEventId, setInvoicesByEventId] = useState<Record<string, Invoice>>({})
 
   // Filters
@@ -101,6 +104,12 @@ export default function CalendarPage() {
   }, [year, month])
 
   useEffect(() => { load() }, [load])
+
+  useEffect(() => {
+    if (searchParams.get("quoteId")) {
+      setApptModalOpen(true)
+    }
+  }, [searchParams])
 
   // Filter events
   const filteredEvents = events.filter(ev => {
@@ -154,12 +163,22 @@ export default function CalendarPage() {
   // Build grid
   const firstDay = new Date(year, month - 1, 1).getDay()
   const daysInMonth = new Date(year, month, 0).getDate()
-  const cells: (number | null)[] = [
+  let cells: (number | null)[] = [
     ...Array(firstDay).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ]
-  // Pad to full weeks
-  while (cells.length % 7 !== 0) cells.push(null)
+  // Month shows the full month; week and day focus the current date range.
+  if (calendarView === "day") {
+    const focusedDay = today.getFullYear() === year && today.getMonth() + 1 === month ? today.getDate() : 1
+    cells = [focusedDay]
+  } else if (calendarView === "week") {
+    const focusedDay = today.getFullYear() === year && today.getMonth() + 1 === month ? today.getDate() : 1
+    const weekStart = Math.max(1, focusedDay - new Date(year, month - 1, focusedDay).getDay())
+    cells = Array.from({ length: 7 }, (_, index) => weekStart + index <= daysInMonth ? weekStart + index : null)
+  } else {
+    // Pad the month to complete calendar rows.
+    while (cells.length % 7 !== 0) cells.push(null)
+  }
 
   const eventsByDay = new Map<number, CalendarEvent[]>()
   for (const ev of filteredEvents) {
@@ -275,6 +294,11 @@ export default function CalendarPage() {
                 <Receipt className="h-3.5 w-3.5" />
                 Invoice List
               </Button>
+            </div>
+            <div className="flex items-center rounded-lg border border-border bg-muted/50 p-0.5" aria-label="Calendar view">
+              {(["month", "week", "day"] as const).map((mode) => (
+                <Button key={mode} variant="ghost" size="sm" onClick={() => setCalendarView(mode)} className={cn("h-7 px-2.5 text-xs capitalize", calendarView === mode && "bg-background shadow-sm text-foreground")}>{mode}</Button>
+              ))}
             </div>
             <div className="flex items-center gap-1">
               <Button variant="outline" size="icon" onClick={prevMonth} aria-label="Previous month">
@@ -414,8 +438,11 @@ export default function CalendarPage() {
 
       {/* Calendar grid */}
       {view === "calendar" && <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm">
+        <div className="border-b border-border bg-muted/20 px-4 py-3 text-sm font-semibold text-foreground">
+          {calendarView === "month" ? `${MONTHS[month - 1]} ${year}` : calendarView === "week" ? "Week schedule" : "Day schedule"}
+        </div>
         {/* Day headers */}
-        <div className="grid grid-cols-7 border-b border-border bg-muted/30">
+        <div className={cn("grid border-b border-border bg-muted/30", calendarView === "day" ? "grid-cols-1" : "grid-cols-7")}>
           {DAYS.map(d => (
             <div key={d} className="py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {d}
@@ -424,7 +451,7 @@ export default function CalendarPage() {
         </div>
 
         {/* Day cells */}
-        <div className="grid grid-cols-7">
+        <div className={cn("grid", calendarView === "day" ? "grid-cols-1" : "grid-cols-7")}>
           {cells.map((day, i) => {
             const dayEvents = day ? (eventsByDay.get(day) ?? []) : []
             return (
@@ -645,9 +672,16 @@ export default function CalendarPage() {
         onCreated={load}
       />
 
-      {/* Day detail dialog */}
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
+      {/* In-page scheduling sidebar */}
+      {selected && <aside className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l border-border bg-background shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-5">
+          <div>
+            <h2 className="flex items-center gap-2 text-base font-semibold"><CalendarDays className="h-4 w-4 text-primary" />{fmtDate(selected.date)}</h2>
+            <p className="text-sm text-muted-foreground">{selected.events.length ? `${selected.events.length} scheduled` : "No jobs scheduled"}</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => setSelected(null)} aria-label="Close scheduling sidebar"><X className="h-4 w-4" /></Button>
+        </div> 
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
             <DialogTitle className="flex items-center gap-2 text-base">
               <CalendarDays className="h-4 w-4 text-primary" />
@@ -747,8 +781,8 @@ export default function CalendarPage() {
               </Button>
             )}
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </aside>}
 
       {/* Appointment Details Modal */}
       <Dialog open={!!viewingEvent} onOpenChange={(open) => {

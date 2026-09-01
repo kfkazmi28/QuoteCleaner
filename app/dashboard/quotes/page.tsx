@@ -897,7 +897,6 @@ export default function SavedQuotesPage() {
   const [viewQuote, setViewQuote] = useState<SavedQuote | null>(null)
   const [editQuote, setEditQuote] = useState<SavedQuote | null>(null)
   const [sendQuote, setSendQuote] = useState<SavedQuote | null>(null)
-  const [scheduleQuote, setScheduleQuote] = useState<SavedQuote | null>(null)
   const [scheduledQuoteIds, setScheduledQuoteIds] = useState<Set<string>>(new Set())
   const [scheduledEventsMap, setScheduledEventsMap] = useState<Map<string, ScheduledEventInfo>>(new Map())
   const [activeTab, setActiveTab] = useState<"open" | "scheduled" | "completed">("open")
@@ -1423,7 +1422,7 @@ export default function SavedQuotesPage() {
                         variant="ghost"
                         size="sm"
                         className="h-7 px-2 text-xs"
-                        onClick={() => setScheduleQuote(quote)}
+                        onClick={() => router.push(`/dashboard/calendar?quoteId=${encodeURIComponent(quote.id)}`)}
                       >
                         <CalendarCheck className="mr-1 h-3 w-3" />
                         {scheduledQuoteIds.has(quote.id) ? "Reschedule" : "Schedule"}
@@ -1549,15 +1548,7 @@ export default function SavedQuotesPage() {
         )
       })()}
 
-      {/* Schedule Modal */}
-      <ScheduleModal
-        quote={scheduleQuote}
-        onClose={() => setScheduleQuote(null)}
-        onScheduled={(id) => {
-          setScheduledQuoteIds(prev => new Set([...prev, id]))
-          getScheduledEventsMap().then(map => setScheduledEventsMap(map))
-        }}
-      />
+
     </div>
   )
 }
