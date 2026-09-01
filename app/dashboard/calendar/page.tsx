@@ -461,12 +461,11 @@ export default function CalendarPage() {
                       <div
                         key={ev.id}
                         className={cn(
-                          "mt-1 truncate rounded px-1 py-0.5 text-[10px] font-medium leading-tight",
+                          "mt-1 truncate rounded-md border px-1.5 py-1 text-[10px] font-medium leading-tight",
                           ev.event_type === "manual"
-                            ? "bg-muted/60 text-muted-foreground"
-                            : ""
+                            ? "border-border bg-muted/70 text-muted-foreground"
+                            : "border-primary/20 bg-primary/10 text-primary"
                         )}
-                        style={ev.event_type !== "manual" ? { background: "oklch(0.60 0.15 175 / 0.15)", color: "oklch(0.42 0.13 175)" } : {}}
                       >
                         {fmt12(ev.start_time) && <span className="mr-1">{fmt12(ev.start_time)}</span>}
                         {ev.event_type === "manual" ? (ev.client_name ?? "Appointment") : (ev.quote?.quote_name ?? "Job")}
@@ -689,7 +688,12 @@ export default function CalendarPage() {
                 return (
                   <div
                     key={ev.id}
-                    className="rounded-lg border border-border bg-muted/30 p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                    className={cn(
+                      "cursor-pointer rounded-lg border p-4 transition-colors",
+                      isManual
+                        ? "border-border bg-muted/60 hover:bg-muted/80"
+                        : "border-primary/20 bg-primary/5 hover:bg-primary/10",
+                    )}
                     onClick={() => setViewingEvent(ev)}
                   >
                     <div className="flex items-center gap-2 min-w-0">
