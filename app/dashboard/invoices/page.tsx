@@ -104,6 +104,7 @@ function InvoiceDetailModal({
   if (!invoice) return null
 
   const [paymentMethod, setPaymentMethod] = useState("Cash")
+  const [paymentReference, setPaymentReference] = useState("")
   const [paymentAmount, setPaymentAmount] = useState(String(invoice.amount_due))
   const [isRecordingPayment, setIsRecordingPayment] = useState(false)
 
@@ -235,10 +236,16 @@ function InvoiceDetailModal({
                   <span className="text-xs text-muted-foreground">Amount Paid</span>
                   <input type="number" min="0.01" step="0.01" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" />
                 </label>
+                {paymentMethod === "Check" && (
+                  <label className="space-y-1 text-sm">
+                    <span className="text-xs text-muted-foreground">Ref #</span>
+                    <input type="text" value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} placeholder="Check number" className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" />
+                  </label>
+                )}
               </div>
               <Button type="button" size="sm" disabled={isRecordingPayment} onClick={async () => {
                 setIsRecordingPayment(true)
-                const result = await recordManualPayment(invoice.id, paymentMethod, Number(paymentAmount))
+                const result = await recordManualPayment(invoice.id, paymentMethod, Number(paymentAmount), paymentReference)
                 setIsRecordingPayment(false)
                 if (result.error) { toast.error(result.error); return }
                 if (result.data) onPaymentRecorded(result.data)
