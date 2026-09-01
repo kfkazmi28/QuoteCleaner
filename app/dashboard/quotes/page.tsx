@@ -767,7 +767,12 @@ function ScheduleModal({
             </div>
 
 <Button type="button" variant="outline" className="h-auto justify-between rounded-xl border-primary/25 bg-primary/5 p-4 text-left hover:bg-primary/10" onClick={() => setCalendarOpen(true)}>
-  <span className="block text-xs font-semibold uppercase tracking-wider text-primary">Schedule date & time</span>
+  <span>
+    <span className="block text-xs font-semibold uppercase tracking-wider text-primary">Schedule date & time</span>
+    <span className="mt-1 block text-sm font-medium text-foreground">
+      {date ? `${new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}${startTime ? ` · ${formatTime12(startTime)}` : ""}${endTime ? `–${formatTime12(endTime)}` : ""}` : "Choose a date and time"}
+    </span>
+  </span>
   <CalendarIcon className="h-5 w-5 text-primary" />
 </Button>
             {calendarOpen && (
@@ -889,7 +894,7 @@ function ScheduleModal({
                 />
               </div>}
             </div>}
-            <Button type="button" onClick={() => setCalendarOpen(false)} disabled={!date}>Use this schedule</Button>
+            <Button type="button" onClick={() => { if (date) setCalendarOpen(false) }} disabled={!date}>Use this schedule</Button>
                     </div>
                 </div>
               </div>
