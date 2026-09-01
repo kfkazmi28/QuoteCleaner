@@ -26,6 +26,7 @@ export interface SaveQuoteInput {
   result_weekly: number
   settings_snapshot: PricingSettings
   preferred_package?: string
+  status?: string
   checklist_data?: {
     standard?: { section: string; items: string[] }[]
     deep?: { section: string; items: string[] }[]

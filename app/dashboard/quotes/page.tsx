@@ -659,7 +659,8 @@ function ScheduleModal({
       setDate("")
       setStartTime("")
       setEndTime("")
-      setNotes("")
+      setNotes(quote.notes ?? "")
+      setCalendarOpen(true)
       const quotedPackage = quote.preferred_package || "standard"
       const quotedPackageData = packages.find((pkg) => pkg.key === quotedPackage) || packages[0]
       setSelectedPackage(quotedPackageData?.key || "")
@@ -713,7 +714,7 @@ function ScheduleModal({
 
   return (
     <Dialog open={!!quote} onOpenChange={onClose}>
-      <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
+      <DialogContent className="flex max-h-[95vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-6xl">
         <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
           <DialogTitle className="flex items-center gap-2">
             <CalendarCheck className="h-5 w-5 text-primary" />
@@ -725,6 +726,12 @@ function ScheduleModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
+
+            {/* Pre-filled quote information */}
+            <div className="grid gap-2 rounded-xl border border-border bg-muted/25 p-4 text-sm sm:grid-cols-2">
+              <div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Customer</p><p className="font-medium">{quote?.client_name || "Not provided"}</p><p className="text-muted-foreground">{quote?.client_email || quote?.client_phone || "No contact details"}</p></div>
+              <div><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Property</p><p className="font-medium">{quote?.home_address || "Address not provided"}</p></div>
+            </div>
 
             {/* Package and quoted price from the selected quote */}
             <div className="grid grid-cols-2 gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 shadow-sm">
@@ -897,6 +904,7 @@ export default function SavedQuotesPage() {
   const [viewQuote, setViewQuote] = useState<SavedQuote | null>(null)
   const [editQuote, setEditQuote] = useState<SavedQuote | null>(null)
   const [sendQuote, setSendQuote] = useState<SavedQuote | null>(null)
+  const [scheduleQuote, setScheduleQuote] = useState<SavedQuote | null>(null)
   const [scheduledQuoteIds, setScheduledQuoteIds] = useState<Set<string>>(new Set())
   const [scheduledEventsMap, setScheduledEventsMap] = useState<Map<string, ScheduledEventInfo>>(new Map())
   const [activeTab, setActiveTab] = useState<"open" | "scheduled" | "completed">("open")
@@ -1422,7 +1430,7 @@ export default function SavedQuotesPage() {
                         variant="ghost"
                         size="sm"
                         className="h-7 px-2 text-xs"
-                        onClick={() => router.push(`/dashboard/calendar?quoteId=${encodeURIComponent(quote.id)}`)}
+                        onClick={() => setScheduleQuote(quote)}
                       >
                         <CalendarCheck className="mr-1 h-3 w-3" />
                         {scheduledQuoteIds.has(quote.id) ? "Reschedule" : "Schedule"}
@@ -1458,6 +1466,18 @@ export default function SavedQuotesPage() {
             </div>
         )}
       </main>
+
+      <ScheduleModal
+        quote={scheduleQuote}
+        onClose={() => setScheduleQuote(null)}
+        onScheduled={(quoteId) => {
+          setScheduledQuoteIds(prev => new Set([...prev, quoteId]))
+          setQuotes(prev => prev.map(q => q.id === quoteId ? { ...q, status: "scheduled" } : q))
+          updateQuote(quoteId, { status: "scheduled" })
+          getScheduledEventsMap().then(map => setScheduledEventsMap(map))
+          toast.success("Quote scheduled successfully")
+        }}
+      />
 
       {/* View Modal */}
       <ViewQuoteModal
