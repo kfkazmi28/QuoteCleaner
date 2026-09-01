@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, CalendarDays, Clock, Trash2, MapPin, User, P
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { getCalendarEvents, deleteCalendarEvent, updateCalendarEvent, type CalendarEvent } from "@/app/actions/calendar"
+import { getSavedQuoteById, getCalendarEvents, deleteCalendarEvent, updateCalendarEvent, type CalendarEvent, type SavedQuoteSearchResult } from "@/app/actions/calendar"
 import { upsertInvoiceForEvent, getInvoicesByQuoteIds, type Invoice } from "@/app/actions/invoices"
 import { getEmployeeContacts } from "@/app/actions/contacts"
 import { getClientContacts } from "@/app/actions/contacts"
@@ -57,6 +57,8 @@ export default function CalendarPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [apptModalOpen, setApptModalOpen] = useState(false)
   const [apptDefaultDate, setApptDefaultDate] = useState<string | undefined>(undefined)
+  const [preloadedQuote, setPreloadedQuote] = useState<SavedQuoteSearchResult | null>(null)
+  const [quoteLoadError, setQuoteLoadError] = useState<string | null>(null)
   const [viewingEvent, setViewingEvent] = useState<CalendarEvent | null>(null)
   const [editingPackage, setEditingPackage] = useState(false)
   const [editPackageName, setEditPackageName] = useState("")
@@ -106,9 +108,19 @@ export default function CalendarPage() {
   useEffect(() => { load() }, [load])
 
   useEffect(() => {
-    if (searchParams.get("quoteId")) {
+    const quoteId = searchParams.get("quoteId")
+    if (!quoteId) return
+    let cancelled = false
+    getSavedQuoteById(quoteId).then((quote) => {
+      if (cancelled) return
+      if (!quote) {
+        setQuoteLoadError("Saved quote could not be found. No appointment was opened.")
+        return
+      }
+      setPreloadedQuote(quote)
       setApptModalOpen(true)
-    }
+    })
+    return () => { cancelled = true }
   }, [searchParams])
 
   // Filter events
@@ -665,10 +677,12 @@ export default function CalendarPage() {
       })()}
 
       {/* New appointment modal */}
-      <AppointmentModal
-        open={apptModalOpen}
-        onOpenChange={setApptModalOpen}
-        defaultDate={apptDefaultDate}
+  {quoteLoadError && <div role="alert" className="mx-auto mb-4 max-w-7xl rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">{quoteLoadError}</div>}
+  <AppointmentModal
+  open={apptModalOpen}
+  onOpenChange={setApptModalOpen}
+  defaultDate={apptDefaultDate}
+  initialQuote={preloadedQuote}
         onCreated={load}
       />
 
