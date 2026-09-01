@@ -17,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
   DialogContent,
@@ -571,6 +570,7 @@ function ScheduleModal({
   const [scheduledDates, setScheduledDates] = useState<Record<string, ScheduledDateEvent[]>>({})
   const [saving, setSaving] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
+  const [pickerMonth, setPickerMonth] = useState(() => new Date())
 
   // Fetch employees and scheduled dates on mount
   useEffect(() => {
@@ -741,7 +741,7 @@ function ScheduleModal({
 
             <Button type="button" variant="outline" className="h-auto justify-between rounded-xl border-primary/25 bg-primary/5 p-4 text-left hover:bg-primary/10" onClick={() => setCalendarOpen(true)}>
               <span><span className="block text-xs font-semibold uppercase tracking-wider text-primary">Schedule date & time</span><span className="mt-1 block text-sm font-medium">{date ? `${new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}${startTime ? ` · ${startTime}` : ""}${endTime ? `–${endTime}` : ""}` : "Choose a date and time"}</span></span>
-              <Calendar className="h-5 w-5 text-primary" />
+              <CalendarIcon className="h-5 w-5 text-primary" />
             </Button>
             {calendarOpen && typeof document !== "undefined" && createPortal(
               <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/40 p-4" onClick={() => setCalendarOpen(false)}>
@@ -755,27 +755,27 @@ function ScheduleModal({
               <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
               <div className="flex flex-col gap-2">
                 <div className="flex min-h-[330px] justify-center overflow-hidden rounded-xl border border-border bg-background p-2">
-                  <Calendar
-                    mode="single"
-                    selected={date ? new Date(date + "T12:00:00") : undefined}
-                    onSelect={(d) => setDate(d ? d.toISOString().split("T")[0] : "")}
-                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                    modifiers={{
-                      booked: (d) => {
-                        const dateStr = d.toISOString().split("T")[0]
-                        return !!scheduledDates[dateStr]
-                      }
-                    }}
-                    modifiersStyles={{
-                      booked: {
-                        fontWeight: 600,
-                        textDecoration: "underline",
-                        textDecorationColor: "oklch(0.6 0.15 175)",
-                        textUnderlineOffset: "3px",
-                      }
-                    }}
-                    initialFocus
-                  />
+                  <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
+                    <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setPickerMonth(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() - 1, 1))} aria-label="Previous month">‹</Button>
+                      <p className="font-semibold">{pickerMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => setPickerMonth(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() + 1, 1))} aria-label="Next month">›</Button>
+                    </div>
+                    <div className="grid grid-cols-7 border-b border-border bg-muted/20">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <div key={day} className="py-2 text-center text-xs font-semibold uppercase text-muted-foreground">{day}</div>)}</div>
+                    <div className="grid grid-cols-7">
+                      {Array.from({ length: new Date(pickerMonth.getFullYear(), pickerMonth.getMonth(), 1).getDay() }).map((_, index) => <div key={`empty-${index}`} className="min-h-24 border-b border-r border-border bg-muted/10" />)}
+                      {Array.from({ length: new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() + 1, 0).getDate() }).map((_, index) => {
+                        const day = index + 1
+                        const dateStr = `${pickerMonth.getFullYear()}-${String(pickerMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                        const dayEvents = scheduledDates[dateStr] || []
+                        const past = new Date(dateStr + "T23:59:59") < new Date()
+                        return <button key={dateStr} type="button" disabled={past} onClick={() => { setDate(dateStr) }} className={`min-h-24 border-b border-r border-border p-2 text-left transition-colors ${past ? "bg-muted/10 text-muted-foreground/40" : "hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
+                          <span className="text-sm font-medium">{day}</span>
+                          <span className="mt-2 flex flex-col gap-1">{dayEvents.slice(0, 3).map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${event.start_time.slice(0, 5)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
+                        </button>
+                      })}
+                    </div>
+                  </div>
                 </div>
                 {/* Show selected day's schedule */}
                 {date && scheduledDates[date] && scheduledDates[date].length > 0 ? (
