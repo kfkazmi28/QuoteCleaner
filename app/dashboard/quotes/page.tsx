@@ -776,8 +776,8 @@ function ScheduleModal({
                     </div>
                   </div>
                 </div>
-                {/* Show selected day's schedule */}
-                {date && scheduledDates[date] && scheduledDates[date].length > 0 ? (
+                {/* Show only the selected day's appointments */}
+                {date ? (
                   <div className="rounded-md border border-input bg-muted/30 p-2">
                     <p className="text-xs font-medium text-foreground mb-1.5">
                       {new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} — {scheduledDates[date].length} job{scheduledDates[date].length > 1 ? "s" : ""}
@@ -794,23 +794,12 @@ function ScheduleModal({
                       ))}
                     </div>
                   </div>
-                ) : null}
-                <div className="rounded-xl border border-border bg-muted/25 p-3">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">Appointments on schedule</p>
-                  <div className="max-h-36 space-y-2 overflow-y-auto">
-                    {Object.entries(scheduledDates).flatMap(([scheduledDate, events]) => events.map((event) => ({ scheduledDate, event }))).length === 0 ? (
-                      <p className="text-sm text-muted-foreground">No appointments scheduled yet.</p>
-                    ) : Object.entries(scheduledDates).flatMap(([scheduledDate, events]) => events.map((event) => ({ scheduledDate, event }))).map(({ scheduledDate, event }) => (
-                      <div key={event.id} className="flex items-center justify-between gap-3 rounded-md bg-background px-3 py-2 text-sm">
-                        <span className="truncate font-medium">{event.quote_name || "Appointment"}</span>
-                        <span className="shrink-0 text-xs text-muted-foreground">{new Date(scheduledDate + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}{event.start_time ? ` · ${event.start_time.slice(0, 5)}` : ""}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                ) : (
+                  <div className="rounded-md border border-border bg-muted/25 p-3 text-sm text-muted-foreground">No appointments on this day.</div>
+                )}
               </div>
             </div>
-            <div className="flex flex-col gap-3 rounded-xl border border-border bg-primary/[0.04] p-4">
+            {date && <div className="flex flex-col gap-3 rounded-xl border border-border bg-primary/[0.04] p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary">Job timing</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
@@ -854,7 +843,7 @@ function ScheduleModal({
                   Estimated labor hours: <span className="italic">(choose cleaning package)</span>
                 </p>
               )}
-            </div>
+            </div>}
             <Button type="button" onClick={() => setCalendarOpen(false)} disabled={!date}>Use this schedule</Button>
                     </div>
                 </div>
