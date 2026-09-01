@@ -709,18 +709,6 @@ export default function CalendarPage() {
           <Button variant="ghost" size="icon" onClick={() => setSelected(null)} aria-label="Close scheduling sidebar"><X className="h-4 w-4" /></Button>
         </div> 
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <DialogHeader className="shrink-0 border-b border-border px-6 py-5">
-            <DialogTitle className="flex items-center gap-2 text-base">
-              <CalendarDays className="h-4 w-4 text-primary" />
-              {selected && fmtDate(selected.date)}
-            </DialogTitle>
-            <DialogDescription>
-              {selected?.events.length
-                ? `${selected.events.length} job${selected.events.length > 1 ? "s" : ""} scheduled`
-                : "No jobs scheduled"}
-            </DialogDescription>
-          </DialogHeader>
-
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {selected?.events.length === 0 && (
               <div className="flex flex-col items-center gap-3 py-8">
