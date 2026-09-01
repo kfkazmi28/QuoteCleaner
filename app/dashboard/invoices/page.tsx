@@ -140,7 +140,7 @@ function InvoiceDetailModal({
             </span>
           </div>
           <DialogDescription className="text-sm text-muted-foreground">
-            Created {formatDate(invoice.created_at)}
+            Cleaned {formatDate(invoice.created_at)}
             {invoice.due_date && ` · Due ${formatDate(invoice.due_date)}`}
           </DialogDescription>
         </DialogHeader>
