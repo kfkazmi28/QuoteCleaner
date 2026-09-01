@@ -1437,8 +1437,8 @@ export default function SavedQuotesPage() {
 
                   {/* Footer */}
                   <div className="contents">
-                    <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                      <CalendarIcon className="h-3 w-3 shrink-0" />
+  <p className="mt-1 ml-4 flex items-center gap-1 text-xs text-muted-foreground">
+  <CalendarIcon className="h-3 w-3 shrink-0" />
                       {activeTab === "scheduled" && scheduledEventsMap.get(quote.id)?.scheduled_date
                         ? formatDate(scheduledEventsMap.get(quote.id)!.scheduled_date)
                         : formatDate(quote.created_at)}
