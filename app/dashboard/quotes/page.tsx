@@ -779,7 +779,6 @@ function ScheduleModal({
                   </div>
                 <div className="flex flex-col gap-4">
                   <div className="rounded-xl border border-border bg-muted/35 p-4">
-              <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
               <div className="flex flex-col gap-2">
                 <div className="w-full rounded-xl border border-brand-pink/40 bg-brand-pink/10 p-2">
                   <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
