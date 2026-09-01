@@ -32,7 +32,7 @@ import {
   LayoutGrid,
   List,
 } from "lucide-react"
-import { getInvoices, markInvoiceSent, deleteInvoice, recordManualPayment, type Invoice } from "@/app/actions/invoices"
+import { getInvoices, markInvoiceSent, deleteInvoice, recordManualPayment, updatePaymentMethod, type Invoice } from "@/app/actions/invoices"
 import { checkInvoicesTableExists } from "@/app/actions/invoices"
 import { getStripeConnectStatus, type StripeConnectStatus } from "@/app/actions/stripe-connect"
 import { toast } from "sonner"
@@ -107,6 +107,8 @@ function InvoiceDetailModal({
   const [paymentReference, setPaymentReference] = useState("")
   const [paymentAmount, setPaymentAmount] = useState(String(invoice.amount_due))
   const [isRecordingPayment, setIsRecordingPayment] = useState(false)
+  const [isEditingPayment, setIsEditingPayment] = useState(false)
+  const [isSavingPayment, setIsSavingPayment] = useState(false)
 
   const emailSubject = `Your Cleaning Invoice from CleanQuote`
   const emailBody = [
@@ -260,9 +262,22 @@ function InvoiceDetailModal({
           {/* Paid info */}
           {invoice.status === "paid" && invoice.paid_at && (
             <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-              <p className="text-sm font-medium text-primary">
-                Paid on {formatDate(invoice.paid_at)}
-              </p>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium text-primary">Paid on {formatDate(invoice.paid_at)}</p>
+                  <p className="text-sm text-muted-foreground">Payment method: {invoice.payment_method || "Stripe"}{invoice.payment_method === "Check" && invoice.payment_reference ? ` · Ref #${invoice.payment_reference}` : ""}</p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={() => { setPaymentMethod(invoice.payment_method || "Cash"); setPaymentReference(invoice.payment_reference || ""); setIsEditingPayment((value) => !value) }}>
+                  {isEditingPayment ? "Cancel" : "Edit"}
+                </Button>
+              </div>
+              {isEditingPayment && (
+                <div className="mt-3 flex flex-wrap items-end gap-2">
+                  <label className="space-y-1 text-sm"><span className="block text-xs text-muted-foreground">Payment Method</span><select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="h-9 rounded-md border border-input bg-background px-2 text-sm"><option>Cash</option><option>Check</option><option>Venmo</option><option>Zelle</option><option>Other</option></select></label>
+                  {paymentMethod === "Check" && <label className="space-y-1 text-sm"><span className="block text-xs text-muted-foreground">Ref #</span><input value={paymentReference} onChange={(e) => setPaymentReference(e.target.value)} className="h-9 rounded-md border border-input bg-background px-2 text-sm" placeholder="Check number" /></label>}
+                  <Button type="button" size="sm" disabled={isSavingPayment} onClick={async () => { setIsSavingPayment(true); const result = await updatePaymentMethod(invoice.id, paymentMethod, paymentReference); setIsSavingPayment(false); if (result.error) { toast.error(result.error); return } if (result.data) onPaymentRecorded(result.data); setIsEditingPayment(false); toast.success("Payment method updated") }}>{isSavingPayment ? "Saving…" : "Save"}</Button>
+                </div>
+              )}
             </div>
           )}
         </div>

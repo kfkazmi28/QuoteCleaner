@@ -254,6 +254,24 @@ export async function recordManualPayment(invoiceId: string, paymentMethod: stri
   return { data: data as Invoice }
 }
 
+export async function updatePaymentMethod(invoiceId: string, paymentMethod: string, paymentReference?: string): Promise<{ data?: Invoice; error?: string }> {
+  if (!paymentMethod.trim()) return { error: "Enter a payment method" }
+  if (paymentMethod === "Check" && !paymentReference?.trim()) return { error: "Enter the check reference number" }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: "Not authenticated" }
+  const { data, error } = await supabase
+    .from("invoices")
+    .update({ payment_method: paymentMethod.trim(), payment_reference: paymentReference?.trim() || null, updated_at: new Date().toISOString() })
+    .eq("id", invoiceId)
+    .eq("user_id", user.id)
+    .eq("status", "paid")
+    .select()
+    .single()
+  if (error) return { error: error.message }
+  return { data: data as Invoice }
+}
+
 export async function deleteInvoice(invoiceId: string): Promise<{ error?: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
