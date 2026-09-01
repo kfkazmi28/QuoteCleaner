@@ -256,13 +256,13 @@ function InvoiceDetailModal({
   )
 }
 
-type TabKey = Invoice["status"] | "all"
+type TabKey = "paid" | "unpaid"
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [tableReady, setTableReady] = useState<boolean | null>(null)
-  const [activeTab, setActiveTab] = useState<TabKey>("all")
+  const [activeTab, setActiveTab] = useState<TabKey>("unpaid")
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null)
   const [connectStatus, setConnectStatus] = useState<StripeConnectStatus | null>(null)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -297,15 +297,11 @@ export default function InvoicesPage() {
   }
 
   const tabs: { key: TabKey; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "draft", label: "Draft" },
-    { key: "sent", label: "Sent" },
     { key: "paid", label: "Paid" },
+    { key: "unpaid", label: "Unpaid" },
   ]
 
-  const filtered = activeTab === "all"
-    ? invoices
-    : invoices.filter((inv) => inv.status === activeTab)
+  const filtered = invoices.filter((inv) => activeTab === "paid" ? inv.status === "paid" : inv.status !== "paid")
 
   const countByStatus = (s: Invoice["status"]) => invoices.filter((i) => i.status === s).length
 
@@ -406,11 +402,10 @@ export default function InvoicesPage() {
 
         {/* Summary cards */}
         {tableReady && !loading && (
-          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mb-6 grid grid-cols-2 gap-3">
             {[
-              { label: "Draft", count: countByStatus("draft"), color: "text-muted-foreground" },
-              { label: "Sent", count: countByStatus("sent"), color: "text-blue-600 dark:text-blue-400" },
               { label: "Paid", count: countByStatus("paid"), color: "text-primary" },
+              { label: "Unpaid", count: invoices.filter((invoice) => invoice.status !== "paid").length, color: "text-blue-600 dark:text-blue-400" },
             ].map((s) => (
               <div key={s.label} className="rounded-lg border border-border bg-card px-4 py-3">
                 <p className="text-xs text-muted-foreground">{s.label}</p>
@@ -433,9 +428,9 @@ export default function InvoicesPage() {
               }`}
             >
               {tab.label}
-              {tab.key !== "all" && !loading && (
+              {!loading && (
                 <span className="ml-1.5 text-xs text-muted-foreground">
-                  ({countByStatus(tab.key as Invoice["status"])})
+                  ({tab.key === "paid" ? countByStatus("paid") : invoices.filter((invoice) => invoice.status !== "paid").length})
                 </span>
               )}
             </button>
