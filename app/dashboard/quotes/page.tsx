@@ -830,6 +830,13 @@ function ScheduleModal({
             </div>
             {date && <div className="flex flex-col gap-3 rounded-xl border border-border bg-primary/[0.04] p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary">Job timing</p>
+              <div className="flex gap-2">
+                {([1, 2] as const).map((count) => (
+                  <Button key={count} type="button" size="sm" variant={cleanerCount === count ? "default" : "outline"} className="h-8 px-3 text-xs" onClick={() => { setCleanerCount(count); if (count === 1) setCleanerIds((ids) => ids.slice(0, 1)) }}>
+                    {count} cleaner{count === 1 ? "" : "s"}
+                  </Button>
+                ))}
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="sched-start" className="flex items-center gap-1.5">
@@ -872,16 +879,6 @@ function ScheduleModal({
                   Estimated labor hours: <span className="italic">(choose cleaning package)</span>
                 </p>
               )}
-              <div className="border-t border-border/70 pt-2">
-                <Label className="text-xs font-semibold">Cleaners</Label>
-                <div className="mt-1 flex gap-2">
-                  {([1, 2] as const).map((count) => (
-                    <Button key={count} type="button" size="sm" variant={cleanerCount === count ? "default" : "outline"} className="h-8 px-3 text-xs" onClick={() => { setCleanerCount(count); if (count === 1) setCleanerIds((ids) => ids.slice(0, 1)) }}>
-                      {count} cleaner{count === 1 ? "" : "s"}
-                    </Button>
-                  ))}
-                </div>
-              </div>
               {employees.length > 0 && <div className="border-t border-border/70 pt-3">
                 <CleanerSelector
                   employees={employees}
