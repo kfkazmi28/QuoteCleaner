@@ -415,9 +415,9 @@ export default function CalendarPage() {
       {/* Calendar grid */}
       {view === "calendar" && <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm">
         {/* Day headers */}
-        <div className="grid grid-cols-7 border-b border-border">
+        <div className="grid grid-cols-7 border-b border-border bg-muted/30">
           {DAYS.map(d => (
-            <div key={d} className="py-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <div key={d} className="py-3 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {d}
             </div>
           ))}
@@ -433,11 +433,10 @@ export default function CalendarPage() {
                 onClick={() => {
                   if (!day) return
                   const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-                  if (dayEvents.length > 0) openDay(day)
-                  else openNewAppt(dateStr)
+                  openNewAppt(dateStr)
                 }}
                 className={cn(
-                  "relative min-h-[90px] border-b border-r border-border p-1.5 sm:p-2",
+                  "relative min-h-[150px] border-b border-r border-border bg-background p-3 transition-colors sm:min-h-[170px] sm:p-4",
                   i % 7 === 6 && "border-r-0",
                   Math.floor(i / 7) === Math.floor((cells.length - 1) / 7) && "border-b-0",
                   day && "cursor-pointer transition-colors hover:bg-muted/40",
@@ -461,14 +460,14 @@ export default function CalendarPage() {
                       <div
                         key={ev.id}
                         className={cn(
-                          "mt-1 truncate rounded-md border px-1.5 py-1 text-[10px] font-medium leading-tight",
+                          "mt-3 truncate rounded-full border px-2.5 py-2 text-xs font-medium leading-tight shadow-sm",
                           ev.event_type === "manual"
                             ? "border-border bg-muted/70 text-muted-foreground"
                             : "border-primary/20 bg-primary/10 text-primary"
                         )}
                       >
                         {fmt12(ev.start_time) && <span className="mr-1">{fmt12(ev.start_time)}</span>}
-                        {ev.event_type === "manual" ? (ev.client_name ?? "Appointment") : (ev.quote?.quote_name ?? "Job")}
+                        <span>{ev.event_type === "manual" ? (ev.client_name ?? "Appointment") : (ev.quote?.quote_name ?? "Job")}</span>
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
