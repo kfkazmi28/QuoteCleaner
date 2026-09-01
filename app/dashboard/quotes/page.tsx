@@ -569,6 +569,7 @@ function ScheduleModal({
   const [employees, setEmployees] = useState<EmployeeContact[]>([])
   const [scheduledDates, setScheduledDates] = useState<Record<string, ScheduledDateEvent[]>>({})
   const [saving, setSaving] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(false)
 
   // Fetch employees and scheduled dates on mount
   useEffect(() => {
@@ -737,7 +738,15 @@ function ScheduleModal({
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 rounded-xl border border-border bg-muted/35 p-4">
+            <Button type="button" variant="outline" className="h-auto justify-between rounded-xl border-primary/25 bg-primary/5 p-4 text-left hover:bg-primary/10" onClick={() => setCalendarOpen(true)}>
+              <span><span className="block text-xs font-semibold uppercase tracking-wider text-primary">Schedule date & time</span><span className="mt-1 block text-sm font-medium">{date ? `${new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}${startTime ? ` · ${startTime}` : ""}${endTime ? `–${endTime}` : ""}` : "Choose a date and time"}</span></span>
+              <Calendar className="h-5 w-5 text-primary" />
+            </Button>
+            <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+                <DialogHeader><DialogTitle>Choose date and time</DialogTitle><DialogDescription>See existing jobs while selecting this quote&apos;s schedule.</DialogDescription></DialogHeader>
+                <div className="flex flex-col gap-4">
+                  <div className="rounded-xl border border-border bg-muted/35 p-4">
               <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
               <div className="flex flex-col gap-2">
                 <div className="flex justify-center rounded-md border border-input bg-background">
@@ -829,6 +838,10 @@ function ScheduleModal({
                 </p>
               )}
             </div>
+            <Button type="button" onClick={() => setCalendarOpen(false)} disabled={!date}>Use this schedule</Button>
+                </div>
+            </DialogContent>
+            </Dialog>
             <div className="flex flex-col gap-2 rounded-xl border border-border bg-muted/25 p-4">
               <Label htmlFor="sched-notes" className="text-base font-semibold">Notes <span className="text-xs font-normal text-muted-foreground">(optional)</span></Label>
               <textarea
