@@ -744,7 +744,7 @@ function ScheduleModal({
             </Button>
             {calendarOpen && (
               <div className="absolute inset-0 z-[100] flex items-center justify-center rounded-xl bg-foreground/40 p-4" onClick={() => setCalendarOpen(false)}>
-                <div className="max-h-full w-full overflow-y-auto rounded-xl border border-border bg-background p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+                <div className="max-h-[95vh] w-full max-w-6xl overflow-y-auto rounded-xl border border-border bg-background p-8 shadow-2xl" onClick={(event) => event.stopPropagation()}>
                   <div className="mb-4 flex items-start justify-between gap-4">
                     <div><h2 className="text-lg font-semibold">Choose date and time</h2><p className="text-sm text-muted-foreground">See existing jobs while selecting this quote&apos;s schedule.</p></div>
                     <Button type="button" variant="ghost" size="icon" aria-label="Close calendar" onClick={() => setCalendarOpen(false)}>×</Button>
