@@ -404,12 +404,12 @@ export default function InvoicesPage() {
         {tableReady && !loading && (
           <div className="mb-6 grid grid-cols-2 gap-3">
             {[
-              { label: "Paid", count: countByStatus("paid"), color: "text-primary" },
-              { label: "Unpaid", count: invoices.filter((invoice) => invoice.status !== "paid").length, color: "text-blue-600 dark:text-blue-400" },
+              { label: "Open Invoices", value: invoices.filter((invoice) => invoice.status !== "paid").length, color: "text-blue-600 dark:text-blue-400" },
+              { label: "Total Amount Due", value: formatCurrency(invoices.filter((invoice) => invoice.status !== "paid").reduce((total, invoice) => total + (Number(invoice.amount_due) || 0), 0)), color: "text-primary" },
             ].map((s) => (
               <div key={s.label} className="rounded-lg border border-border bg-card px-4 py-3">
                 <p className="text-xs text-muted-foreground">{s.label}</p>
-                <p className={`text-2xl font-bold ${s.color}`}>{s.count}</p>
+                <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
               </div>
             ))}
           </div>
