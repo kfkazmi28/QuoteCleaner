@@ -726,7 +726,7 @@ function ScheduleModal({
           <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
 
             {/* Package and quoted price from the selected quote */}
-            <div className="grid grid-cols-2 gap-3 rounded-md border border-border bg-muted/30 p-3">
+            <div className="grid grid-cols-2 gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 shadow-sm">
               <div>
                 <Label>Cleaning Package</Label>
                 <p className="mt-1 text-sm font-medium">{packageName || "Quoted cleaning package"}</p>
@@ -737,8 +737,8 @@ function ScheduleModal({
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label>Date <span className="text-destructive">*</span></Label>
+            <div className="flex flex-col gap-3 rounded-xl border border-border bg-muted/35 p-4">
+              <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
               <div className="flex flex-col gap-2">
                 <div className="flex justify-center rounded-md border border-input bg-background">
                   <Calendar
@@ -784,7 +784,8 @@ function ScheduleModal({
                 ) : null}
               </div>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3 rounded-xl border border-border bg-primary/[0.04] p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Job timing</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="sched-start" className="flex items-center gap-1.5">
@@ -828,8 +829,8 @@ function ScheduleModal({
                 </p>
               )}
             </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="sched-notes">Notes <span className="text-xs text-muted-foreground">(optional)</span></Label>
+            <div className="flex flex-col gap-2 rounded-xl border border-border bg-muted/25 p-4">
+              <Label htmlFor="sched-notes" className="text-base font-semibold">Notes <span className="text-xs font-normal text-muted-foreground">(optional)</span></Label>
               <textarea
                 id="sched-notes"
                 rows={2}
@@ -842,12 +843,14 @@ function ScheduleModal({
 
             {/* Cleaner selector — search-driven, shown last */}
             {employees.length > 0 && (
+              <div className="rounded-xl border border-border bg-muted/25 p-4">
               <CleanerSelector
                 employees={employees}
                 cleanerIds={cleanerIds}
                 setCleanerIds={setCleanerIds}
                 isAvailable={isAvailable}
               />
+              </div>
             )}
           </div>
           <DialogFooter className="shrink-0 border-t border-border px-6 py-4 gap-2 sm:gap-0">
