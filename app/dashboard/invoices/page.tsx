@@ -231,7 +231,10 @@ function InvoiceDetailModal({
                 </label>
                 <label className="space-y-1 text-sm">
                   <span className="text-xs text-muted-foreground">Amount Paid</span>
-                  <input type="number" min="0.01" step="0.01" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" />
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground">$</span>
+                    <input type="number" min="0.01" step="0.01" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="h-9 w-full rounded-md border border-input bg-background pl-7 pr-2 text-sm" />
+                  </div>
                 </label>
                 {paymentMethod === "Check" && (
                   <label className="space-y-1 text-sm">
