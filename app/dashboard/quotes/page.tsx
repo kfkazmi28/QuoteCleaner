@@ -750,8 +750,8 @@ function ScheduleModal({
               <CalendarIcon className="h-5 w-5 text-primary" />
             </Button>
             {calendarOpen && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/40 p-6" onPointerDown={(event) => event.stopPropagation()} onClick={() => setCalendarOpen(false)}>
-                <div className="max-h-[92vh] w-full max-w-[90rem] overflow-y-auto rounded-xl border border-border bg-background p-8 shadow-2xl" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
+              <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-foreground/40 p-4 sm:p-6" onPointerDown={(event) => event.stopPropagation()} onClick={() => setCalendarOpen(false)}>
+                <div className="max-h-[calc(100vh-2rem)] w-full max-w-5xl overflow-y-auto rounded-xl border border-border bg-background p-5 shadow-2xl sm:max-h-[calc(100vh-3rem)] sm:p-6" onPointerDown={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
                   <div className="mb-4 flex items-start justify-between gap-4">
                     <div><h2 className="text-lg font-semibold">Choose date and time</h2><p className="text-sm text-muted-foreground">See existing jobs while selecting this quote&apos;s schedule.</p></div>
                     <Button type="button" variant="ghost" size="icon" aria-label="Close calendar" onClick={() => setCalendarOpen(false)}>×</Button>
@@ -760,7 +760,7 @@ function ScheduleModal({
                   <div className="rounded-xl border border-border bg-muted/35 p-4">
               <Label className="text-base font-semibold">Date <span className="text-destructive">*</span></Label>
               <div className="flex flex-col gap-2">
-                <div className="flex min-h-[650px] w-full justify-center overflow-auto rounded-xl border border-border bg-background p-2">
+                <div className="max-h-[52vh] min-h-[360px] w-full overflow-auto rounded-xl border border-border bg-background p-2">
                   <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
                     <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3">
                       <Button type="button" variant="ghost" size="icon" onClick={() => setPickerMonth(new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() - 1, 1))} aria-label="Previous month">‹</Button>
@@ -769,7 +769,7 @@ function ScheduleModal({
                     </div>
                     <div className="grid grid-cols-7 border-b border-border bg-muted/20">{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <div key={day} className="py-2 text-center text-xs font-semibold uppercase text-muted-foreground">{day}</div>)}</div>
                     <div className="grid grid-cols-7">
-                      {Array.from({ length: new Date(pickerMonth.getFullYear(), pickerMonth.getMonth(), 1).getDay() }).map((_, index) => <div key={`empty-${index}`} className="min-h-32 border-b border-r border-border bg-muted/10" />)}
+                      {Array.from({ length: new Date(pickerMonth.getFullYear(), pickerMonth.getMonth(), 1).getDay() }).map((_, index) => <div key={`empty-${index}`} className="min-h-20 border-b border-r border-border bg-muted/10" />)}
                       {Array.from({ length: new Date(pickerMonth.getFullYear(), pickerMonth.getMonth() + 1, 0).getDate() }).map((_, index) => {
                         const day = index + 1
                         const dateStr = `${pickerMonth.getFullYear()}-${String(pickerMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
@@ -777,7 +777,7 @@ function ScheduleModal({
                         const today = new Date()
                         today.setHours(0, 0, 0, 0)
                         const past = new Date(dateStr + "T00:00:00") < today
-                        return <button key={dateStr} type="button" disabled={past} onPointerDown={(event) => event.stopPropagation()} onClick={() => { setDate(dateStr) }} className={`min-h-32 border-b border-r border-border p-3 text-left transition-colors ${past ? "cursor-not-allowed bg-muted/10 text-muted-foreground/40" : "cursor-pointer text-foreground hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
+                        return <button key={dateStr} type="button" disabled={past} onPointerDown={(event) => event.stopPropagation()} onClick={() => { setDate(dateStr) }} className={`min-h-20 border-b border-r border-border p-2 text-left transition-colors ${past ? "cursor-not-allowed bg-muted/10 text-muted-foreground/40" : "cursor-pointer text-foreground hover:bg-primary/5"} ${date === dateStr ? "bg-primary/10 ring-2 ring-inset ring-primary" : ""}`}>
                           <span className="text-sm font-medium">{day}</span>
                           <span className="mt-2 flex flex-col gap-1">{dayEvents.slice(0, 3).map((event) => <span key={event.id} className="truncate rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary">{event.start_time ? `${event.start_time.slice(0, 5)} ` : ""}{event.quote_name || "Appointment"}</span>)}</span>
                         </button>
