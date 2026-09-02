@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from "@/components/ui/badge"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { usePricingSettings, defaultHomeDetails, defaultSettings } from "@/contexts/pricing-settings-context"
+import { calculateQuote as computeQuotePricing } from "@/lib/pricing"
 import { Calculator, Sparkles, Lock, Info, Check, Bookmark, Send, FileDown, Pencil, Trash2, Plus, FolderOpen, ChevronDown, BookmarkPlus, MoreHorizontal } from "lucide-react"
 import { getSavedCalculators, getCalculatorFolders, createCalculatorFolder, updateCalculatorFolder, moveCalculator, saveCalculator, deleteCalculator, renameCalculator, type SavedCalculator, type CalculatorFolder } from "@/app/actions/calculators"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -563,31 +564,20 @@ export default function DashboardPage() {
   }
 
   const runCalculation = () => {
-    const cleanLevelMinutes: Record<string, number> = { "1": 60, "2": 120, "3": 180 }
-
-    const sqft = toSqFt(squareFootage)
-    const beds = parseFloat(bedrooms) || 0
-    const baths = parseFloat(bathrooms) || 0
-    const numPets = parseFloat(pets) || 0
-    const numChildren = parseFloat(children) || 0
-
-    const totalMinutes =
-      sqft * settings.sqftMultiplier +
-      (cleanLevelMinutes[cleanLevel] || 120) +
-      beds * settings.bedroomMinutes +
-      baths * settings.bathroomMinutes +
-      numPets * settings.petFeeMinutes +
-      numChildren * settings.childrenFeeMinutes
-
-    const totalHours = totalMinutes / 60
-    const deepClean = Math.round(totalHours * settings.hourlyRate)
-    const moveInMoveOut = Math.round((totalHours + 2) * settings.hourlyRate)
-    const standardSingle = Math.round(deepClean * 0.80)
-    const monthly = Math.round(standardSingle * 0.95)
-    const biweekly = Math.round(standardSingle * 0.90)
-    const weekly = Math.round(standardSingle * 0.85)
-
-    updateQuoteResults({ deepClean, moveInMoveOut, standardSingle, monthly, biweekly, weekly, totalHours })
+    // Shared engine — identical math to public booking forms (lib/pricing.ts)
+    updateQuoteResults(
+      computeQuotePricing(
+        {
+          squareFootage: toSqFt(squareFootage),
+          cleanLevel,
+          bedrooms: parseFloat(bedrooms) || 0,
+          bathrooms: parseFloat(bathrooms) || 0,
+          pets: parseFloat(pets) || 0,
+          children: parseFloat(children) || 0,
+        },
+        settings,
+      ),
+    )
   }
 
   // User has unlimited access if subscribed OR has an active Day Pass

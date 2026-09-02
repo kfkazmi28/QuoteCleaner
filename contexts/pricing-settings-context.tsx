@@ -3,37 +3,11 @@
 import { createContext, useContext, useState, useEffect, useRef, type ReactNode } from "react"
 import { createClient } from "@/lib/supabase/client"
 
-export interface PricingSettings {
-  hourlyRate: number
-  bedroomMinutes: number
-  bathroomMinutes: number
-  petFeeMinutes: number
-  childrenFeeMinutes: number
-  sqftMultiplier: number
-  moveInExtraHours: number
-  standardCleanDiscount: number
-  monthlyDiscount: number
-  biweeklyDiscount: number
-  weeklyDiscount: number
-  minimumQuotePrice: number
-  travelFee: number
-}
+import { defaultPricingSettings, type PricingSettings, type QuoteResults } from "@/lib/pricing"
 
-export const defaultSettings: PricingSettings = {
-  hourlyRate: 50,
-  bedroomMinutes: 20,
-  bathroomMinutes: 25,
-  petFeeMinutes: 15,
-  childrenFeeMinutes: 10,
-  sqftMultiplier: 0.05,
-  moveInExtraHours: 2,
-  standardCleanDiscount: 20,
-  monthlyDiscount: 5,
-  biweeklyDiscount: 10,
-  weeklyDiscount: 15,
-  minimumQuotePrice: 80,
-  travelFee: 0,
-}
+// Re-export so existing imports keep working; the canonical definitions live in lib/pricing.ts
+export type { PricingSettings, QuoteResults }
+export const defaultSettings: PricingSettings = defaultPricingSettings
 
 export interface HomeDetails {
   squareFootage: string
@@ -51,16 +25,6 @@ export const defaultHomeDetails: HomeDetails = {
   bathrooms: "",
   pets: "0",
   children: "0",
-}
-
-export interface QuoteResults {
-  deepClean: number
-  moveInMoveOut: number
-  standardSingle: number
-  monthly: number
-  biweekly: number
-  weekly: number
-  totalHours: number
 }
 
 interface PricingSettingsContextValue {

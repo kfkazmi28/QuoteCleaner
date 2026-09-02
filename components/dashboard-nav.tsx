@@ -44,6 +44,7 @@ export function DashboardNav() {
   const navLinks = [
     { href: "/dashboard/calculator", label: "Calculator" },
     { href: "/dashboard/quotes", label: "Saved Quotes" },
+    { href: "/dashboard/booking-forms", label: "Booking Forms" },
     { href: "/dashboard/calendar", label: "Calendar" },
     { href: "/dashboard/contacts", label: "Contacts" },
     { href: "/dashboard/invoices", label: "Invoices" },
