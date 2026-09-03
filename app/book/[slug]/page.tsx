@@ -37,7 +37,7 @@ export default async function PublicBookingPage({ params }: Params) {
         </header>
 
         {form.is_active ? (
-          <BookingFlow slug={form.slug} businessName={form.business_name} />
+          <BookingFlow slug={form.slug} business_name={form.business_name} />
         ) : (
           <div className="rounded-xl border border-border bg-card p-8 text-center">
             <h2 className="text-lg font-semibold text-foreground">This form isn&apos;t accepting requests right now</h2>

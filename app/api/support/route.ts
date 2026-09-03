@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { EMAIL_SENDER, COMPANY_NAME, SUPPORT_EMAIL, WEBSITE_URL, EMAIL_FOOTER_HTML } from "@/lib/company-config"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -22,10 +20,13 @@ export async function POST(req: NextRequest) {
       timeZone: "UTC",
     })
 
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) return NextResponse.json({ error: "Email provider is not configured" }, { status: 503 })
+    const resend = new Resend(apiKey)
     const { data, error } = await resend.emails.send({
       from: EMAIL_SENDER,
       to: [SUPPORT_EMAIL],
-      reply_to: userEmail,
+      replyTo: userEmail,
       subject: `[Support] ${subject}`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">

@@ -93,6 +93,9 @@ interface SavedQuote {
   archived?: boolean
   status?: string | null
   preferred_package?: string | null
+  booking_form_id?: string | null
+  preferred_date?: string | null
+  preferred_time_window?: string | null
   checklist_data?: {
     standard?: { section: string; items: string[] }[]
     deep?: { section: string; items: string[] }[]
@@ -937,7 +940,7 @@ export default function SavedQuotesPage() {
   const [scheduleQuote, setScheduleQuote] = useState<SavedQuote | null>(null)
   const [scheduledQuoteIds, setScheduledQuoteIds] = useState<Set<string>>(new Set())
   const [scheduledEventsMap, setScheduledEventsMap] = useState<Map<string, ScheduledEventInfo>>(new Map())
-  const [activeTab, setActiveTab] = useState<"open" | "scheduled">("open")
+  const [activeTab, setActiveTab] = useState<"open" | "requested" | "scheduled">("open")
   const [isPending, startTransition] = useTransition()
   const [statusColumnReady, setStatusColumnReady] = useState<boolean | null>(null)
   const [checklistModalQuote, setChecklistModalQuote] = useState<SavedQuote | null>(null)
@@ -1078,7 +1081,8 @@ export default function SavedQuotesPage() {
   const scheduledQuotes = quotes.filter(q =>
     !q.archived && q.status !== "completed" && scheduledQuoteIds.has(q.id) && !isAppointmentPast(q.id)
   )
-  const filteredQuotes = activeTab === "scheduled" ? scheduledQuotes : openQuotes
+  const requestedQuotes = quotes.filter(q => !q.archived && q.status === "requested")
+  const filteredQuotes = activeTab === "scheduled" ? scheduledQuotes : activeTab === "requested" ? requestedQuotes : openQuotes
 
   const displayQuotes = useMemo(() => {
     const selectedPrice = (q: SavedQuote) => {
@@ -1218,9 +1222,20 @@ export default function SavedQuotesPage() {
             Open Quotes
             {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({openQuotes.length})</span>}
           </button>
-          <button
-            onClick={() => setActiveTab("scheduled")}
-            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+  <button
+  onClick={() => setActiveTab("requested")}
+  className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+  activeTab === "requested"
+  ? "bg-background text-foreground shadow-sm"
+  : "text-muted-foreground hover:text-foreground"
+  }`}
+  >
+  Requests
+  {!loading && <span className="ml-1.5 text-xs text-muted-foreground">({requestedQuotes.length})</span>}
+  </button>
+  <button
+  onClick={() => setActiveTab("scheduled")}
+  className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === "scheduled"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"

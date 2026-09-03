@@ -2,8 +2,6 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { Resend } from "resend"
-import { EMAIL_SENDER, COMPANY_NAME, WEBSITE_URL, wrapEmailHtml } from "@/lib/company-config"
 import {
   calculateQuote,
   buildTierCards,
@@ -16,7 +14,6 @@ import {
 } from "@/lib/pricing"
 import {
   slugify,
-  timeWindowLabel,
   type BookingForm,
   type PublicBookingForm,
   type BookingHomeDetails,
@@ -282,142 +279,8 @@ export async function submitBookingRequest(
   // 3) Bump submissions counter
   await admin.from("booking_forms").update({ submissions_count: (form.submissions_count ?? 0) + 1 }).eq("id", form.id)
 
-  // 4) Emails (best-effort; never block the client on failures)
-  try {
-    await sendBookingEmails({ form, quoteId: quote.id, client: c, chosen, sqft: parsed.sqft, home: parsed.input })
-  } catch (e) {
-    console.error("[booking] email failed", e)
-  }
-
+  // Email delivery is intentionally deferred until a provider is connected.
+  // The request is fully persisted above and can be delivered later from the
+  // communication_events pipeline without changing the client flow.
   return { ok: true, quoteId: quote.id }
-}
-
-/* ------------------------------------------------------------------ */
-/* Email helpers                                                       */
-/* ------------------------------------------------------------------ */
-
-function esc(s: string) {
-  return s.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]!)
-}
-
-function fmtDate(d: string) {
-  return new Date(d + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
-}
-
-async function sendBookingEmails(args: {
-  form: BookingForm
-  quoteId: string
-  client: BookingSubmission["client"]
-  chosen: TierCard
-  sqft: number
-  home: { cleanLevel: string; bedrooms: number; bathrooms: number; pets: number; children: number }
-}) {
-  if (!process.env.RESEND_API_KEY) return
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  const admin = createAdminClient()
-  const { form, client, chosen } = args
-
-  // Owner email + sender preferences
-  const [{ data: ownerRes }, { data: comm }] = await Promise.all([
-    admin.auth.admin.getUserById(form.user_id),
-    admin.from("communication_settings").select("email_sender_name, email_reply_to").eq("user_id", form.user_id).maybeSingle(),
-  ])
-  const ownerEmail = ownerRes?.user?.email
-  const business = form.business_name || comm?.email_sender_name || COMPANY_NAME
-  const replyTo = comm?.email_reply_to || ownerEmail || undefined
-
-  const dateLabel = fmtDate(client.preferredDate)
-  const windowLabel = timeWindowLabel(client.timeWindow)
-  const price = `$${chosen.price.toLocaleString()}`
-
-  const detailRows = [
-    ["Service", `${chosen.label} — ${price}${chosen.recurring ? " per visit" : ""}`],
-    ["Preferred date", `${dateLabel} (${windowLabel})`],
-    ["Address", client.address],
-    ["Home", `${Math.round(args.sqft).toLocaleString()} sq ft · ${args.home.bedrooms} bed · ${args.home.bathrooms} bath`],
-    ["Pets / Children", `${args.home.pets} / ${args.home.children}`],
-    ...(client.notes ? [["Notes", client.notes]] : []),
-  ]
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:6px 12px 6px 0;color:#6b7280;font-size:14px;white-space:nowrap;vertical-align:top;">${esc(k)}</td><td style="padding:6px 0;color:#111827;font-size:14px;">${esc(v)}</td></tr>`,
-    )
-    .join("")
-
-  const sends: Promise<unknown>[] = []
-
-  // Owner notification
-  if (ownerEmail) {
-    const link = `${WEBSITE_URL}/dashboard/quotes`
-    sends.push(
-      resend.emails.send({
-        from: EMAIL_SENDER,
-        to: ownerEmail,
-        replyTo: client.email,
-        subject: `New booking request from ${client.name} — ${chosen.label}`,
-        html: wrapEmailHtml(`
-          <h2 style="margin:0 0 6px;font-size:20px;color:#18181b;">New booking request</h2>
-          <p style="margin:0 0 18px;font-size:14px;color:#6b7280;">Submitted via your "${esc(form.name)}" booking form.</p>
-          <table role="presentation" cellspacing="0" cellpadding="0" style="margin-bottom:18px;">
-            <tr><td style="padding:6px 12px 6px 0;color:#6b7280;font-size:14px;">Client</td><td style="padding:6px 0;color:#111827;font-size:14px;">${esc(client.name)}<br><a href="mailto:${esc(client.email)}" style="color:#0d9488;">${esc(client.email)}</a><br>${esc(client.phone)}</td></tr>
-            ${detailRows}
-          </table>
-          <a href="${link}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:8px;font-size:14px;">Open in Saved Quotes</a>
-        `),
-      }),
-    )
-  }
-
-  // Client confirmation
-  sends.push(
-    resend.emails.send({
-      from: EMAIL_SENDER,
-      to: client.email,
-      replyTo,
-      subject: `${business}: we received your cleaning request`,
-      html: wrapEmailHtml(`
-        <h2 style="margin:0 0 6px;font-size:20px;color:#18181b;">Thanks, ${esc(client.name.split(" ")[0])}!</h2>
-        <p style="margin:0 0 18px;font-size:15px;color:#374151;line-height:1.5;">We received your request and will reach out shortly to confirm your appointment.</p>
-        <table role="presentation" cellspacing="0" cellpadding="0" style="margin-bottom:18px;">${detailRows}</table>
-        <p style="margin:0;font-size:13px;color:#6b7280;">Pricing shown is an estimate based on the details you provided and may be adjusted after a walkthrough.</p>
-        <p style="margin:18px 0 0;font-size:14px;color:#374151;">— ${esc(business)}</p>
-      `),
-    }),
-  )
-
-  const results = await Promise.allSettled(sends)
-
-  // Log to communications history
-  const events = [
-    ownerEmail && {
-      user_id: form.user_id,
-      customer_name: client.name,
-      customer_email: ownerEmail,
-      channel: "email",
-      message_type: "booking_request_owner",
-      status: results[0]?.status === "fulfilled" ? "sent" : "failed",
-      subject: `New booking request from ${client.name}`,
-      sent_at: new Date().toISOString(),
-      provider: "resend",
-      error_message: results[0]?.status === "rejected" ? String((results[0] as PromiseRejectedResult).reason) : null,
-    },
-    {
-      user_id: form.user_id,
-      customer_name: client.name,
-      customer_email: client.email,
-      customer_phone: client.phone,
-      channel: "email",
-      message_type: "booking_request_confirmation",
-      status: results[results.length - 1]?.status === "fulfilled" ? "sent" : "failed",
-      subject: `${business}: we received your cleaning request`,
-      sent_at: new Date().toISOString(),
-      provider: "resend",
-      error_message:
-        results[results.length - 1]?.status === "rejected"
-          ? String((results[results.length - 1] as PromiseRejectedResult).reason)
-          : null,
-    },
-  ].filter(Boolean)
-
-  await admin.from("communication_events").insert(events)
 }
