@@ -45,3 +45,37 @@ export type EmployeeContact = {
   created_at: string
   updated_at: string
 }
+
+// ─── Client profile history ─────────────────────────────────────────────────
+
+export type ClientPayment = {
+  id: string
+  invoice_title: string
+  amount_total: number
+  amount_due: number
+  status: "draft" | "sent" | "paid" | "canceled"
+  due_date: string | null
+  paid_at: string | null
+  payment_method: string | null
+  created_at: string
+}
+
+export type ClientAppointment = {
+  id: string
+  scheduled_date: string
+  start_time: string | null
+  end_time: string | null
+  status: string
+  service_type: string | null
+  package_name: string | null
+  package_price: number | null
+  event_type: "quote-linked" | "manual"
+}
+
+export type ClientHistory = {
+  payments: ClientPayment[]
+  appointments: ClientAppointment[]
+  totalPaid: number
+  outstanding: number
+  appointmentCount: number
+}
