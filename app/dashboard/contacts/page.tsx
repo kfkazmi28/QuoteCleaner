@@ -38,6 +38,7 @@ import {
   deleteEmployeeContact,
 } from "@/app/actions/contacts"
 import { getActiveClientIdentifiers } from "@/app/actions/calendar"
+import { ClientProfileDialog } from "@/components/contacts/client-profile-dialog"
 import {
   DEFAULT_AVAILABILITY,
   type ClientContact,
@@ -50,6 +51,7 @@ import {
   UserCheck,
   Plus,
   Pencil,
+  Eye,
   Trash2,
   Mail,
   Phone,
@@ -365,24 +367,32 @@ function EmployeeForm({
 function ClientRow({
   contact,
   isActive,
+  onView,
   onEdit,
   onDelete,
   onToggleActive,
 }: {
   contact: ClientContact
   isActive: boolean
+  onView: () => void
   onEdit: () => void
   onDelete: () => void
   onToggleActive: () => void
 }) {
   return (
     <div className="flex items-center gap-4 rounded-lg border border-border bg-card px-4 py-3 hover:bg-muted/30 transition-colors">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
+      <button
+        onClick={onView}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/20 transition-colors"
+        aria-label={`View ${contact.name}'s profile`}
+      >
         {contact.name.charAt(0).toUpperCase()}
-      </div>
+      </button>
       <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-4 gap-1 sm:gap-4">
         <div className="flex items-center gap-2">
-          <p className="font-medium text-foreground text-sm truncate">{contact.name}</p>
+          <button onClick={onView} className="font-medium text-foreground text-sm truncate hover:text-primary hover:underline text-left">
+            {contact.name}
+          </button>
           {isActive && (
             <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 shrink-0">
               <Star className="h-2.5 w-2.5 fill-current" />
@@ -422,6 +432,10 @@ function ClientRow({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuItem onClick={onView} className="gap-2">
+            <Eye className="h-3.5 w-3.5" />
+            View profile
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={onEdit} className="gap-2">
             <Pencil className="h-3.5 w-3.5" />
             Edit
@@ -446,12 +460,14 @@ function ClientRow({
 function ClientCard({
   contact,
   isActive,
+  onView,
   onEdit,
   onDelete,
   onToggleActive,
 }: {
   contact: ClientContact
   isActive: boolean
+  onView: () => void
   onEdit: () => void
   onDelete: () => void
   onToggleActive: () => void
@@ -460,11 +476,17 @@ function ClientCard({
     <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
+          <button
+            onClick={onView}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/20 transition-colors"
+            aria-label={`View ${contact.name}'s profile`}
+          >
             {contact.name.charAt(0).toUpperCase()}
-          </div>
+          </button>
           <div className="flex items-center gap-1.5">
-            <p className="font-semibold text-foreground text-sm leading-tight">{contact.name}</p>
+            <button onClick={onView} className="font-semibold text-foreground text-sm leading-tight hover:text-primary hover:underline text-left">
+              {contact.name}
+            </button>
             {isActive && (
               <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                 <Star className="h-2.5 w-2.5 fill-current" />
@@ -480,6 +502,10 @@ function ClientCard({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem onClick={onView} className="gap-2">
+              <Eye className="h-3.5 w-3.5" />
+              View profile
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={onEdit} className="gap-2">
               <Pencil className="h-3.5 w-3.5" />
               Edit
@@ -716,6 +742,7 @@ export default function ContactsPage() {
   const [clientDialog, setClientDialog] = useState<"add" | "edit" | null>(null)
   const [importOpen, setImportOpen] = useState(false)
   const [editingClient, setEditingClient] = useState<ClientContact | null>(null)
+  const [viewingClient, setViewingClient] = useState<ClientContact | null>(null)
   const [savingClient, setSavingClient] = useState(false)
   const [deleteClientId, setDeleteClientId] = useState<string | null>(null)
 
@@ -1025,6 +1052,7 @@ export default function ContactsPage() {
                   key={c.id}
                   contact={c}
                   isActive={isClientActive(c)}
+                  onView={() => setViewingClient(c)}
                   onEdit={() => {
                     setEditingClient(c)
                     setClientDialog("edit")
@@ -1041,6 +1069,7 @@ export default function ContactsPage() {
                   key={c.id}
                   contact={c}
                   isActive={isClientActive(c)}
+                  onView={() => setViewingClient(c)}
                   onEdit={() => {
                     setEditingClient(c)
                     setClientDialog("edit")
@@ -1155,6 +1184,14 @@ export default function ContactsPage() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Client profile */}
+      <ClientProfileDialog
+        contact={viewingClient}
+        isActive={viewingClient ? isClientActive(viewingClient) : false}
+        open={!!viewingClient}
+        onOpenChange={open => { if (!open) setViewingClient(null) }}
+      />
 
       {/* Delete client confirm */}
       <AlertDialog open={!!deleteClientId} onOpenChange={open => { if (!open) setDeleteClientId(null) }}>
